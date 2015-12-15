@@ -41,8 +41,9 @@
                 android:icon="@drawable/ic_dashboard"
                 android:title="Sub item 1" />
             <item
-                android:icon="@drawable/ic_forum"
-                android:title="Sub item 2" />
+                android:id="@+id/map"
+                android:icon="@android:drawable/ic_dialog_map"
+                android:title="Find pharmacy" />
         </menu>
     </item>
 

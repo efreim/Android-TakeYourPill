@@ -16,8 +16,11 @@
 
 package pl.balazinski.jakub.takeyourpill.data;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.ImageView;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -34,14 +37,16 @@ public class Pill implements Serializable {
     private int mPillsTaken;
     private int mPillsRemaining;
     private boolean isActive = true;
+    private Uri mPhoto;
     private static final Random RANDOM = new Random();
 
-    public Pill(String name, String desc, int count, int taken) {
+    public Pill(String name, String desc, int count, int taken, Uri photo) {
         this.mID++;
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
         this.mPillsTaken = taken;
+        this.mPhoto = photo;
     }
 
     public static int getRandomCheeseDrawable() {
@@ -116,4 +121,11 @@ public class Pill implements Serializable {
         this.mPillsRemaining = mPillsRemaining;
     }
 
+    public Uri getPhoto() {
+        return mPhoto;
+    }
+
+    public void setPhoto(Uri photo) {
+        this.mPhoto = photo;
+    }
 }

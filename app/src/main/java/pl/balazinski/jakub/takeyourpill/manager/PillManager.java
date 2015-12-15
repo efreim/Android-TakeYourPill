@@ -1,9 +1,10 @@
-package pl.balazinski.jakub.takeyourpill.domain;
+package pl.balazinski.jakub.takeyourpill.manager;
 
 
 import java.util.ArrayList;
 
 import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 
 /**
  * Created by Kuba on 08.12.2015.
@@ -13,6 +14,7 @@ public class PillManager {
 
 
     private ArrayList<Pill> pillList;
+    private RecyclerViewListAdapter adapter;
 
     public PillManager() {
         pillList = new ArrayList<>();
@@ -23,6 +25,14 @@ public class PillManager {
             mInstance = new PillManager();
         }
         return mInstance;
+    }
+
+    public RecyclerViewListAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(RecyclerViewListAdapter adapter) {
+        this.adapter = adapter;
     }
 
     public ArrayList<Pill> getPillList() {

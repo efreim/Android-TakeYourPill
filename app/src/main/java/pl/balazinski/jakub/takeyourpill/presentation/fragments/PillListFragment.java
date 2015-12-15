@@ -21,45 +21,48 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.Serializable;
+import com.melnykov.fab.FloatingActionButton;
 
-import pl.balazinski.jakub.takeyourpill.domain.PillManager;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 import pl.balazinski.jakub.takeyourpill.R;
 
 public class PillListFragment extends Fragment {
 
-    public RecyclerViewListAdapter listAdapter;
+    private RecyclerViewListAdapter listAdapter;
+    private RecyclerView rv;
+
+//    @Bind(R.id.fab)
+//    FloatingActionButton button;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RecyclerView rv = (RecyclerView) inflater.inflate(
-                R.layout.fragment_cheese_list, container, false);
-
-        Log.i("FRAGMENT", "onCreateView");
+        rv = (RecyclerView) inflater.inflate(
+                R.layout.fragment_pill_list, container, false);
+//        ButterKnife.bind(this, rv);
         setupRecyclerView(rv);
         return rv;
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        listAdapter = new RecyclerViewListAdapter(getActivity());
+        listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
+   //     button.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(listAdapter);
-        recyclerView.invalidateItemDecorations();
-        recyclerView.invalidate();
+        PillManager.getInstance().setAdapter(listAdapter);
         listAdapter.notifyDataSetChanged();
     }
 
-
-
-    //public void updateList(){
-    //    listAdapter.notifyDataSetChanged();
-    //}
+    public void updateList() {
+        if (PillManager.getInstance().getAdapter() != null)
+            PillManager.getInstance().getAdapter().notifyDataSetChanged();
+    }
 
 }

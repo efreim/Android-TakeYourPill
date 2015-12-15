@@ -3,6 +3,7 @@ package pl.balazinski.jakub.takeyourpill.presentation.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import pl.balazinski.jakub.takeyourpill.domain.PillManager;
+import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.R;
@@ -25,9 +26,18 @@ import pl.balazinski.jakub.takeyourpill.R;
 public class RecyclerViewListAdapter
         extends RecyclerView.Adapter<RecyclerViewListAdapter.ViewHolder> {
 
+    private static RecyclerViewListAdapter mInstance = null;
     private TypedValue mTypedValue = new TypedValue();
     private int mBackground;
     private ArrayList<Pill> pillArrayList;
+
+    public static RecyclerViewListAdapter getInstance(Context context){
+        if(mInstance == null){
+            mInstance = new RecyclerViewListAdapter(context);
+        }
+        return mInstance;
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public Pill pill;
@@ -68,19 +78,22 @@ public class RecyclerViewListAdapter
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.pill = pillArrayList.get(position);
         holder.mTextView.setText(holder.pill.getName());
-
+        Log.i("onBindViewHolder", String.valueOf(position));
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, PillDetailActivity.class);
-                intent.putExtra("pos", position);
-                context.startActivity(intent);
+                Log.i("onClick", String.valueOf(position));
+                if (position != -1) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, PillDetailActivity.class);
+                    intent.putExtra("pos", position);
+                    context.startActivity(intent);
+                }
             }
         });
 
         Glide.with(holder.mImageView.getContext())
-                .load(Pill.getRandomCheeseDrawable())
+                .load(pillArrayList.get(position).getPhoto())
                 .fitCenter()
                 .into(holder.mImageView);
     }

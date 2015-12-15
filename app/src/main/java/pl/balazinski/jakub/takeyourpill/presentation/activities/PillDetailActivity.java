@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;
 
@@ -28,13 +29,12 @@ import com.bumptech.glide.Glide;
 
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.domain.PillManager;
+import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 
 public class PillDetailActivity extends AppCompatActivity {
 
     private Pill pill;
     private int mPosition;
-
 
 
     @Override
@@ -44,6 +44,8 @@ public class PillDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         intent.getIntExtra("pos", mPosition);
+        mPosition = intent.getIntExtra("pos", -1);
+        Log.i("onBindViewHolder", String.valueOf(mPosition));
         pill = PillManager.getInstance().getPill(mPosition);
         final String cheeseName = pill.getName();
 
@@ -60,7 +62,7 @@ public class PillDetailActivity extends AppCompatActivity {
 
     private void loadBackdrop() {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        Glide.with(this).load(Pill.getRandomCheeseDrawable()).centerCrop().into(imageView);
+        Glide.with(this).load(PillManager.getInstance().getPill(mPosition).getPhoto()).centerCrop().into(imageView);
     }
 
     @Override

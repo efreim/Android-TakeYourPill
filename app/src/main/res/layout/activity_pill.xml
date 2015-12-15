@@ -112,9 +112,16 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/add_photo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
+        android:text="Add photo"/>
+
+    <Button
         android:id="@+id/add_pill"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.25"
         android:text="Save" />
 </LinearLayout>

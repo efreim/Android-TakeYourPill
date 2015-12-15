@@ -1,12 +1,11 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -19,16 +18,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.io.Serializable;
+import com.google.android.gms.maps.GoogleMap;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.domain.PillManager;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragAdapter;
-import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 import pl.balazinski.jakub.takeyourpill.R;
 
@@ -37,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private PillListFragment activeFragment;
     private PillListFragment inactiveFragment;
+    FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
+    private GoogleMap map;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -54,10 +54,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            activeFragment = new PillListFragment();
-            inactiveFragment = new PillListFragment();
-        }
+        activeFragment = new PillListFragment();
+        inactiveFragment = new PillListFragment();
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -79,30 +77,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("Main", "ON_RESUME");
-        if (activeFragment != null) {
-            if (activeFragment.listAdapter != null)
-                activeFragment.listAdapter.notifyDataSetChanged();
-        }
-        if (inactiveFragment != null) {
-            if (inactiveFragment.listAdapter != null)
-                inactiveFragment.listAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         Log.i("Main", "ON_START");
         if (activeFragment != null) {
-            if (activeFragment.listAdapter != null)
-                activeFragment.listAdapter.notifyDataSetChanged();
+            activeFragment.updateList();
         }
+
         if (inactiveFragment != null) {
-            if (inactiveFragment.listAdapter != null)
-                inactiveFragment.listAdapter.notifyDataSetChanged();
+            inactiveFragment.updateList();
         }
     }
 
@@ -111,12 +94,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), PillActivity.class);
         startActivity(intent);
         if (activeFragment != null) {
-            if (activeFragment.listAdapter != null)
-                activeFragment.listAdapter.notifyDataSetChanged();
+            activeFragment.updateList();
         }
         if (inactiveFragment != null) {
-            if (inactiveFragment.listAdapter != null)
-                inactiveFragment.listAdapter.notifyDataSetChanged();
+            inactiveFragment.updateList();
         }
     }
 
@@ -137,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
         adapter.addFragment(activeFragment, "Active");
         adapter.addFragment(inactiveFragment, "Inactive");
         viewPager.setAdapter(adapter);
@@ -149,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
+                        Log.i("mapclick","clicked");
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
                         mDrawerLayout.closeDrawers();
                         return true;
                     }
