@@ -16,6 +16,7 @@
 
 package pl.balazinski.jakub.takeyourpill.presentation.fragments;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,38 +25,43 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
+import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
-import pl.balazinski.jakub.takeyourpill.R;
 
 public class PillListFragment extends Fragment {
 
     private RecyclerViewListAdapter listAdapter;
     private RecyclerView rv;
 
-//    @Bind(R.id.fab)
-//    FloatingActionButton button;
+    //@Bind(R.id.fab)
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rv = (RecyclerView) inflater.inflate(
                 R.layout.fragment_pill_list, container, false);
-//        ButterKnife.bind(this, rv);
+        FloatingActionButton button = (FloatingActionButton) getView().findViewById(R.id.fab);
         setupRecyclerView(rv);
         return rv;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Toast.makeText(getContext(), "test", Toast.LENGTH_SHORT).show();
+        super.onConfigurationChanged(newConfig);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
-   //     button.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(listAdapter);
+        //ButterKnife.bind(rv);
+        //button.attachToRecyclerView(recyclerView);
         PillManager.getInstance().setAdapter(listAdapter);
         listAdapter.notifyDataSetChanged();
     }

@@ -24,11 +24,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 
 public class PillDetailActivity extends AppCompatActivity {
@@ -37,17 +40,19 @@ public class PillDetailActivity extends AppCompatActivity {
     private int mPosition;
 
 
+    @Bind(R.id.description)
+    TextView desriptionTextView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
+        ButterKnife.bind(this);
         Intent intent = getIntent();
         intent.getIntExtra("pos", mPosition);
         mPosition = intent.getIntExtra("pos", -1);
         Log.i("onBindViewHolder", String.valueOf(mPosition));
         pill = PillManager.getInstance().getPill(mPosition);
-        final String cheeseName = pill.getName();
+        final String pillName = pill.getName();
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -55,8 +60,8 @@ public class PillDetailActivity extends AppCompatActivity {
 
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(cheeseName);
-
+        collapsingToolbar.setTitle(pillName);
+        desriptionTextView.setText(pill.getDescription());
         loadBackdrop();
     }
 
