@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import pl.balazinski.jakub.takeyourpill.manager.PillManager;
+import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.R;
@@ -89,6 +90,20 @@ public class RecyclerViewListAdapter
                     intent.putExtra("pos", position);
                     context.startActivity(intent);
                 }
+            }
+        });
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                if(position != -1){
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, PillActivity.class);
+                    intent.putExtra("pos", position);
+                    context.startActivity(intent);
+                    return true;
+                }
+                return false;
             }
         });
 

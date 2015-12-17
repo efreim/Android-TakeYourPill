@@ -2,6 +2,7 @@ package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,14 +10,19 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
@@ -50,12 +56,19 @@ public class PillActivity extends AppCompatActivity {
     public EditText pillNameEditText;
     @Bind(R.id.pill_desc)
     public EditText pillDescEditText;
+    @Bind(R.id.add_pill)
+    public Button addPill;
+    @Bind(R.id.add_photo)
+    public Button addPhoto;
 
     private NumberPicker pillCountNumberPicker, pillTakenNumberPicker;
 
     private String mName, mDesc;
     private int mCount, mTaken;
+    private int mPosition = -1;
     private State state;
+    private Pill mPill;
+    private boolean mNewPhoto;
 
     private Uri ivImage = null;
 
@@ -64,35 +77,68 @@ public class PillActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pill);
         ButterKnife.bind(this);
+        Bundle extras = getIntent().getExtras();
+        pillCountNumberPicker = (NumberPicker) findViewById(R.id.pill_number_picker);
+        pillTakenNumberPicker = (NumberPicker) findViewById(R.id.pill_taken_picker);
 
-      /*  final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Intent intent = getIntent();
+        if(extras==null){
+            state = State.NEW;
+            setView(state);
+        }else{
+            state  = State.EDIT;
+            mPosition = extras.getInt("pos");
+            if(mPosition!=-1) {
+                mPill = PillManager.getInstance().getPill(mPosition);
+                setView(state);
+                ivImage = mPill.getPhoto();
+            }
+        }
+
+        Window window = getWindow();
+// clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+// finally change the color
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarPill);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
-
-        setView();
-
-        state = State.NEW;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
-    private void setView() {
-        pillCountNumberPicker = (NumberPicker) findViewById(R.id.pill_number_picker);
-        pillCountNumberPicker.setValue(1);
+    private void setView(State state) {
         pillCountNumberPicker.setMinValue(1);
         pillCountNumberPicker.setMaxValue(100);
         pillCountNumberPicker.setWrapSelectorWheel(true);
 
-        pillTakenNumberPicker = (NumberPicker) findViewById(R.id.pill_taken_picker);
-        pillTakenNumberPicker.setValue(1);
         pillTakenNumberPicker.setMinValue(1);
         pillTakenNumberPicker.setMaxValue(10);
         pillTakenNumberPicker.setWrapSelectorWheel(true);
+
+        if(state == State.NEW){
+            pillCountNumberPicker.setValue(1);
+            pillTakenNumberPicker.setValue(1);
+            addPill.setText("SAVE");
+            addPhoto.setText("ADD PHOTO");
+        }else if(state == State.EDIT){
+            addPill.setText("UPDATE");
+            addPhoto.setText("EDIT PHOTO");
+            pillNameEditText.setText(mPill.getName());
+            pillDescEditText.setText(mPill.getName());
+            pillCountNumberPicker.setValue(mPill.getPillsCount());
+            pillTakenNumberPicker.setValue(mPill.getPillsTaken());
+        }
     }
 
     @OnClick(R.id.add_pill)
     public void addPill(View view) {
-        mName = pillNameEditText.getText().toString();
-        mDesc = pillDescEditText.getText().toString();
+        if(pillNameEditText.getText()!=null)
+            mName = pillNameEditText.getText().toString();
+        if(pillDescEditText.getText()!=null)
+            mDesc = pillDescEditText.getText().toString();
         mCount = pillCountNumberPicker.getValue();
         mTaken = pillTakenNumberPicker.getValue();
 
@@ -103,13 +149,14 @@ public class PillActivity extends AppCompatActivity {
             pillNameEditText.setError("Set name to your pill");
         else if (TextUtils.isEmpty(strDescEditText)) {
             pillDescEditText.setError("Set description to your pill");
-        }/* else if (state == State.EDIT) {
-            pill = pillListActive.get(mID);
-            pill.setName(mName);
-            pill.setDescription(mDesc);
-            pill.setPillsCount(mCount);
-            pill.setPillsTaken(mTaken);
-            finish();}*/
+        } else if (state == State.EDIT) {
+            mPill.setName(mName);
+            mPill.setDescription(mDesc);
+            mPill.setPillsCount(mCount);
+            mPill.setPillsTaken(mTaken);
+            mPill.setPhoto(getIvImage());
+            finish();
+        }
         else if (state == State.NEW) {
             Pill pill = new Pill(mName, mDesc, mCount, mTaken, getIvImage());
             PillManager.getInstance().addPill(pill);

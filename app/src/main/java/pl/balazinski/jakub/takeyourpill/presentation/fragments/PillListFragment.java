@@ -45,7 +45,7 @@ public class PillListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rv = (RecyclerView) inflater.inflate(
                 R.layout.fragment_pill_list, container, false);
-        FloatingActionButton button = (FloatingActionButton) getView().findViewById(R.id.fab);
+//        FloatingActionButton button = (FloatingActionButton) getView().findViewById(R.id.fab);
         setupRecyclerView(rv);
         return rv;
     }

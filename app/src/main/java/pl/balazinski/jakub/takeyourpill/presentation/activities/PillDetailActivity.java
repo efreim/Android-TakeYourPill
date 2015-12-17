@@ -41,7 +41,7 @@ public class PillDetailActivity extends AppCompatActivity {
 
 
     @Bind(R.id.description)
-    TextView desriptionTextView;
+    TextView decsriptionTextView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +61,7 @@ public class PillDetailActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(pillName);
-        desriptionTextView.setText(pill.getDescription());
+        decsriptionTextView.setText(pill.getDescription());
         loadBackdrop();
     }
 
