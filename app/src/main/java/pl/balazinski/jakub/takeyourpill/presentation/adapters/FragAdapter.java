@@ -7,8 +7,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * Created by Kuba on 08.12.2015.
+ * Creates fragments and adds them into viewpager
  */
 public class FragAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragments = new ArrayList<>();

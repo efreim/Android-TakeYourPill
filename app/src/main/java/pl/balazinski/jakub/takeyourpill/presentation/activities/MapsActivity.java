@@ -1,142 +1,292 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.app.Dialog;
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
+
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.PlacesService;
 
 /**
- * Created by Kuba on 15.12.2015.
+ * Activity that creates map fragment
  */
-public class MapsActivity extends AppCompatActivity implements LocationListener {
+public class MapsActivity extends AppCompatActivity {
     //private GoogleMap map;
+    @Bind(R.id.mapToolbar)
+    public Toolbar toolbar;
 
-   /* @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.map_activity);
-        Log.i("map","mapactivity");
-       // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+    private final String TAG = getClass().getSimpleName();
+    private GoogleMap mMap;
+    private String places;
+    private LocationManager locationManager;
+    private Location loc;
 
-        //final ActionBar ab = getSupportActionBar();
-        //ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        //ab.setDisplayHomeAsUpEnabled(true);
+    private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
 
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps)).getMap();
-        map.setMyLocationEnabled(true);
-        //Marker davao = map.addMarker(new MarkerOptions().position(DAVAO).title("Davao City").snippet("Ateneo de Davao University"));
+    // private static String PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longtitude + "&radius=100&sensor=true&key=" + API_KEY;
 
-        // zoom in the camera to Davao city
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(map.getM, 15));
-
-        // animate the zoom process
-        map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-    }*/
-
-    GoogleMap googleMap;
+    private static final boolean PRINT_AS_STRING = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+        ButterKnife.bind(this);
+        initCompo();
+        places = getResources().getString(R.string.place);
+
+
+        //Setting up notification bar color
+        Window window = getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        // change the color
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
+
+        //Setting up toolbar
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        currentLocation();
+        //   String PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longtitude + "&radius=100&sensor=true&key=" + API_KEY;
+    }
+/*
+    public Location createMap() {
+        Location location = null;
         // Getting Google Play availability status
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
-
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
-
             int requestCode = 10;
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
             dialog.show();
-
         } else { // Google Play Services are available
-
+            //TODO dodac okienko do wlaczania itnernetu/gps
             if (Build.VERSION.SDK_INT >= 23 &&
                     ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
+                return null;
             }
             // Getting reference to the SupportMapFragment of activity_main.xml
             googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps)).getMap();
-
-            // FragmentManager fm = (FragmentManager) getFragmentManager().findFragmentById(R.id.maps);
-
-            // Getting GoogleMap object from the fragment
-            //  googleMap = fm.getMap();
-
             // Enabling MyLocation Layer of Google Map
             googleMap.setMyLocationEnabled(true);
-
             // Getting LocationManager object from System Service LOCATION_SERVICE
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
             // Creating a criteria object to retrieve provider
             Criteria criteria = new Criteria();
-
             // Getting the name of the best provider
             String provider = locationManager.getBestProvider(criteria, true);
-
             // Getting Current Location
-            Location location = locationManager.getLastKnownLocation(provider);
-
+            location = locationManager.getLastKnownLocation(provider);
             if (location != null) {
                 onLocationChanged(location);
             }
-            locationManager.requestLocationUpdates(provider, 20000, 0, this);
+            //LocationServices.FusedLocationApi.requestLocationUpdates(provider, 2000, 0, this);
+            //locationManager.requestLocationUpdates(provider, 20000, 0, this);
+        }
+        return location;
+    }*/
+
+
+    private class GetPlaces extends AsyncTask<Void, Void, ArrayList<pl.balazinski.jakub.takeyourpill.data.Place>> {
+
+        private ProgressDialog dialog;
+        private Context context;
+        private String places;
+
+        public GetPlaces(Context context, String places) {
+            this.context = context;
+            this.places = places;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> result) {
+            super.onPostExecute(result);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            for (int i = 0; i < result.size(); i++) {
+                mMap.addMarker(new MarkerOptions()
+                        .title(result.get(i).getName())
+                        .position(
+                                new LatLng(result.get(i).getLatitude(), result
+                                        .get(i).getLongitude()))
+                        .icon(BitmapDescriptorFactory
+                                .fromResource(R.drawable.pin))
+                        .snippet(result.get(i).getVicinity()));
+            }
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(loc.getLatitude(), loc.getLongitude())) // Sets the center of the map to
+                            // Mountain View
+                    .zoom(14) // Sets the zoom
+                    .tilt(30) // Sets the tilt of the camera to 30 degrees
+                    .build(); // Creates a CameraPosition from the builder
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(cameraPosition));
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(context);
+            dialog.setCancelable(false);
+            dialog.setMessage("Loading..");
+            dialog.isIndeterminate();
+            dialog.show();
+        }
+
+        @Override
+        protected ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> doInBackground(Void... arg0) {
+            PlacesService service = new PlacesService(API_KEY);
+            ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
+                    loc.getLongitude(), places); // 77.218276
+
+            for (int i = 0; i < findPlaces.size(); i++) {
+
+                pl.balazinski.jakub.takeyourpill.data.Place placeDetail = findPlaces.get(i);
+                Log.e(TAG, "places : " + placeDetail.getName());
+            }
+            return findPlaces;
+        }
+
+    }
+
+    private void initCompo() {
+        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
+                .getMap();
+        mMap.setMyLocationEnabled(true);
+    }
+
+
+    private void currentLocation() {
+        Location location = null;
+
+        // locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //      String provider = locationManager
+        //              .getBestProvider(new Criteria(), false);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        // Creating a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
+        // Getting the name of the best provider
+        String provider = locationManager.getBestProvider(criteria, true);
+        // Getting Current Location
+        location = locationManager.getLastKnownLocation(provider);
+        if (location == null) {
+            listener.onLocationChanged(location);
+            //locationManager.requestLocationUpdates(provider, 20000, 0, this);
+        } else {
+            loc = location;
+            new GetPlaces(MapsActivity.this, places).execute();
+            Log.e(TAG, "location : " + location);
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+      /*  Location location = locationManager.getLastKnownLocation(provider);
+
+        if (location == null) {
+            locationManager.requestLocationUpdates(provider, 1000, 1000, listener);
+            LocationServices.FusedLocationApi.requestLocationUpdates(provider, 2000, 0, listener);
+        } else {
+            loc = location;
+            new GetPlaces(MapsActivity.this, places[0].toLowerCase().replace(
+                    "-", "_")).execute();
+            Log.e(TAG, "location : " + location);
+        }*/
 
 
-        // Getting latitude of the current location
-        double latitude = location.getLatitude();
+    private android.location.LocationListener listener = new android.location.LocationListener() {
 
-        // Getting longitude of the current location
-        double longitude = location.getLongitude();
 
-        // Creating a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.e(TAG, "location update : " + location);
+            loc = location;
 
-        // Showing the current location in Google Map
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            if (location == null)
+                return;
 
-        // Zoom in the Google Map
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+            if (loc.getLatitude() == location.getLatitude() && loc.getLatitude() == location.getLongitude()) {
+                Log.e(TAG, "location not changed.");
+                return;
+            }
 
-    }
+            loc.setLatitude(location.getLatitude());
+            loc.setLongitude(location.getLongitude());
+            Log.i(TAG, "Location changed to (" + loc.getLatitude() + ", " + loc.getLatitude() + ")");
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            locationManager.removeUpdates(listener);
+            // Ask fragment to get new data and update screen
+        }
 
-    @Override
-    public void onProviderDisabled(String provider) {
-        // TODO Auto-generated method stub
-    }
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    @Override
-    public void onProviderEnabled(String provider) {
-        // TODO Auto-generated method stub
-    }
+        }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // TODO Auto-generated method stub
-    }
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
 
 }

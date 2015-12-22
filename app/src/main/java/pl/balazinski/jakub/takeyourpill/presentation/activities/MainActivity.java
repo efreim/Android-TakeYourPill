@@ -1,5 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -13,11 +15,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.util.ArrayList;
@@ -31,13 +41,15 @@ import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 import pl.balazinski.jakub.takeyourpill.R;
 
 
+/**
+ * Main class of the project
+ */
 public class MainActivity extends AppCompatActivity {
 
     private PillListFragment activeFragment;
     private PillListFragment inactiveFragment;
-    FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
-    private GoogleMap map;
 
+    //Setting up components
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.drawer_layout)
@@ -60,11 +72,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        //Setting up toolbar
         setSupportActionBar(toolbar);
-
         final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
+
 
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -76,29 +91,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i("Main", "ON_START");
-        if (activeFragment != null) {
-            activeFragment.updateList();
-        }
-
-        if (inactiveFragment != null) {
-            inactiveFragment.updateList();
-        }
-    }
 
     @OnClick(R.id.fab)
     public void onClick(View v) {
         Intent intent = new Intent(getApplicationContext(), PillActivity.class);
         startActivity(intent);
-        if (activeFragment != null) {
-            activeFragment.updateList();
-        }
-        if (inactiveFragment != null) {
-            inactiveFragment.updateList();
-        }
     }
 
     @Override
@@ -117,19 +114,27 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Sets up viewpager for fragments
+     * @param viewPager layout component
+     */
     private void setupViewPager(ViewPager viewPager) {
+        FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
         adapter.addFragment(activeFragment, "Active");
         adapter.addFragment(inactiveFragment, "Inactive");
         viewPager.setAdapter(adapter);
     }
 
+    /**
+     * Sets up drawer
+     * @param navigationView layout component
+     */
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
-                        Log.i("mapclick","clicked");
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
                         mDrawerLayout.closeDrawers();
@@ -138,4 +143,56 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+  /*  public void onPickButtonClick() {
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        try {
+            PlacePicker.IntentBuilder intentBuilder =
+                    new PlacePicker.IntentBuilder();
+            Intent intent = intentBuilder.build(this);
+            // Start the intent by requesting a result,
+            // identified by a request code.
+            startActivityForResult(intent, 1);
+        }
+        catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode, Intent data) {
+
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+
+            // The user has selected a place. Extract the name and address.
+            final Place place = PlacePicker.getPlace(data, this);
+            Log.i("Place", String.valueOf(place.getName()));
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }*/
 }

@@ -22,26 +22,46 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.io.Serializable;
 import java.util.Random;
 
 import pl.balazinski.jakub.takeyourpill.R;
 
-public class Pill implements Serializable {
+/**
+ * Class stores information about pills
+ */
+@DatabaseTable(tableName = "pill")
+public class Pill {
 
-    private static int mID = 0;
+    @DatabaseField(generatedId = true)
+    private Long mId;
+
+    @DatabaseField
     private String mName;
-    private String mDescription;
-    private int mPillsCount;
-    //pills taken at once
-    private int mPillsTaken;
-    private int mPillsRemaining;
-    private boolean isActive = true;
-    private Uri mPhoto;
-    private static final Random RANDOM = new Random();
 
-    public Pill(String name, String desc, int count, int taken, Uri photo) {
-        this.mID++;
+    @DatabaseField
+    private String mDescription;
+
+    @DatabaseField
+    private int mPillsCount;
+
+    //pills taken at once
+    @DatabaseField
+    private int mPillsTaken;
+
+    @DatabaseField
+    private String mPhoto;
+
+    private int mPillsRemaining;
+
+
+    public Pill() {
+    }
+
+    public Pill(String name, String desc, int count, int taken, String photo) {
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
@@ -49,29 +69,6 @@ public class Pill implements Serializable {
         this.mPhoto = photo;
     }
 
-    public static int getRandomCheeseDrawable() {
-        switch (RANDOM.nextInt(5)) {
-            default:
-            case 0:
-                return R.drawable.cheese_1;
-            case 1:
-                return R.drawable.cheese_2;
-            case 2:
-                return R.drawable.cheese_3;
-            case 3:
-                return R.drawable.cheese_4;
-            case 4:
-                return R.drawable.cheese_5;
-        }
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
 
     public int getPillsTaken() {
         return mPillsTaken;
@@ -81,12 +78,12 @@ public class Pill implements Serializable {
         this.mPillsTaken = mPillsTaken;
     }
 
-    public int getID() {
-        return mID;
+    public Long getId() {
+        return mId;
     }
 
-    public void setID(int mID) {
-        this.mID = mID;
+    public void setId(Long mId) {
+        this.mId = mId;
     }
 
     public String getName() {
@@ -121,11 +118,11 @@ public class Pill implements Serializable {
         this.mPillsRemaining = mPillsRemaining;
     }
 
-    public Uri getPhoto() {
+    public String getPhoto() {
         return mPhoto;
     }
 
     public void setPhoto(Uri photo) {
-        this.mPhoto = photo;
+        this.mPhoto = photo.toString();
     }
 }

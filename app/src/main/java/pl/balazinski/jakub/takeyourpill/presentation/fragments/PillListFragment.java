@@ -27,12 +27,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.melnykov.fab.FloatingActionButton;
-
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.manager.PillManager;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 
+/**
+ * Fragments which contains list inside viewpager.
+ */
 public class PillListFragment extends Fragment {
 
     private RecyclerViewListAdapter listAdapter;
@@ -58,17 +58,17 @@ public class PillListFragment extends Fragment {
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
+        //listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
+        listAdapter = new RecyclerViewListAdapter(getActivity());
         recyclerView.setAdapter(listAdapter);
-        //ButterKnife.bind(rv);
-        //button.attachToRecyclerView(recyclerView);
-        PillManager.getInstance().setAdapter(listAdapter);
+        listAdapter.notifyDataSetChanged();
+
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
         listAdapter.notifyDataSetChanged();
     }
-
-    public void updateList() {
-        if (PillManager.getInstance().getAdapter() != null)
-            PillManager.getInstance().getAdapter().notifyDataSetChanged();
-    }
-
 }

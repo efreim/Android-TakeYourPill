@@ -17,6 +17,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -31,43 +32,61 @@ import com.bumptech.glide.Glide;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.manager.PillManager;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 
+/**
+ * Activity that shows up after clicking on list item (PillListFragment item)
+ */
 public class PillDetailActivity extends AppCompatActivity {
 
     private Pill pill;
-    private int mPosition;
 
-
+    //Setting up components for view
     @Bind(R.id.description)
-    TextView decsriptionTextView;
+    TextView descriptionTextView;
+    @Bind(R.id.toolbar_detail)
+    Toolbar toolbar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
+
+        //Loading clicked item position from intent
+        int mPosition = -1;
         Intent intent = getIntent();
-        intent.getIntExtra("pos", mPosition);
-        mPosition = intent.getIntExtra("pos", -1);
-        Log.i("onBindViewHolder", String.valueOf(mPosition));
-        pill = PillManager.getInstance().getPill(mPosition);
+        mPosition = intent.getIntExtra(Constants.EXTRA_INT, -1);
+        Log.i("POZYCJA", String.valueOf(mPosition));
+        mPosition++;
+
+
+        //Getting chosen pill from database
+        pill = DatabaseHelper.getInstance(this).getDao().queryForId(mPosition);
+
         final String pillName = pill.getName();
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        //Setting up toolbar
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(pillName);
-        decsriptionTextView.setText(pill.getDescription());
+        descriptionTextView.setText(pill.getDescription());
         loadBackdrop();
     }
 
+    /**
+     * Loads image from photo into views background
+     */
     private void loadBackdrop() {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        Glide.with(this).load(PillManager.getInstance().getPill(mPosition).getPhoto()).centerCrop().into(imageView);
+        Glide.with(this).load(Uri.parse(pill.getPhoto())).centerCrop().into(imageView);
     }
 
     @Override
