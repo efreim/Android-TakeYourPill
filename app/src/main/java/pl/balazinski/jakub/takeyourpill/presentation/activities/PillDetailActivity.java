@@ -29,6 +29,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.w3c.dom.Text;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
@@ -46,6 +48,10 @@ public class PillDetailActivity extends AppCompatActivity {
     //Setting up components for view
     @Bind(R.id.description)
     TextView descriptionTextView;
+    @Bind(R.id.dosage)
+    TextView dosageTextView;
+    @Bind(R.id.alarms)
+    TextView alarmsTextView;
     @Bind(R.id.toolbar_detail)
     Toolbar toolbar;
 
@@ -78,6 +84,8 @@ public class PillDetailActivity extends AppCompatActivity {
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(pillName);
         descriptionTextView.setText(pill.getDescription());
+        dosageTextView.setText(getString(R.string.lorem_ipsum));
+        alarmsTextView.setText(getString(R.string.lorem_ipsum));
         loadBackdrop();
     }
 

@@ -16,18 +16,18 @@
 
 package pl.balazinski.jakub.takeyourpill.presentation.fragments;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 
 /**
@@ -43,18 +43,26 @@ public class PillListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rv = (RecyclerView) inflater.inflate(
-                R.layout.fragment_pill_list, container, false);
+        rv = (RecyclerView) inflater.inflate(R.layout.fragment_pill_list, container, false);
+
 //        FloatingActionButton button = (FloatingActionButton) getView().findViewById(R.id.fab);
+      /*  if(savedInstanceState!=null){
+            if(savedInstanceState.getInt(Constants.ALARM_FRAGMENT) == Constants.ALARM_FRAGMENT_VALUE){
+                //// TODO: 04.01.2016  
+                Log.i("ALARM FRAG", "im here");
+            }
+            if(savedInstanceState.getInt(Constants.PILL_FRAGMENT) == Constants.PILL_FRAGMENT_VALUE){*/
         setupRecyclerView(rv);
+        //   }
+        //  }
         return rv;
     }
-
+/*
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         Toast.makeText(getContext(), "test", Toast.LENGTH_SHORT).show();
         super.onConfigurationChanged(newConfig);
-    }
+    }*/
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
@@ -69,6 +77,11 @@ public class PillListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        listAdapter.notifyDataSetChanged();
+        refreshList();
+    }
+
+    public void refreshList() {
+        if (listAdapter != null)
+            listAdapter.notifyDataSetChanged();
     }
 }

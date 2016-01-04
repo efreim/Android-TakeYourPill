@@ -1,13 +1,10 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -15,27 +12,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.GoogleMap;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
+import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 import pl.balazinski.jakub.takeyourpill.R;
@@ -46,8 +34,8 @@ import pl.balazinski.jakub.takeyourpill.R;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private PillListFragment activeFragment;
-    private PillListFragment inactiveFragment;
+    private PillListFragment alarmFragment;
+    private PillListFragment pillFragment;
 
     //Setting up components
     @Bind(R.id.toolbar)
@@ -66,8 +54,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activeFragment = new PillListFragment();
-        inactiveFragment = new PillListFragment();
+        Bundle alarmBundle = new Bundle();
+        alarmBundle.putInt(Constants.ALARM_FRAGMENT, Constants.ALARM_FRAGMENT_VALUE);
+        alarmFragment = new PillListFragment();
+        alarmFragment.setArguments(alarmBundle);
+
+        Bundle pillBundle = new Bundle();
+        pillBundle.putInt(Constants.PILL_FRAGMENT, Constants.PILL_FRAGMENT_VALUE);
+        pillFragment = new PillListFragment();
+        pillFragment.setArguments(pillBundle);
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -91,42 +86,87 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @OnClick(R.id.fab)
     public void onClick(View v) {
-        Intent intent = new Intent(getApplicationContext(), PillActivity.class);
-        startActivity(intent);
+        if (viewPager != null) {
+            if (viewPager.getCurrentItem() == 0)
+                Toast.makeText(getApplicationContext(), "Add alarm", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent(getApplicationContext(), PillActivity.class);
+                startActivity(intent);
+            }
+        }
     }
 
+    /**
+     * Options panel right on action bar
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
         return true;
     }
 
+    /**
+     * Drawer panel left on action bar
+     *
+     * @param item Open drawer item
+     * @return If true open drawer
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.i("ITEM", String.valueOf(item.getItemId()));
+
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.delete_database:
+                Log.i("ITEM", String.valueOf(R.id.delete_database));
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                alertDialogBuilder.setTitle("Delete database");
+                alertDialogBuilder.setMessage("Deleting database will remove all of your pills and alarms!\nAre you sure?")
+                        .setCancelable(false)
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                PillRepository.deleteDatabase(MainActivity.this);
+                                alarmFragment.refreshList();
+                                pillFragment.refreshList();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
      * Sets up viewpager for fragments
+     *
      * @param viewPager layout component
      */
     private void setupViewPager(ViewPager viewPager) {
         FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
-        adapter.addFragment(activeFragment, "Active");
-        adapter.addFragment(inactiveFragment, "Inactive");
+        adapter.addFragment(alarmFragment, "Alarms");
+        adapter.addFragment(pillFragment, "Pills");
         viewPager.setAdapter(adapter);
     }
 
     /**
      * Sets up drawer
+     *
      * @param navigationView layout component
      */
     private void setupDrawerContent(NavigationView navigationView) {
@@ -134,65 +174,30 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(intent);
-                        mDrawerLayout.closeDrawers();
+                        switch (menuItem.getItemId()) {
+                            case R.id.nav_one:
+                                Toast.makeText(getApplicationContext(), "First item", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.nav_two:
+                                Toast.makeText(getApplicationContext(), "Second item", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.nav_three:
+                                Toast.makeText(getApplicationContext(), "Third item", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.nav_four:
+                                Toast.makeText(getApplicationContext(), "Fourth item", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.find_pharmacy:
+                                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                                startActivity(intent);
+                                mDrawerLayout.closeDrawers();
+                                break;
+                            default:
+                                return true;
+                        }
                         return true;
                     }
                 });
     }
 
-  /*  public void onPickButtonClick() {
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        try {
-            PlacePicker.IntentBuilder intentBuilder =
-                    new PlacePicker.IntentBuilder();
-            Intent intent = intentBuilder.build(this);
-            // Start the intent by requesting a result,
-            // identified by a request code.
-            startActivityForResult(intent, 1);
-        }
-        catch (Exception e) {
-
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode,
-                                    int resultCode, Intent data) {
-
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-
-            // The user has selected a place. Extract the name and address.
-            final Place place = PlacePicker.getPlace(data, this);
-            Log.i("Place", String.valueOf(place.getName()));
-
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }*/
 }

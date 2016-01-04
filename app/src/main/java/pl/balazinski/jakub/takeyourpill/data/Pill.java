@@ -39,7 +39,7 @@ public class Pill {
     @DatabaseField(generatedId = true)
     private Long mId;
 
-    @DatabaseField
+    @DatabaseField//(columnName = "name")
     private String mName;
 
     @DatabaseField

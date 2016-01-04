@@ -20,4 +20,8 @@
         android:id="@+id/action_settings"
         android:title="@string/menu_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/delete_database"
+        android:title="Delete database"
+        app:showAsAction="never"/>
 </menu>

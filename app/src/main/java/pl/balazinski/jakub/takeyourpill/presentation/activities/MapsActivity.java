@@ -46,14 +46,10 @@ public class MapsActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
     private GoogleMap mMap;
     private String places;
-    private LocationManager locationManager;
     private Location loc;
-
+    private LocationManager locationManager;
+    
     private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
-
-    // private static String PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longtitude + "&radius=100&sensor=true&key=" + API_KEY;
-
-    private static final boolean PRINT_AS_STRING = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,108 +77,6 @@ public class MapsActivity extends AppCompatActivity {
         currentLocation();
         //   String PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longtitude + "&radius=100&sensor=true&key=" + API_KEY;
     }
-/*
-    public Location createMap() {
-        Location location = null;
-        // Getting Google Play availability status
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are not available
-            int requestCode = 10;
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
-            dialog.show();
-        } else { // Google Play Services are available
-            //TODO dodac okienko do wlaczania itnernetu/gps
-            if (Build.VERSION.SDK_INT >= 23 &&
-                    ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return null;
-            }
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps)).getMap();
-            // Enabling MyLocation Layer of Google Map
-            googleMap.setMyLocationEnabled(true);
-            // Getting LocationManager object from System Service LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-            // Getting Current Location
-            location = locationManager.getLastKnownLocation(provider);
-            if (location != null) {
-                onLocationChanged(location);
-            }
-            //LocationServices.FusedLocationApi.requestLocationUpdates(provider, 2000, 0, this);
-            //locationManager.requestLocationUpdates(provider, 20000, 0, this);
-        }
-        return location;
-    }*/
-
-
-    private class GetPlaces extends AsyncTask<Void, Void, ArrayList<pl.balazinski.jakub.takeyourpill.data.Place>> {
-
-        private ProgressDialog dialog;
-        private Context context;
-        private String places;
-
-        public GetPlaces(Context context, String places) {
-            this.context = context;
-            this.places = places;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> result) {
-            super.onPostExecute(result);
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-            for (int i = 0; i < result.size(); i++) {
-                mMap.addMarker(new MarkerOptions()
-                        .title(result.get(i).getName())
-                        .position(
-                                new LatLng(result.get(i).getLatitude(), result
-                                        .get(i).getLongitude()))
-                        .icon(BitmapDescriptorFactory
-                                .fromResource(R.drawable.pin))
-                        .snippet(result.get(i).getVicinity()));
-            }
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(loc.getLatitude(), loc.getLongitude())) // Sets the center of the map to
-                            // Mountain View
-                    .zoom(14) // Sets the zoom
-                    .tilt(30) // Sets the tilt of the camera to 30 degrees
-                    .build(); // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory
-                    .newCameraPosition(cameraPosition));
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = new ProgressDialog(context);
-            dialog.setCancelable(false);
-            dialog.setMessage("Loading..");
-            dialog.isIndeterminate();
-            dialog.show();
-        }
-
-        @Override
-        protected ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> doInBackground(Void... arg0) {
-            PlacesService service = new PlacesService(API_KEY);
-            ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
-                    loc.getLongitude(), places); // 77.218276
-
-            for (int i = 0; i < findPlaces.size(); i++) {
-
-                pl.balazinski.jakub.takeyourpill.data.Place placeDetail = findPlaces.get(i);
-                Log.e(TAG, "places : " + placeDetail.getName());
-            }
-            return findPlaces;
-        }
-
-    }
 
     private void initCompo() {
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
@@ -190,15 +84,7 @@ public class MapsActivity extends AppCompatActivity {
         mMap.setMyLocationEnabled(true);
     }
 
-
     private void currentLocation() {
-        Location location = null;
-
-        // locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        //      String provider = locationManager
-        //              .getBestProvider(new Criteria(), false);
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -215,7 +101,7 @@ public class MapsActivity extends AppCompatActivity {
         // Getting the name of the best provider
         String provider = locationManager.getBestProvider(criteria, true);
         // Getting Current Location
-        location = locationManager.getLastKnownLocation(provider);
+        Location location = locationManager.getLastKnownLocation(provider);
         if (location == null) {
             listener.onLocationChanged(location);
             //locationManager.requestLocationUpdates(provider, 20000, 0, this);
@@ -225,18 +111,6 @@ public class MapsActivity extends AppCompatActivity {
             Log.e(TAG, "location : " + location);
         }
     }
-
-      /*  Location location = locationManager.getLastKnownLocation(provider);
-
-        if (location == null) {
-            locationManager.requestLocationUpdates(provider, 1000, 1000, listener);
-            LocationServices.FusedLocationApi.requestLocationUpdates(provider, 2000, 0, listener);
-        } else {
-            loc = location;
-            new GetPlaces(MapsActivity.this, places[0].toLowerCase().replace(
-                    "-", "_")).execute();
-            Log.e(TAG, "location : " + location);
-        }*/
 
 
     private android.location.LocationListener listener = new android.location.LocationListener() {
@@ -266,6 +140,7 @@ public class MapsActivity extends AppCompatActivity {
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
+                //   ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQ);
                 return;
             }
             locationManager.removeUpdates(listener);
@@ -287,6 +162,70 @@ public class MapsActivity extends AppCompatActivity {
 
         }
     };
+
+    private class GetPlaces extends AsyncTask<Void, Void, ArrayList<pl.balazinski.jakub.takeyourpill.data.Place>> {
+
+        private ProgressDialog dialog;
+        private Context context;
+        private String places;
+
+        public GetPlaces(Context context, String places) {
+            this.context = context;
+            this.places = places;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(context);
+            dialog.setCancelable(false);
+            dialog.setMessage("Loading..");
+            dialog.isIndeterminate();
+            dialog.show();
+        }
+
+        @Override
+        protected ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> doInBackground(Void... arg0) {
+            PlacesService service = new PlacesService(API_KEY);
+            ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
+                    loc.getLongitude(), places); // 77.218276
+
+            for (int i = 0; i < findPlaces.size(); i++) {
+
+                pl.balazinski.jakub.takeyourpill.data.Place placeDetail = findPlaces.get(i);
+                Log.e(TAG, "places : " + placeDetail.getName());
+            }
+            return findPlaces;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> result) {
+            super.onPostExecute(result);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            for (int i = 0; i < result.size(); i++) {
+                mMap.addMarker(new MarkerOptions()
+                        .title(result.get(i).getName())
+                        .position(
+                                new LatLng(result.get(i).getLatitude(), result
+                                        .get(i).getLongitude()))
+                        .icon(BitmapDescriptorFactory
+                                .fromResource(R.drawable.pin))
+                        .snippet(result.get(i).getVicinity()));
+            }
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(loc.getLatitude(), loc.getLongitude())) // Sets the center of the map to
+                            // Mountain View
+                    .zoom(14) // Sets the zoom
+                    .tilt(30) // Sets the tilt of the camera to 30 degrees
+                    .build(); // Creates a CameraPosition from the builder
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(cameraPosition));
+        }
+
+    }
 
 
 }

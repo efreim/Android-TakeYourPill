@@ -82,7 +82,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Info"
+                        android:text="@string/info"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <TextView
@@ -109,13 +109,13 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Friends"
+                        android:text="@string/dosage"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <TextView
+                        android:id="@+id/dosage"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/cheese_ipsum" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
@@ -136,13 +136,13 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Related"
+                        android:text="@string/alarms"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <TextView
+                        android:id="@+id/alarms"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/cheese_ipsum" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 

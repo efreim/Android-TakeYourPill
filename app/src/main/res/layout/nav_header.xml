@@ -24,10 +24,12 @@
     android:orientation="vertical"
     android:gravity="bottom">
 
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Username"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/card_margin"
+        android:layout_gravity="center"
+        android:contentDescription="@string/none"
+        android:src="@drawable/ic_launcher"/>
 
 </LinearLayout>

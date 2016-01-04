@@ -18,30 +18,27 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_one"
             android:icon="@drawable/ic_dashboard"
-            android:title="Home" />
+            android:title="Item 1" />
         <item
-            android:id="@+id/nav_messages"
+            android:id="@+id/nav_two"
             android:icon="@drawable/ic_event"
-            android:title="Messages" />
+            android:title="Item 2" />
         <item
-            android:id="@+id/nav_friends"
+            android:id="@+id/nav_three"
             android:icon="@drawable/ic_headset"
-            android:title="Friends" />
+            android:title="Item 3" />
         <item
-            android:id="@+id/nav_discussion"
+            android:id="@+id/nav_four"
             android:icon="@drawable/ic_forum"
-            android:title="Discussion" />
+            android:title="Item 4" />
     </group>
 
-    <item android:title="Sub items">
+    <item android:title="Other">
         <menu>
             <item
-                android:icon="@drawable/ic_dashboard"
-                android:title="Sub item 1" />
-            <item
-                android:id="@+id/map"
+                android:id="@+id/find_pharmacy"
                 android:icon="@android:drawable/ic_dialog_map"
                 android:title="Find pharmacy" />
         </menu>
