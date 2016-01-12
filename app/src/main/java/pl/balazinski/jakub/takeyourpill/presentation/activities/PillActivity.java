@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
@@ -52,11 +53,14 @@ public class PillActivity extends AppCompatActivity {
     public EditText pillNameEditText;
     @Bind(R.id.pill_desc)
     public EditText pillDescEditText;
+    @Bind(R.id.pill_count)
+    public EditText pillCountNumberPicker;
+    @Bind(R.id.pill_dose)
+    public EditText pillTakenNumberPicker;
     @Bind(R.id.add_pill)
     public Button addPill;
     @Bind(R.id.add_photo)
     public Button addPhoto;
-    private NumberPicker pillCountNumberPicker, pillTakenNumberPicker;
 
 
     private String mName, mDesc;
@@ -113,7 +117,7 @@ public class PillActivity extends AppCompatActivity {
      * @param state lets method know to set up add or edit view
      */
     private void setView(State state) {
-        pillCountNumberPicker = (NumberPicker) findViewById(R.id.pill_number_picker);
+      /*  pillCountNumberPicker = (NumberPicker) findViewById(R.id.pill_number_picker);
         pillCountNumberPicker.setMinValue(1);
         pillCountNumberPicker.setMaxValue(100);
         pillCountNumberPicker.setWrapSelectorWheel(true);
@@ -121,11 +125,11 @@ public class PillActivity extends AppCompatActivity {
         pillTakenNumberPicker = (NumberPicker) findViewById(R.id.pill_taken_picker);
         pillTakenNumberPicker.setMinValue(1);
         pillTakenNumberPicker.setMaxValue(10);
-        pillTakenNumberPicker.setWrapSelectorWheel(true);
+        pillTakenNumberPicker.setWrapSelectorWheel(true);*/
 
         if (state == State.NEW) {
-            pillCountNumberPicker.setValue(1);
-            pillTakenNumberPicker.setValue(1);
+           // pillCountNumberPicker.setValue(1);
+           // pillTakenNumberPicker.setValue(1);
             addPill.setText("SAVE");
             addPhoto.setText("ADD PHOTO");
         } else if (state == State.EDIT) {
@@ -133,20 +137,24 @@ public class PillActivity extends AppCompatActivity {
             addPhoto.setText("EDIT PHOTO");
             pillNameEditText.setText(mPill.getName());
             pillDescEditText.setText(mPill.getName());
-            pillCountNumberPicker.setValue(mPill.getPillsCount());
-            pillTakenNumberPicker.setValue(mPill.getPillsTaken());
+            pillCountNumberPicker.setText(mPill.getPillsCount());
+            pillTakenNumberPicker.setText(mPill.getPillsTaken());
         }
     }
 
     @OnClick(R.id.add_pill)
     public void addPill(View view) {
+        int mCount = 0;
+        int mTaken = 0;
         if (pillNameEditText.getText() != null)
             mName = pillNameEditText.getText().toString();
         if (pillDescEditText.getText() != null)
             mDesc = pillDescEditText.getText().toString();
+        if(pillCountNumberPicker.getText() !=null)
+            mCount =Integer.parseInt(pillCountNumberPicker.getText().toString());
+        if(pillTakenNumberPicker.getText() != null)
+            mTaken = Integer.parseInt(pillTakenNumberPicker.getText().toString());
 
-        int mCount = pillCountNumberPicker.getValue();
-        int mTaken = pillTakenNumberPicker.getValue();
 
 
         //  String strNameEditText = pillNameEditText.getText().toString();
@@ -182,6 +190,14 @@ public class PillActivity extends AppCompatActivity {
     @OnClick(R.id.add_photo)
     public void addPhoto(View view) {
         selectImage();
+    }
+
+    @OnCheckedChanged(R.id.optional_checkbox)
+    public void onChecked(boolean checked){
+        if (checked)
+            addPhoto.setVisibility(View.VISIBLE);
+        else
+            addPhoto.setVisibility(View.GONE);
     }
 
     /**

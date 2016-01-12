@@ -63,6 +63,16 @@
                 android:value=".presentation.activities.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".presentation.activities.AddPillActivity"
+            android:parentActivityName=".presentation.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".presentation.activities.MainActivity" />
+        </activity>
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyD4Z9dKyLxIHKzQMKUsVRaIrtQt0Px_AYM" />

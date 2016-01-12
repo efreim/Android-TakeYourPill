@@ -21,6 +21,7 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnPageChange;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             if (viewPager.getCurrentItem() == 0)
                 Toast.makeText(getApplicationContext(), "Add alarm", Toast.LENGTH_SHORT).show();
             else {
-                Intent intent = new Intent(getApplicationContext(), PillActivity.class);
+                Intent intent = new Intent(getApplicationContext(), AddPillActivity.class);
                 startActivity(intent);
             }
         }
@@ -199,5 +200,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 }

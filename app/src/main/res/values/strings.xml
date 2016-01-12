@@ -39,4 +39,6 @@
     <string name="dosage">Dosage</string>
     <string name="alarms">Alarms</string>
     <string name="none"/>
+    <string name="pill_details">Pill details</string>
+    <string name="pill_optional">Optional</string>
 </resources>
