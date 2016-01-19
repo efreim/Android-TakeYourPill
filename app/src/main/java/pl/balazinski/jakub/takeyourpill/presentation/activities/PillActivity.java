@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -67,6 +69,7 @@ public class PillActivity extends AppCompatActivity {
     private State state;
     private Pill mPill;
     private Uri imageUri = null;
+    public static int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +89,10 @@ public class PillActivity extends AppCompatActivity {
         } else {
             state = State.EDIT;
             int mPosition = extras.getInt(Constants.EXTRA_INT);
-            mPosition++;
-            mPill = DatabaseHelper.getInstance(this).getDao().queryForId(mPosition);
+            //mPosition++;
+            //mPill = DatabaseHelper.getInstance(this).getDao().queryForId(mPosition);
+            List<Pill> list = PillRepository.getAllPills(this);
+            mPill = list.get(mPosition);
             setView(state);
             imageUri = Uri.parse(mPill.getPhoto());
         }
@@ -108,7 +113,6 @@ public class PillActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
     /**
@@ -117,28 +121,16 @@ public class PillActivity extends AppCompatActivity {
      * @param state lets method know to set up add or edit view
      */
     private void setView(State state) {
-      /*  pillCountNumberPicker = (NumberPicker) findViewById(R.id.pill_number_picker);
-        pillCountNumberPicker.setMinValue(1);
-        pillCountNumberPicker.setMaxValue(100);
-        pillCountNumberPicker.setWrapSelectorWheel(true);
-
-        pillTakenNumberPicker = (NumberPicker) findViewById(R.id.pill_taken_picker);
-        pillTakenNumberPicker.setMinValue(1);
-        pillTakenNumberPicker.setMaxValue(10);
-        pillTakenNumberPicker.setWrapSelectorWheel(true);*/
-
         if (state == State.NEW) {
-           // pillCountNumberPicker.setValue(1);
-           // pillTakenNumberPicker.setValue(1);
             addPill.setText("SAVE");
             addPhoto.setText("ADD PHOTO");
         } else if (state == State.EDIT) {
             addPill.setText("UPDATE");
             addPhoto.setText("EDIT PHOTO");
             pillNameEditText.setText(mPill.getName());
-            pillDescEditText.setText(mPill.getName());
-            pillCountNumberPicker.setText(mPill.getPillsCount());
-            pillTakenNumberPicker.setText(mPill.getPillsTaken());
+            pillDescEditText.setText(mPill.getDescription());
+            pillCountNumberPicker.setText(String.valueOf(mPill.getPillsCount()));
+            pillTakenNumberPicker.setText(String.valueOf(mPill.getPillsTaken()));
         }
     }
 
@@ -155,10 +147,6 @@ public class PillActivity extends AppCompatActivity {
         if(pillTakenNumberPicker.getText() != null)
             mTaken = Integer.parseInt(pillTakenNumberPicker.getText().toString());
 
-
-
-        //  String strNameEditText = pillNameEditText.getText().toString();
-        //  String strDescEditText = pillDescEditText.getText().toString();
 
         if (TextUtils.isEmpty(mName))
             pillNameEditText.setError("Set name to your pill");
@@ -180,7 +168,8 @@ public class PillActivity extends AppCompatActivity {
                 path = getImageUri().toString();
             else
                 path = "";
-            Pill pill = new Pill(mName, mDesc, mCount, mTaken, path);
+            id++;
+            Pill pill = new Pill(id, mName, mDesc, mCount, mTaken, path);
             PillRepository.addPill(this, pill);
             finish();
         }

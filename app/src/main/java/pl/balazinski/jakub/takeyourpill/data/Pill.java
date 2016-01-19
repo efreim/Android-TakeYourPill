@@ -16,19 +16,10 @@
 
 package pl.balazinski.jakub.takeyourpill.data;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.widget.ImageView;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-
-import java.io.Serializable;
-import java.util.Random;
-
-import pl.balazinski.jakub.takeyourpill.R;
 
 /**
  * Class stores information about pills
@@ -36,10 +27,10 @@ import pl.balazinski.jakub.takeyourpill.R;
 @DatabaseTable(tableName = "pill")
 public class Pill {
 
-    @DatabaseField(generatedId = true)
-    private Long mId;
+    @DatabaseField(columnName = "id")
+    private int mId = 0;
 
-    @DatabaseField//(columnName = "name")
+    @DatabaseField(columnName = "name")
     private String mName;
 
     @DatabaseField
@@ -48,7 +39,6 @@ public class Pill {
     @DatabaseField
     private int mPillsCount;
 
-    //pills taken at once
     @DatabaseField
     private int mPillsTaken;
 
@@ -61,7 +51,8 @@ public class Pill {
     public Pill() {
     }
 
-    public Pill(String name, String desc, int count, int taken, String photo) {
+    public Pill(int id, String name, String desc, int count, int taken, String photo) {
+        this.mId = id;
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
@@ -78,11 +69,11 @@ public class Pill {
         this.mPillsTaken = mPillsTaken;
     }
 
-    public Long getId() {
+    public int getId() {
         return mId;
     }
 
-    public void setId(Long mId) {
+    public void setId(int mId) {
         this.mId = mId;
     }
 

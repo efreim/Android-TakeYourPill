@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.List;
+
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
@@ -30,13 +32,14 @@ public class RecyclerViewListAdapter
 
     private int mBackground;
     private Context context;
+    private List<Pill> pills;
 
-
-    public RecyclerViewListAdapter(Context context) {
+    public RecyclerViewListAdapter(Context context, List<Pill> list) {
         this.context = context;
         TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
+        pills = list;
     }
 
 

@@ -1,5 +1,6 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -95,8 +96,12 @@ public class AddPillActivity extends AppCompatActivity {
 
     @OnClick(R.id.scan_button)
     public void scanBarcode(View v) {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.initiateScan();
+        /*IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.initiateScan();*/
+
+        Intent i = new Intent(this, ScanBarcodeActivity.class);
+        startActivityForResult(i, 1);
+        Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumberEditText.getText().toString(), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -111,8 +116,7 @@ public class AddPillActivity extends AppCompatActivity {
 
     @OnClick(R.id.add_manually_button)
     public void addManually(View v) {
-        Intent intent = new Intent(getApplicationContext(), PillActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(getApplicationContext(), PillActivity.class));
     }
 
     /**
@@ -123,14 +127,24 @@ public class AddPillActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+       /* IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (scanResult != null) {
             Snackbar snackbar = Snackbar
                     .make(this.findViewById(android.R.id.content), "Barcode: " + scanResult.toString(), Snackbar.LENGTH_LONG);
             snackbar.show();
             read(scanResult.getContents());
+        }*/
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                Snackbar snackbar = Snackbar
+                        .make(this.findViewById(android.R.id.content), "Barcode: " + result, Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
         }
-
     }
 
     public void read(String code) {
@@ -140,10 +154,9 @@ public class AddPillActivity extends AppCompatActivity {
 
         for (int i = 0; i < cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            PillRepository.addPill(getApplicationContext(), new Pill(cursor.getString(2), cursor.getString(1), 0, 0, ""));
+            PillRepository.addPill(getApplicationContext(), new Pill(PillActivity.id++, cursor.getString(2), cursor.getString(1), 0, 0, ""));
         }
         //TemporaryPill temp = new TemporaryPill(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4), cursor.getString(5));
-
        // PillRepository.addPill(getApplicationContext(), new Pill(cursor.getString(2), cursor.getString(1), 0, 0, ""));
     }
 

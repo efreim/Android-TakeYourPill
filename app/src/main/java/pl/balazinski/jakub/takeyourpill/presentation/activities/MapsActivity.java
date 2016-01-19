@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.PlacesService;
+import pl.balazinski.jakub.takeyourpill.data.map.PlacesService;
+import pl.balazinski.jakub.takeyourpill.data.map.Place;
 
 /**
  * Activity that creates map fragment
@@ -161,7 +162,7 @@ public class MapsActivity extends AppCompatActivity {
         }
     };
 
-    private class GetPlaces extends AsyncTask<Void, Void, ArrayList<pl.balazinski.jakub.takeyourpill.data.Place>> {
+    private class GetPlaces extends AsyncTask<Void, Void, ArrayList<Place>> {
 
         private ProgressDialog dialog;
         private Context context;
@@ -183,21 +184,21 @@ public class MapsActivity extends AppCompatActivity {
         }
 
         @Override
-        protected ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> doInBackground(Void... arg0) {
+        protected ArrayList<Place> doInBackground(Void... arg0) {
             PlacesService service = new PlacesService(API_KEY);
-            ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
+            ArrayList<Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
                     loc.getLongitude(), places); // 77.218276
 
             for (int i = 0; i < findPlaces.size(); i++) {
 
-                pl.balazinski.jakub.takeyourpill.data.Place placeDetail = findPlaces.get(i);
+                Place placeDetail = findPlaces.get(i);
                 Log.e(TAG, "places : " + placeDetail.getName());
             }
             return findPlaces;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<pl.balazinski.jakub.takeyourpill.data.Place> result) {
+        protected void onPostExecute(ArrayList<Place> result) {
             super.onPostExecute(result);
             if (dialog.isShowing()) {
                 dialog.dismiss();

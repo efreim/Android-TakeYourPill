@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 PillRepository.deleteDatabase(MainActivity.this);
-                                alarmFragment.refreshList();
+                                //alarmFragment.refreshList();
                                 pillFragment.refreshList();
                             }
                         });

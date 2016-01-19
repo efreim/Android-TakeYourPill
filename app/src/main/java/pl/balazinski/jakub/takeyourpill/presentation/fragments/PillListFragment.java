@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
 
 /**
@@ -54,7 +55,7 @@ public class PillListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         //listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
-        listAdapter = new RecyclerViewListAdapter(getActivity());
+        listAdapter = new RecyclerViewListAdapter(getActivity(), PillRepository.getAllPills(getContext()));
         recyclerView.setAdapter(listAdapter);
         listAdapter.notifyDataSetChanged();
 

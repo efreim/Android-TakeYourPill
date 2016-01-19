@@ -1,4 +1,4 @@
-package pl.balazinski.jakub.takeyourpill.data;
+package pl.balazinski.jakub.takeyourpill.data.map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
