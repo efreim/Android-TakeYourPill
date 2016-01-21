@@ -37,6 +37,11 @@
     <string name="place">pharmacy</string>
     <string name="info">Description</string>
     <string name="dosage">Dosage</string>
+    <string name="active_substance">Active substance</string>
+    <string name="count">Medicine count</string>
+    <string name="count_left">Medicine left</string>
+    <string name="price">Price</string>
+    <string name="barcode_number">Barcode number</string>
     <string name="alarms">Alarms</string>
     <string name="none"/>
     <string name="pill_details">Pill details</string>

@@ -12,13 +12,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
+import android.widget.LinearLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,21 +50,33 @@ public class PillActivity extends AppCompatActivity {
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
+
     @Bind(R.id.pill_name)
     public EditText pillNameEditText;
     @Bind(R.id.pill_desc)
     public EditText pillDescEditText;
-    @Bind(R.id.pill_count)
-    public EditText pillCountNumberPicker;
     @Bind(R.id.pill_dose)
-    public EditText pillTakenNumberPicker;
-    @Bind(R.id.add_pill)
-    public Button addPill;
+    public EditText pillDosageEditText;
+
+    //Optional
+    @Bind(R.id.optional_layout)
+    public LinearLayout optionalLayout;
+    @Bind(R.id.pill_count)
+    public EditText pillCountEditText;
+    @Bind(R.id.active_substance_et)
+    public EditText pillActiveSubEditText;
+    @Bind(R.id.pill_price)
+    public EditText pillPriceEditText;
+    @Bind(R.id.pill_barcode)
+    public EditText pillBarcodeEditText;
     @Bind(R.id.add_photo)
     public Button addPhoto;
 
+    @Bind(R.id.add_pill)
+    public Button addPill;
 
     private String mName, mDesc;
+    private int mDosage = -1;
     private State state;
     private Pill mPill;
     private Uri imageUri = null;
@@ -89,8 +100,7 @@ public class PillActivity extends AppCompatActivity {
         } else {
             state = State.EDIT;
             int mPosition = extras.getInt(Constants.EXTRA_INT);
-            //mPosition++;
-            //mPill = DatabaseHelper.getInstance(this).getDao().queryForId(mPosition);
+
             List<Pill> list = PillRepository.getAllPills(this);
             mPill = list.get(mPosition);
             setView(state);
@@ -127,49 +137,74 @@ public class PillActivity extends AppCompatActivity {
         } else if (state == State.EDIT) {
             addPill.setText("UPDATE");
             addPhoto.setText("EDIT PHOTO");
+
             pillNameEditText.setText(mPill.getName());
             pillDescEditText.setText(mPill.getDescription());
-            pillCountNumberPicker.setText(String.valueOf(mPill.getPillsCount()));
-            pillTakenNumberPicker.setText(String.valueOf(mPill.getPillsTaken()));
+            pillDosageEditText.setText(String.valueOf(mPill.getDosage()));
+
+            if (mPill.getPillsCount() != -1)
+                pillCountEditText.setText(String.valueOf(mPill.getPillsCount()));
+            if (!mPill.getActiveSubstance().equals(""))
+                pillActiveSubEditText.setText(mPill.getActiveSubstance());
+            if (!mPill.getPrice().equals(""))
+                pillPriceEditText.setText(mPill.getPrice());
+            if (mPill.getBarcodeNumber() != -1)
+                pillBarcodeEditText.setText(String.valueOf(mPill.getBarcodeNumber()));
         }
     }
 
     @OnClick(R.id.add_pill)
     public void addPill(View view) {
-        int mCount = 0;
-        int mTaken = 0;
+        int mCount = -1;
+        String activeSubstance = "";
+        String price = "";
+        long barcode = -1;
+
+
         if (pillNameEditText.getText() != null)
             mName = pillNameEditText.getText().toString();
         if (pillDescEditText.getText() != null)
             mDesc = pillDescEditText.getText().toString();
-        if(pillCountNumberPicker.getText() !=null)
-            mCount =Integer.parseInt(pillCountNumberPicker.getText().toString());
-        if(pillTakenNumberPicker.getText() != null)
-            mTaken = Integer.parseInt(pillTakenNumberPicker.getText().toString());
+        if (!pillDosageEditText.getText().toString().equals(""))
+            mDosage = Integer.parseInt(pillDosageEditText.getText().toString());
+
+        //if(optionalLayout.getVisibility() == View.VISIBLE)
+        if (!pillCountEditText.getText().toString().equals(""))
+            mCount = Integer.parseInt(pillCountEditText.getText().toString());
+        if (pillActiveSubEditText.getText() != null)
+            activeSubstance = pillActiveSubEditText.getText().toString();
+        if (pillPriceEditText.getText() != null)
+            price = pillPriceEditText.getText().toString();
+        if (!pillBarcodeEditText.getText().toString().equals(""))
+            barcode = Long.parseLong(pillBarcodeEditText.getText().toString());
 
 
         if (TextUtils.isEmpty(mName))
             pillNameEditText.setError("Set name to your pill");
         else if (TextUtils.isEmpty(mDesc)) {
             pillDescEditText.setError("Set description to your pill");
+        } else if (mDosage==-1) {
+            pillDosageEditText.setError("Set dosage");
         } else if (state == State.EDIT) {
             mPill.setName(mName);
             mPill.setDescription(mDesc);
+            mPill.setDosage(mDosage);
             mPill.setPillsCount(mCount);
-            mPill.setPillsTaken(mTaken);
+            mPill.setActiveSubstance(activeSubstance);
+            mPill.setPrice(price);
+            mPill.setBarcodeNumber(barcode);
             mPill.setPhoto(getImageUri());
             DatabaseHelper.getInstance(this).getDao().update(mPill);
             finish();
         } else if (state == State.NEW) {
             String path;
-
             //If path equals "" pill image is empty.
             if (getImageUri() != null)
                 path = getImageUri().toString();
             else
                 path = "";
             id++;
-            Pill pill = new Pill(id, mName, mDesc, mCount, mTaken, path);
+            Pill pill = new Pill(id, mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
             PillRepository.addPill(this, pill);
             finish();
         }
@@ -182,11 +217,11 @@ public class PillActivity extends AppCompatActivity {
     }
 
     @OnCheckedChanged(R.id.optional_checkbox)
-    public void onChecked(boolean checked){
+    public void onChecked(boolean checked) {
         if (checked)
-            addPhoto.setVisibility(View.VISIBLE);
+            optionalLayout.setVisibility(View.VISIBLE);
         else
-            addPhoto.setVisibility(View.GONE);
+            optionalLayout.setVisibility(View.GONE);
     }
 
     /**

@@ -21,9 +21,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,12 +33,15 @@ import com.bumptech.glide.Glide;
 
 import org.w3c.dom.Text;
 
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
+import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 
 /**
  * Activity that shows up after clicking on list item (PillListFragment item)
@@ -50,8 +55,30 @@ public class PillDetailActivity extends AppCompatActivity {
     TextView descriptionTextView;
     @Bind(R.id.dosage)
     TextView dosageTextView;
-    @Bind(R.id.alarms)
-    TextView alarmsTextView;
+
+
+    @Bind(R.id.pill_count)
+    TextView pillCountTextView;
+    @Bind(R.id.pill_count_left)
+    TextView pillCountLeftTextView;
+    @Bind(R.id.active_substance)
+    TextView activeSubstanceTextView;
+    @Bind(R.id.price)
+    TextView priceTextView;
+    @Bind(R.id.barcode_number)
+    TextView barcodeNumberTextView;
+
+    @Bind(R.id.pill_count_cv)
+    CardView pillCountCardView;
+    @Bind(R.id.pill_count_left_cv)
+    CardView pillCountLeftCardView;
+    @Bind(R.id.active_substance_cv)
+    CardView pillActiveSubCardView;
+    @Bind(R.id.pill_price_cv)
+    CardView pillPriceCardView;
+    @Bind(R.id.barcode_number_cv)
+    CardView pillBarcodeCardView;
+
     @Bind(R.id.toolbar_detail)
     Toolbar toolbar;
 
@@ -66,11 +93,11 @@ public class PillDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mPosition = intent.getIntExtra(Constants.EXTRA_INT, -1);
         Log.i("POZYCJA", String.valueOf(mPosition));
-        mPosition++;
 
 
         //Getting chosen pill from database
-        pill = DatabaseHelper.getInstance(this).getDao().queryForId(mPosition);
+        List<Pill> list = PillRepository.getAllPills(this);
+        pill = list.get(mPosition);
 
         final String pillName = pill.getName();
 
@@ -84,8 +111,33 @@ public class PillDetailActivity extends AppCompatActivity {
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(pillName);
         descriptionTextView.setText(pill.getDescription());
-        dosageTextView.setText(getString(R.string.lorem_ipsum));
-        alarmsTextView.setText(getString(R.string.lorem_ipsum));
+        dosageTextView.setText(String.valueOf(pill.getDosage()));
+
+        if (pill.getActiveSubstance().equals(""))
+            pillActiveSubCardView.setVisibility(View.GONE);
+        else
+            activeSubstanceTextView.setText(pill.getActiveSubstance());
+
+        if (pill.getPillsCount() == -1)
+            pillCountCardView.setVisibility(View.GONE);
+        else
+            pillCountTextView.setText(String.valueOf(pill.getPillsCount()));
+
+        if(pill.getPillsRemaining() == -1)
+            pillCountLeftCardView.setVisibility(View.GONE);
+        else
+            pillCountLeftTextView.setText(String.valueOf(pill.getPillsRemaining()));
+
+        if(pill.getPrice().equals(""))
+            pillPriceCardView.setVisibility(View.GONE);
+        else
+            priceTextView.setText(pill.getPrice());
+
+        if(pill.getBarcodeNumber() == -1)
+            pillBarcodeCardView.setVisibility(View.GONE);
+        else
+            barcodeNumberTextView.setText(String.valueOf(pill.getBarcodeNumber()));
+
         loadBackdrop();
     }
 

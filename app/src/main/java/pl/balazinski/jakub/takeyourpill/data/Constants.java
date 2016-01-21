@@ -9,7 +9,7 @@ public class Constants {
     public static final int SELECT_FILE = 2;
 
     public static final String DATABASE_NAME = "takeyourpill.db";
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 8;
 
     public static final String EXTRA_INT = "position";
 

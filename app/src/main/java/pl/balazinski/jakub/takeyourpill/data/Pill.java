@@ -27,7 +27,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "pill")
 public class Pill {
 
-    @DatabaseField(columnName = "id")
+    @DatabaseField(id = true, canBeNull = false, columnName = "id")
     private int mId = 0;
 
     @DatabaseField(columnName = "name")
@@ -40,33 +40,67 @@ public class Pill {
     private int mPillsCount;
 
     @DatabaseField
-    private int mPillsTaken;
+    private int mDosage;
 
     @DatabaseField
     private String mPhoto;
 
+    @DatabaseField
+    private String mActiveSubstance;
+
+    @DatabaseField
+    private long mBarcodeNumber;
+
+    @DatabaseField
+    private String mPrice;
+
+    @DatabaseField
     private int mPillsRemaining;
 
 
     public Pill() {
     }
 
-    public Pill(int id, String name, String desc, int count, int taken, String photo) {
+    public Pill(int id, String name, String desc, int count, int dosage, String photo, String activeSubstance, String price, long barcodeNumber) {
         this.mId = id;
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
-        this.mPillsTaken = taken;
+        this.mDosage = dosage;
         this.mPhoto = photo;
+        this.mActiveSubstance = activeSubstance;
+        this.mPrice = price;
+        this.mBarcodeNumber = barcodeNumber;
+        this.mPillsRemaining = count;
+    }
+
+    public Pill(int id, String name, String desc, int count, String photo, String activeSubstance, String price, long barcodeNumber) {
+        this.mId = id;
+        this.mName = name;
+        this.mDescription = desc;
+        this.mPillsCount = count;
+        this.mPhoto = "";
+        this.mActiveSubstance = activeSubstance;
+        this.mPrice = price;
+        this.mBarcodeNumber = barcodeNumber;
+        this.mPillsRemaining = count;
+    }
+
+    public Pill(int id, String name, String desc, int dosage) {
+        this.mId = id;
+        this.mName = name;
+        this.mDescription = desc;
+        this.mPhoto = "";
     }
 
 
-    public int getPillsTaken() {
-        return mPillsTaken;
+
+    public int getDosage() {
+        return mDosage;
     }
 
-    public void setPillsTaken(int mPillsTaken) {
-        this.mPillsTaken = mPillsTaken;
+    public void setDosage(int mPillsTaken) {
+        this.mDosage = mPillsTaken;
     }
 
     public int getId() {
@@ -115,5 +149,33 @@ public class Pill {
 
     public void setPhoto(Uri photo) {
         this.mPhoto = photo.toString();
+    }
+
+    public String getPrice() {
+        return mPrice;
+    }
+
+    public void setPrice(String mPrice) {
+        this.mPrice = mPrice;
+    }
+
+    public long getBarcodeNumber() {
+        return mBarcodeNumber;
+    }
+
+    public void setBarcodeNumber(long mBarcodeNumber) {
+        this.mBarcodeNumber = mBarcodeNumber;
+    }
+
+    public String getActiveSubstance() {
+        return mActiveSubstance;
+    }
+
+    public void setActiveSubstance(String mActiveSubstance) {
+        this.mActiveSubstance = mActiveSubstance;
+    }
+
+    public void pillTaken(){
+        this.mPillsRemaining =- this.mDosage;
     }
 }

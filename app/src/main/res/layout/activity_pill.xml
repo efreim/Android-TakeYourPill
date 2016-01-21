@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:http="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:http="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarPill"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_scrollFlags="scroll|enterAlways|snap"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        app:layout_scrollFlags="scroll|enterAlways|snap" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbarPill"
-        android:layout_above="@+id/add_pill">
+        android:layout_above="@+id/add_pill"
+        android:layout_below="@+id/toolbarPill">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,15 +30,16 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.1"
-                android:text="@string/pill_details"
-                android:layout_margin="@dimen/pill_activity_item_margin"/>
+                android:text="@string/pill_details" />
+
             <EditText
                 android:id="@+id/pill_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.1"
                 android:layout_margin="@dimen/pill_activity_item_margin"
+                android:layout_weight="0.1"
                 android:hint="Pill name"
                 android:maxLength="50"
                 android:singleLine="true" />
@@ -46,47 +47,37 @@
             <EditText
                 android:id="@+id/pill_desc"
                 android:layout_width="match_parent"
-                android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_height="0dp"
+                android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.1"
                 android:hint="Pill description"
-                android:singleLine="false"
-                android:maxLength="100" />
+                android:maxLength="100"
+                android:singleLine="false" />
 
-            <EditText
-                android:id="@+id/pill_count"
-                android:layout_width="match_parent"
-                android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_height="0dp"
-                android:layout_weight="0.1"
-                android:hint="Number of pills"
-                android:singleLine="true"
-                android:maxLength="3"
-                android:inputType="numberDecimal"
-                />
 
             <EditText
                 android:id="@+id/pill_dose"
                 android:layout_width="match_parent"
-                android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_height="0dp"
+                android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.1"
                 android:hint="Dosage"
-                android:singleLine="true"
-                android:maxLength="2"
                 android:inputType="numberDecimal"
-                />
+                android:maxLength="2"
+                android:singleLine="true" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.1">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/pill_optional"
-                android:layout_margin="@dimen/pill_activity_item_margin"
-                android:id="@+id/textView" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:text="@string/pill_optional" />
+
                 <CheckBox
                     android:id="@+id/optional_checkbox"
                     android:layout_width="wrap_content"
@@ -95,14 +86,62 @@
                     android:layout_toEndOf="@+id/textView" />
             </RelativeLayout>
 
-            <Button
-                android:id="@+id/add_photo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.1"
-                android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_marginTop="@dimen/card_margin"
-                android:visibility="gone"/>
+                android:layout_weight="0.4"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/optional_layout">
+
+                <EditText
+                    android:id="@+id/pill_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="Number of pills"
+                    android:inputType="numberDecimal"
+                    android:maxLength="3"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/active_substance_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="@string/active_substance"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/pill_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="@string/price"
+                    android:maxLength="3"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/pill_barcode"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="@string/barcode_number"
+                    android:inputType="numberDecimal"
+                    android:singleLine="true" />
+
+                <Button
+                    android:id="@+id/add_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_marginTop="@dimen/card_margin"
+                    android:layout_weight="0.1" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -110,8 +149,8 @@
         android:id="@+id/add_pill"
         android:layout_width="match_parent"
         android:layout_height="75dp"
-        android:layout_gravity="bottom"
-        android:layout_margin="@dimen/pill_activity_item_margin"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/pill_activity_item_margin" />
 </RelativeLayout>

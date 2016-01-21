@@ -1,6 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,13 +40,10 @@ import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.data.TemporaryPill;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 
-/**
- * Created by Kuba on 11.01.2016.
- */
+
 public class AddPillActivity extends AppCompatActivity {
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
@@ -75,7 +74,7 @@ public class AddPillActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        displayDialog();
+        //displayDialog();
     }
 
     private void displayDialog() {
@@ -152,12 +151,53 @@ public class AddPillActivity extends AppCompatActivity {
         Cursor cursor = outerPillDatabase.getReadableDatabase()
                 .rawQuery("SELECT * FROM " + Constants.TABLE_NAME + " where kod = " + code + ";", null);
 
-        for (int i = 0; i < cursor.getCount(); i++){
-            cursor.moveToPosition(i);
-            PillRepository.addPill(getApplicationContext(), new Pill(PillActivity.id++, cursor.getString(2), cursor.getString(1), 0, 0, ""));
-        }
-        //TemporaryPill temp = new TemporaryPill(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4), cursor.getString(5));
-       // PillRepository.addPill(getApplicationContext(), new Pill(cursor.getString(2), cursor.getString(1), 0, 0, ""));
+        if(cursor!=null) {
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+            }
+            String activeSubstance = cursor.getString(1);
+            String nameAndDesc = cursor.getString(2);
+            String[] nameSplit = nameAndDesc.split(",");
+            String name = nameSplit[0];
+            StringBuilder builder = new StringBuilder();
+            for(int i=1; i<nameSplit.length;i++)
+                builder.append(nameSplit[i]);
+
+            String description = builder.toString();
+
+            String countString = cursor.getString(3);
+            String[] countSplit = countString.split(" ");
+            int count = Integer.parseInt(countSplit[0]);
+            long barcode = Long.parseLong(code);
+            String price = cursor.getString(5);
+            int dosage = 1;
+
+            PillRepository.addPill(getApplicationContext(), new Pill(PillActivity.id++, name, description, count, dosage, "", activeSubstance, price, barcode));
+
+            finish();
+        }else
+            Toast.makeText(getApplicationContext(), "Pill not found, try again or add manually.", Toast.LENGTH_SHORT);
     }
+
+  /*  private int showDosageDialog(){
+        LayoutInflater inflater = (LayoutInflater)
+                getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View npView = inflater.inflate(R.layout.number_picker_dialog_layout, null);
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Dosage")
+                .setView(npView)
+                .setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                npView.
+                            }
+                        }).create();
+                .setNegativeButton(android.R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                .create();
+    }*/
 
 }
