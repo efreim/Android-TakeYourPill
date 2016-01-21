@@ -1,0 +1,41 @@
+# --table-start--
+dataClass=pl.balazinski.jakub.takeyourpill.data.Pill
+tableName=pill
+# --table-fields-start--
+# --field-start--
+fieldName=mId
+columnName=id
+canBeNull=false
+id=true
+# --field-end--
+# --field-start--
+fieldName=mName
+columnName=name
+# --field-end--
+# --field-start--
+fieldName=mDescription
+# --field-end--
+# --field-start--
+fieldName=mPillsCount
+# --field-end--
+# --field-start--
+fieldName=mDosage
+# --field-end--
+# --field-start--
+fieldName=mPhoto
+# --field-end--
+# --field-start--
+fieldName=mActiveSubstance
+# --field-end--
+# --field-start--
+fieldName=mBarcodeNumber
+# --field-end--
+# --field-start--
+fieldName=mPrice
+# --field-end--
+# --field-start--
+fieldName=mPillsRemaining
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
