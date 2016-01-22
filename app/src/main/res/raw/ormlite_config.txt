@@ -5,8 +5,7 @@ tableName=pill
 # --field-start--
 fieldName=mId
 columnName=id
-canBeNull=false
-id=true
+generatedId=true
 # --field-end--
 # --field-start--
 fieldName=mName

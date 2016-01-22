@@ -1,38 +1,20 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -172,7 +154,7 @@ public class AddPillActivity extends AppCompatActivity {
             String price = cursor.getString(5);
             int dosage = 1;
 
-            PillRepository.addPill(getApplicationContext(), new Pill(PillActivity.id++, name, description, count, dosage, "", activeSubstance, price, barcode));
+            PillRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, "", activeSubstance, price, barcode));
 
             finish();
         }else

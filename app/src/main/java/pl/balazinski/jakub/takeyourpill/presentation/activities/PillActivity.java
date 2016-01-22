@@ -29,9 +29,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 
@@ -78,7 +78,7 @@ public class PillActivity extends AppCompatActivity {
     private String mName, mDesc;
     private int mDosage = -1;
     private State state;
-    private Pill mPill;
+    private Pill mPill = null;
     private Uri imageUri = null;
     public static int id = 0;
 
@@ -88,23 +88,30 @@ public class PillActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pill);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
-
         /*
          * If extras are empty state is new otherwise
          * state is edit and edited pill must be loaded
          * from database.
          */
+
         if (extras == null) {
             state = State.NEW;
             setView(state);
         } else {
             state = State.EDIT;
-            int mPosition = extras.getInt(Constants.EXTRA_INT);
+            Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
 
             List<Pill> list = PillRepository.getAllPills(this);
-            mPill = list.get(mPosition);
-            setView(state);
-            imageUri = Uri.parse(mPill.getPhoto());
+
+            for (Pill p : list) {
+                if (p.getId().equals(mId)) {
+                    mPill = p;
+                }
+            }
+            if (mPill != null) {
+                setView(state);
+                imageUri = Uri.parse(mPill.getPhoto());
+            }
         }
 
         /*
@@ -183,7 +190,7 @@ public class PillActivity extends AppCompatActivity {
             pillNameEditText.setError("Set name to your pill");
         else if (TextUtils.isEmpty(mDesc)) {
             pillDescEditText.setError("Set description to your pill");
-        } else if (mDosage==-1) {
+        } else if (mDosage == -1) {
             pillDosageEditText.setError("Set dosage");
         } else if (state == State.EDIT) {
             mPill.setName(mName);
@@ -203,8 +210,8 @@ public class PillActivity extends AppCompatActivity {
                 path = getImageUri().toString();
             else
                 path = "";
-            id++;
-            Pill pill = new Pill(id, mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
+
+            Pill pill = new Pill(mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
             PillRepository.addPill(this, pill);
             finish();
         }

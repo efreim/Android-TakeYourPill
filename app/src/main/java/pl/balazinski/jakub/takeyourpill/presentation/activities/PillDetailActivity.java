@@ -31,8 +31,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import butterknife.Bind;
@@ -40,7 +38,6 @@ import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
 
 /**
@@ -89,15 +86,19 @@ public class PillDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         //Loading clicked item position from intent
-        int mPosition = -1;
+        Long mPosition;
         Intent intent = getIntent();
-        mPosition = intent.getIntExtra(Constants.EXTRA_INT, -1);
+        mPosition = intent.getLongExtra(Constants.EXTRA_LONG_ID, -1);
         Log.i("POZYCJA", String.valueOf(mPosition));
 
 
         //Getting chosen pill from database
         List<Pill> list = PillRepository.getAllPills(this);
-        pill = list.get(mPosition);
+        for (Pill p : list) {
+            if (p.getId().equals(mPosition))
+                pill = p;
+        }
+        //  pill = list.get(mPosition);
 
         final String pillName = pill.getName();
 

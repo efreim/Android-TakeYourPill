@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +15,11 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
+import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.R;
 
 /**
  * Adapter for lists in fragments
@@ -73,7 +71,7 @@ public class RecyclerViewListAdapter
     }
 
     public Pill getItem(int position) {
-        return PillRepository.getAllPills(context).get(position);
+        return pills.get(position);
     }
 
 
@@ -87,7 +85,7 @@ public class RecyclerViewListAdapter
                 if (position != -1) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, PillDetailActivity.class);
-                    intent.putExtra(Constants.EXTRA_INT, position);
+                    intent.putExtra(Constants.EXTRA_LONG_ID, holder.pill.getId());
                     context.startActivity(intent);
                 }
             }
@@ -99,7 +97,7 @@ public class RecyclerViewListAdapter
                 if (position != -1) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, PillActivity.class);
-                    intent.putExtra(Constants.EXTRA_INT, position);
+                    intent.putExtra(Constants.EXTRA_LONG_ID, holder.pill.getId());
                     context.startActivity(intent);
                     return true;
                 }
@@ -116,6 +114,6 @@ public class RecyclerViewListAdapter
 
     @Override
     public int getItemCount() {
-        return PillRepository.getAllPills(context).size();
+        return pills.size();
     }
 }

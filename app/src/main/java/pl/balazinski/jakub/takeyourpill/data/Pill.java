@@ -27,8 +27,8 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "pill")
 public class Pill {
 
-    @DatabaseField(id = true, canBeNull = false, columnName = "id")
-    private int mId = 0;
+    @DatabaseField(generatedId = true, columnName = "id")
+    private Long mId;
 
     @DatabaseField(columnName = "name")
     private String mName;
@@ -61,8 +61,7 @@ public class Pill {
     public Pill() {
     }
 
-    public Pill(int id, String name, String desc, int count, int dosage, String photo, String activeSubstance, String price, long barcodeNumber) {
-        this.mId = id;
+    public Pill(String name, String desc, int count, int dosage, String photo, String activeSubstance, String price, long barcodeNumber) {
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
@@ -74,8 +73,7 @@ public class Pill {
         this.mPillsRemaining = count;
     }
 
-    public Pill(int id, String name, String desc, int count, String photo, String activeSubstance, String price, long barcodeNumber) {
-        this.mId = id;
+    public Pill(String name, String desc, int count, String photo, String activeSubstance, String price, long barcodeNumber) {
         this.mName = name;
         this.mDescription = desc;
         this.mPillsCount = count;
@@ -86,8 +84,7 @@ public class Pill {
         this.mPillsRemaining = count;
     }
 
-    public Pill(int id, String name, String desc, int dosage) {
-        this.mId = id;
+    public Pill(String name, String desc, int dosage) {
         this.mName = name;
         this.mDescription = desc;
         this.mPhoto = "";
@@ -103,11 +100,11 @@ public class Pill {
         this.mDosage = mPillsTaken;
     }
 
-    public int getId() {
+    public Long getId() {
         return mId;
     }
 
-    public void setId(int mId) {
+    public void setId(Long mId) {
         this.mId = mId;
     }
 
