@@ -9,7 +9,7 @@ public class Constants {
     public static final int SELECT_FILE = 2;
 
     public static final String DATABASE_NAME = "takeyourpill.db";
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 14;
 
     public static final String EXTRA_LONG_ID = "id";
 
@@ -20,4 +20,10 @@ public class Constants {
     public static final Integer PILL_FRAGMENT_VALUE = 1;
 
     public static final String TABLE_NAME = "drugtable";
+
+    public static final String MAIN_PACKAGE_NAME = "pl.balazinski.jakub.takeyourpill";
+    public static final String MAIN_ACTIVITY_NAME = "pl.balazinski.jakub.takeyourpill.presentation.activities.MainActivity";
+
+    public static final String MAIN_FROM_ALARM_KEY = "RETURNING_KEY";
+    public static final String MAIN_FROM_ALARM = "RETURNING";
 }

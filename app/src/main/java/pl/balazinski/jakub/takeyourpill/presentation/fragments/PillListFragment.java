@@ -21,22 +21,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
-import pl.balazinski.jakub.takeyourpill.presentation.adapters.RecyclerViewListAdapter;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.PillListAdapter;
 
 /**
  * Fragments which contains list inside viewpager.
  */
 public class PillListFragment extends Fragment {
 
-    private RecyclerViewListAdapter listAdapter;
+    private PillListAdapter pillListAdapter;
     private RecyclerView rv;
 
     //@Bind(R.id.fab)
@@ -44,7 +42,7 @@ public class PillListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rv = (RecyclerView) inflater.inflate(R.layout.fragment_pill_list, container, false);
+        rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
 
         setupRecyclerView(rv);
 
@@ -54,10 +52,10 @@ public class PillListFragment extends Fragment {
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        //listAdapter = RecyclerViewListAdapter.getInstance(getActivity());
-        listAdapter = new RecyclerViewListAdapter(getActivity(), PillRepository.getAllPills(getContext()));
-        recyclerView.setAdapter(listAdapter);
-        listAdapter.notifyDataSetChanged();
+        //pillListAdapter = PillListAdapter.getInstance(getActivity());
+        pillListAdapter = new PillListAdapter(getActivity());
+        recyclerView.setAdapter(pillListAdapter);
+        pillListAdapter.notifyDataSetChanged();
 
     }
 
@@ -69,7 +67,7 @@ public class PillListFragment extends Fragment {
     }
 
     public void refreshList() {
-        if (listAdapter != null)
-            listAdapter.notifyDataSetChanged();
+        if (pillListAdapter != null)
+            pillListAdapter.notifyDataSetChanged();
     }
 }

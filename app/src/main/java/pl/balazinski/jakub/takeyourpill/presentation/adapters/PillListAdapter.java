@@ -18,6 +18,7 @@ import java.util.List;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
 
@@ -25,19 +26,19 @@ import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivi
  * Adapter for lists in fragments
  * Nothing to explain :D
  */
-public class RecyclerViewListAdapter
-        extends RecyclerView.Adapter<RecyclerViewListAdapter.ViewHolder> {
+public class PillListAdapter
+        extends RecyclerView.Adapter<PillListAdapter.ViewHolder> {
 
     private int mBackground;
     private Context context;
-    private List<Pill> pills;
+    //private List<Pill> pills;
 
-    public RecyclerViewListAdapter(Context context, List<Pill> list) {
+    public PillListAdapter(Context context) {
         this.context = context;
         TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
-        pills = list;
+        //pills = DatabaseRepository.getAllPills(context);
     }
 
 
@@ -65,13 +66,13 @@ public class RecyclerViewListAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.pill_list_item, parent, false);
         view.setBackgroundResource(mBackground);
         return new ViewHolder(view);
     }
 
     public Pill getItem(int position) {
-        return pills.get(position);
+        return DatabaseRepository.getAllPills(context).get(position);
     }
 
 
@@ -114,6 +115,6 @@ public class RecyclerViewListAdapter
 
     @Override
     public int getItemCount() {
-        return pills.size();
+        return DatabaseRepository.getAllPills(context).size();
     }
 }

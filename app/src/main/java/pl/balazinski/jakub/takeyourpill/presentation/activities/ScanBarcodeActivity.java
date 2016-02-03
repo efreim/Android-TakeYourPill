@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -125,6 +126,7 @@ public class ScanBarcodeActivity extends Activity {
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
                     scanText.setText("barcode result " + sym.getData());
+                    Log.i("BARCODE", sym.getData());
                     barcodeScanned = true;
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("result", sym.getData());

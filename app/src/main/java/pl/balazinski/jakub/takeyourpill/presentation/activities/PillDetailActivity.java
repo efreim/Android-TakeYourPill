@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 
 /**
  * Activity that shows up after clicking on list item (PillListFragment item)
@@ -93,7 +93,7 @@ public class PillDetailActivity extends AppCompatActivity {
 
 
         //Getting chosen pill from database
-        List<Pill> list = PillRepository.getAllPills(this);
+        List<Pill> list = DatabaseRepository.getAllPills(this);
         for (Pill p : list) {
             if (p.getId().equals(mPosition))
                 pill = p;

@@ -21,11 +21,13 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnPageChange;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
-import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragAdapter;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragmentViewPagerAdapter;
+import pl.balazinski.jakub.takeyourpill.presentation.fragments.AlarmListFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 import pl.balazinski.jakub.takeyourpill.R;
 
@@ -35,7 +37,7 @@ import pl.balazinski.jakub.takeyourpill.R;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private PillListFragment alarmFragment;
+    private AlarmListFragment alarmFragment;
     private PillListFragment pillFragment;
 
     //Setting up components
@@ -55,9 +57,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            //String s = savedInstanceState.getString(Constants.MAIN_FROM_ALARM_KEY);
+            Long id = intent.getLongExtra("id", 0);
+            Log.i("MAIN ID", String.valueOf(id));
+            if (id != 0) {
+                showDialog(id);
+                Log.i("MAIN ID", String.valueOf(id));
+            }
+        }
+
         Bundle alarmBundle = new Bundle();
         alarmBundle.putInt(Constants.ALARM_FRAGMENT, Constants.ALARM_FRAGMENT_VALUE);
-        alarmFragment = new PillListFragment();
+        alarmFragment = new AlarmListFragment();
         alarmFragment.setArguments(alarmBundle);
 
         Bundle pillBundle = new Bundle();
@@ -90,9 +103,10 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.fab)
     public void onClick(View v) {
         if (viewPager != null) {
-            if (viewPager.getCurrentItem() == 0)
-                Toast.makeText(getApplicationContext(), "Add alarm", Toast.LENGTH_SHORT).show();
-            else {
+            if (viewPager.getCurrentItem() == 0) {
+                Intent intent = new Intent(getApplicationContext(), AlarmActivity.class);
+                startActivity(intent);
+            } else {
                 Intent intent = new Intent(getApplicationContext(), AddPillActivity.class);
                 startActivity(intent);
             }
@@ -138,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                PillRepository.deleteDatabase(MainActivity.this);
-                                //alarmFragment.refreshList();
+                                DatabaseRepository.deleteWholeDatabase(MainActivity.this);
+                                alarmFragment.refreshList();
                                 pillFragment.refreshList();
                             }
                         });
@@ -159,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
      * @param viewPager layout component
      */
     private void setupViewPager(ViewPager viewPager) {
-        FragAdapter adapter = new FragAdapter(getSupportFragmentManager());
+        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(alarmFragment, "Alarms");
         adapter.addFragment(pillFragment, "Pills");
         viewPager.setAdapter(adapter);
@@ -201,5 +215,44 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private void showDialog(final Long pillId) {
+        final AlarmReceiver alarmReceiver = new AlarmReceiver();
+        final Pill p = DatabaseRepository.getPillbyID(getApplicationContext(), pillId);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Take your pill!");
+        alertDialogBuilder.setMessage("Did you take your pill?");
+        // set positive button: Yes message
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                AlarmReceiver.stopRingtone();
+                if (p != null) {
+                    int pillRemaining = p.getPillsRemaining();
+                    int pillDosage = p.getDosage();
+                    if (pillRemaining != -1 && pillDosage != -1) {
+                        p.setPillsRemaining(pillRemaining - pillDosage);
+                        DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(p);
+                    }
+                    alarmReceiver.cancelAlarm(getApplicationContext(), p.getId());
+                } else
+                    Toast.makeText(getApplicationContext(), "Error: pill is null", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // set negative button: No message
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                AlarmReceiver.stopRingtone();
+                // cancel the alert box and put a Toast to the user
+                if (p != null)
+                    alarmReceiver.cancelAlarm(getApplicationContext(), p.getId());
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "You chose a negative answer", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show alert
+        alertDialog.show();
+    }
 
 }

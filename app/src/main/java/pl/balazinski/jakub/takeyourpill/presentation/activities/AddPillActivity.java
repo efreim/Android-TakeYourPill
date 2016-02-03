@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,7 +24,7 @@ import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 
 
 public class AddPillActivity extends AppCompatActivity {
@@ -82,7 +83,10 @@ public class AddPillActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, ScanBarcodeActivity.class);
         startActivityForResult(i, 1);
-        Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumberEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+        String barcodeNumber = barcodeNumberEditText.getText().toString();
+        if (barcodeNumber != null) {
+            Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumber, Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -116,11 +120,12 @@ public class AddPillActivity extends AppCompatActivity {
             read(scanResult.getContents());
         }*/
         if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                Snackbar snackbar = Snackbar
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                read(result);
+                /*Snackbar snackbar = Snackbar
                         .make(this.findViewById(android.R.id.content), "Barcode: " + result, Snackbar.LENGTH_LONG);
-                snackbar.show();
+                snackbar.show();*/
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -132,8 +137,8 @@ public class AddPillActivity extends AppCompatActivity {
         OuterPillDatabase outerPillDatabase = new OuterPillDatabase(getApplicationContext());
         Cursor cursor = outerPillDatabase.getReadableDatabase()
                 .rawQuery("SELECT * FROM " + Constants.TABLE_NAME + " where kod = " + code + ";", null);
-
-        if(cursor!=null) {
+        Log.i("READ", code);
+        if (cursor.getCount() != 0) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
             }
@@ -142,7 +147,7 @@ public class AddPillActivity extends AppCompatActivity {
             String[] nameSplit = nameAndDesc.split(",");
             String name = nameSplit[0];
             StringBuilder builder = new StringBuilder();
-            for(int i=1; i<nameSplit.length;i++)
+            for (int i = 1; i < nameSplit.length; i++)
                 builder.append(nameSplit[i]);
 
             String description = builder.toString();
@@ -154,11 +159,11 @@ public class AddPillActivity extends AppCompatActivity {
             String price = cursor.getString(5);
             int dosage = 1;
 
-            PillRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, "", activeSubstance, price, barcode));
+            DatabaseRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, "", activeSubstance, price, barcode));
 
             finish();
-        }else
-            Toast.makeText(getApplicationContext(), "Pill not found, try again or add manually.", Toast.LENGTH_SHORT);
+        } else
+            Toast.makeText(getApplicationContext(), "Pill not found, try again or add manually.", Toast.LENGTH_SHORT).show();
     }
 
   /*  private int showDosageDialog(){

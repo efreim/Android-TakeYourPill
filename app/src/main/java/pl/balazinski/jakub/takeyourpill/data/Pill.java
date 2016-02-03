@@ -17,6 +17,7 @@
 package pl.balazinski.jakub.takeyourpill.data;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -172,7 +173,4 @@ public class Pill {
         this.mActiveSubstance = mActiveSubstance;
     }
 
-    public void pillTaken(){
-        this.mPillsRemaining =- this.mDosage;
-    }
 }

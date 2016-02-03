@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Creates fragments and adds them into viewpager
  */
-public class FragAdapter extends FragmentPagerAdapter {
+public class FragmentViewPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragments = new ArrayList<>();
     private final List<String> mFragmentTitles = new ArrayList<>();
 
-    public FragAdapter(FragmentManager fm) {
+    public FragmentViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

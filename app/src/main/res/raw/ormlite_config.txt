@@ -1,4 +1,28 @@
 # --table-start--
+dataClass=pl.balazinski.jakub.takeyourpill.data.Alarm
+tableName=alarm
+# --table-fields-start--
+# --field-start--
+fieldName=mId
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=hour
+# --field-end--
+# --field-start--
+fieldName=minute
+# --field-end--
+# --field-start--
+fieldName=isActive
+# --field-end--
+# --field-start--
+fieldName=pillId
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
 dataClass=pl.balazinski.jakub.takeyourpill.data.Pill
 tableName=pill
 # --table-fields-start--

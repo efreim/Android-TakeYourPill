@@ -33,7 +33,7 @@ import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
-import pl.balazinski.jakub.takeyourpill.data.database.PillRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 
 /**
  * Activity lets you add or edit pills
@@ -101,7 +101,7 @@ public class PillActivity extends AppCompatActivity {
             state = State.EDIT;
             Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
 
-            List<Pill> list = PillRepository.getAllPills(this);
+            List<Pill> list = DatabaseRepository.getAllPills(this);
 
             for (Pill p : list) {
                 if (p.getId().equals(mId)) {
@@ -201,7 +201,7 @@ public class PillActivity extends AppCompatActivity {
             mPill.setPrice(price);
             mPill.setBarcodeNumber(barcode);
             mPill.setPhoto(getImageUri());
-            DatabaseHelper.getInstance(this).getDao().update(mPill);
+            DatabaseHelper.getInstance(this).getPillDao().update(mPill);
             finish();
         } else if (state == State.NEW) {
             String path;
@@ -212,7 +212,7 @@ public class PillActivity extends AppCompatActivity {
                 path = "";
 
             Pill pill = new Pill(mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
-            PillRepository.addPill(this, pill);
+            DatabaseRepository.addPill(this, pill);
             finish();
         }
 
