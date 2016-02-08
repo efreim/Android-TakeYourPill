@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter;
 
 /**
@@ -21,7 +20,6 @@ public class AlarmListFragment extends Fragment{
     private AlarmListAdapter alarmListAdapter;
     private RecyclerView rv;
 
-    //@Bind(R.id.fab)
 
     @Nullable
     @Override

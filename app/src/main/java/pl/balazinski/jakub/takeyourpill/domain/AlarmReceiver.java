@@ -1,9 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.domain;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
@@ -42,8 +40,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         i.setClassName(Constants.MAIN_PACKAGE_NAME, Constants.MAIN_ACTIVITY_NAME);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //i.putExtra(Constants.MAIN_FROM_ALARM_KEY, Constants.MAIN_FROM_ALARM);
-        i.putExtra("id", bundle.getLong("id"));
-        Log.i("RECIEVER ID", String.valueOf(bundle.getLong("id")));
+        i.putExtra("pillID", bundle.getLong("pillID"));
+        i.putExtra("alarmID", bundle.getLong("alarmID"));
         context.startActivity(i);
 
         //this will send a notification message
@@ -53,13 +51,24 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         setResultCode(Activity.RESULT_OK);*/
     }
 
-    public void setAlarm(Context context, Calendar calendar, Long id)
+    public void setAlarm(Context context, Calendar calendar, Long pillID, Long alarmID)
     {
+        Calendar now = Calendar.getInstance();
+        long alarmTimeInMillis = 0;
+
+        if (calendar.getTimeInMillis() <= now.getTimeInMillis())
+            alarmTimeInMillis = calendar.getTimeInMillis() + (AlarmManager.INTERVAL_DAY + 1);
+        else
+            alarmTimeInMillis = calendar.getTimeInMillis();
+
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra("id", id);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(id), intent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        intent.putExtra("pillID", pillID);
+        intent.putExtra("alarmID", alarmID);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+        Log.i("setAlarm", "alarmID == " + String.valueOf(alarmID));
+        Log.i("setAlarm", "pillID == " + String.valueOf(pillID));
     }
 
     public void cancelAlarm(Context context, Long id)
@@ -68,6 +77,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         PendingIntent sender = PendingIntent.getBroadcast(context, longToInt(id), intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
+        Log.i("cancelAlarm", "id == " + String.valueOf(id));
+
     }
 
     public static void stopRingtone() {

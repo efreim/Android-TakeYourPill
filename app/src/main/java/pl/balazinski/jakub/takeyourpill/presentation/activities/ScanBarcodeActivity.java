@@ -3,6 +3,7 @@ package pl.balazinski.jakub.takeyourpill.presentation.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.sourceforge.zbar.Config;
 import net.sourceforge.zbar.Image;
@@ -46,8 +48,12 @@ public class ScanBarcodeActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         autoFocusHandler = new Handler();
-        mCamera = getCameraInstance();
-
+        int i = getCameraInformation();
+        mCamera = getCameraInstance(i);
+        if (mCamera == null) {
+            Toast.makeText(getApplicationContext(), "No rear camera available.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         /* Instance barcode scanner */
         scanner = new ImageScanner();
         scanner.setConfig(0, Config.X_DENSITY, 3);
@@ -83,13 +89,25 @@ public class ScanBarcodeActivity extends Activity {
     /**
      * A safe way to get an instance of the Camera object.
      */
-    public static Camera getCameraInstance() {
+    public static Camera getCameraInstance(int i) {
         Camera c = null;
         try {
-            c = Camera.open();
+            //int no = Camera.getNumberOfCameras();
+            if (i == 0)
+                c = Camera.open(1);
         } catch (Exception e) {
         }
         return c;
+    }
+
+    private int getCameraInformation() {
+        PackageManager packageManager = getApplicationContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            return 0;
+        else if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT))
+            return 1;
+        else
+            return -1;
     }
 
     private void releaseCamera() {

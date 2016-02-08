@@ -1,9 +1,5 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -14,15 +10,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -136,14 +128,11 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
 
-
-        //List<Long> idList = new ArrayList<>();
-        //idList.add(pill.getId());
         Alarm alarm = new Alarm(hour, minute, pill.getId(), true);
         DatabaseRepository.addAlarm(this, alarm);
 
         AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.setAlarm(getApplicationContext(), calendar, pill.getId());
+        alarmReceiver.setAlarm(getApplicationContext(), calendar, alarm.getPillId(), alarm.getId());
 
         finish();
     }

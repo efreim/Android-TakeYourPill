@@ -1,33 +1,25 @@
 package pl.balazinski.jakub.takeyourpill.presentation.adapters;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
+import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Alarm;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
-import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
-import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -49,7 +41,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener {
         public Alarm alarm;
         public final View mView;
         public final TextView mTextView;
@@ -65,6 +57,45 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         @Override
         public String toString() {
             return super.toString() + " '" + mTextView.getText();
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            AlarmReceiver alarmReceiver = new AlarmReceiver();
+            int hour = alarm.getHour();
+            int minute = alarm.getMinute();
+            final Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            switch (item.getItemId()) {
+                case R.id.set_activity:
+                    if (alarm.isActive()) {
+                        item.setTitle("Deactivate alarm");
+                        alarm.setIsActive(false);
+                        DatabaseHelper.getInstance(mView.getContext()).getAlarmDao().update(alarm);
+                        alarmItem.setBackgroundColor(Color.GRAY);
+                        alarmReceiver.cancelAlarm(mView.getContext(), alarm.getId());
+                    } else {
+                        item.setTitle("Activate alarm");
+                        alarm.setIsActive(true);
+                        DatabaseHelper.getInstance(mView.getContext()).getAlarmDao().update(alarm);
+                        alarmItem.setBackgroundColor(Color.WHITE);
+                        alarmReceiver.setAlarm(mView.getContext(), calendar, alarm.getPillId(), alarm.getId());
+                    }
+                    break;
+                case R.id.edit_alarm:
+                    Toast.makeText(mView.getContext(), "to be done", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.delete_alarm:
+                    alarmReceiver.cancelAlarm(mView.getContext(), alarm.getId());
+                    DatabaseHelper.getInstance(mView.getContext()).getAlarmDao().delete(alarm);
+                    mView.postInvalidate();
+                    Toast.makeText(mView.getContext(), "Alarm deleted!", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+            return true;
         }
     }
 
@@ -96,16 +127,28 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.valueOf(hour));
         stringBuilder.append(s);
-        if(minute<10)
+        if (minute < 10)
             stringBuilder.append(String.valueOf(0));
         stringBuilder.append(String.valueOf(minute));
 
         holder.mTextView.setText(stringBuilder);
 
-        if(holder.alarm.isActive())
+        if (holder.alarm.isActive())
             holder.alarmItem.setBackgroundColor(Color.WHITE);
         else
             holder.alarmItem.setBackgroundColor(Color.GRAY);
+
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.inflate(R.menu.alarm_context_menu);
+                popupMenu.setOnMenuItemClickListener(holder);
+                popupMenu.show();
+                return true;
+            }
+        });
 
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -114,13 +157,14 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                 if (position != -1) {
                     if (holder.alarm.isActive()) {
                         holder.alarm.setIsActive(false);
+                        DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                         holder.alarmItem.setBackgroundColor(Color.GRAY);
                         alarmReceiver.cancelAlarm(context, holder.alarm.getId());
-                    }
-                    else {
+                    } else {
                         holder.alarm.setIsActive(true);
+                        DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                         holder.alarmItem.setBackgroundColor(Color.WHITE);
-                        alarmReceiver.setAlarm(context, calendar, holder.alarm.getId());
+                        alarmReceiver.setAlarm(context, calendar, holder.alarm.getPillId(), holder.alarm.getId());
                     }
                 }
             }

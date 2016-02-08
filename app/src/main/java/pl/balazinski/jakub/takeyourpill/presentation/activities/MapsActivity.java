@@ -5,8 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
-
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,13 +31,13 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.map.PlacesService;
 import pl.balazinski.jakub.takeyourpill.data.map.Place;
+import pl.balazinski.jakub.takeyourpill.data.map.PlacesService;
 
 /**
  * Activity that creates map fragment
  */
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements LocationListener {
     //private GoogleMap map;
     @Bind(R.id.mapToolbar)
     public Toolbar toolbar;
@@ -47,7 +47,7 @@ public class MapsActivity extends AppCompatActivity {
     private String places;
     private Location loc;
     private LocationManager locationManager;
-    
+
     private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
 
     @Override
@@ -55,6 +55,7 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
+
         initCompo();
         places = getResources().getString(R.string.place);
 
@@ -81,6 +82,7 @@ public class MapsActivity extends AppCompatActivity {
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
                 .getMap();
         mMap.setMyLocationEnabled(true);
+
     }
 
     private void currentLocation() {
@@ -94,7 +96,7 @@ public class MapsActivity extends AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         // Creating a criteria object to retrieve provider
         Criteria criteria = new Criteria();
         // Getting the name of the best provider
@@ -102,65 +104,59 @@ public class MapsActivity extends AppCompatActivity {
         // Getting Current Location
         Location location = locationManager.getLastKnownLocation(provider);
         if (location == null) {
-            listener.onLocationChanged(location);
-            //locationManager.requestLocationUpdates(provider, 20000, 0, this);
+            onLocationChanged(location);
+            locationManager.requestLocationUpdates(provider, 20000, 0, this);
         } else {
             loc = location;
             new GetPlaces(MapsActivity.this, places).execute();
-            Log.e(TAG, "location : " + location);
         }
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.e(TAG, "location update : " + location);
+        loc = location;
 
-    private android.location.LocationListener listener = new android.location.LocationListener() {
+        if (location == null)
+            return;
 
-
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.e(TAG, "location update : " + location);
-            loc = location;
-
-            if (location == null)
-                return;
-
-            if (loc.getLatitude() == location.getLatitude() && loc.getLatitude() == location.getLongitude()) {
-                Log.e(TAG, "location not changed.");
-                return;
-            }
-
-            loc.setLatitude(location.getLatitude());
-            loc.setLongitude(location.getLongitude());
-            Log.i(TAG, "Location changed to (" + loc.getLatitude() + ", " + loc.getLatitude() + ")");
-            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                //   ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQ);
-                return;
-            }
-            locationManager.removeUpdates(listener);
-            // Ask fragment to get new data and update screen
+        if (loc.getLatitude() == location.getLatitude() && loc.getLatitude() == location.getLongitude()) {
+            Log.e(TAG, "location not changed.");
+            return;
         }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        loc.setLatitude(location.getLatitude());
+        loc.setLongitude(location.getLongitude());
+        Log.i(TAG, "Location changed to (" + loc.getLatitude() + ", " + loc.getLatitude() + ")");
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //   ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQ);
+            return;
         }
+        locationManager.removeUpdates(this);
+        // Ask fragment to get new data and update screen
+    }
 
-        @Override
-        public void onProviderEnabled(String provider) {
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        }
+    }
 
-        @Override
-        public void onProviderDisabled(String provider) {
+    @Override
+    public void onProviderEnabled(String provider) {
 
-        }
-    };
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 
     private class GetPlaces extends AsyncTask<Void, Void, ArrayList<Place>> {
 

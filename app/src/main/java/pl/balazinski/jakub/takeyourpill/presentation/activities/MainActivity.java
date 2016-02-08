@@ -3,6 +3,7 @@ package pl.balazinski.jakub.takeyourpill.presentation.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -10,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
@@ -29,7 +30,6 @@ import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragmentViewPagerAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.AlarmListFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
-import pl.balazinski.jakub.takeyourpill.R;
 
 
 /**
@@ -60,11 +60,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             //String s = savedInstanceState.getString(Constants.MAIN_FROM_ALARM_KEY);
-            Long id = intent.getLongExtra("id", 0);
-            Log.i("MAIN ID", String.valueOf(id));
-            if (id != 0) {
-                showDialog(id);
-                Log.i("MAIN ID", String.valueOf(id));
+            Long pillID = intent.getLongExtra("pillID", 0);
+            Long alarmID = intent.getLongExtra("alarmID", 0);
+            Log.i("MAIN", "pillID == " + String.valueOf(pillID));
+            Log.i("MAIN", "alarmID == " + String.valueOf(alarmID));
+            if (pillID != 0 && alarmID != 0) {
+                displayDialog(pillID, alarmID);
             }
         }
 
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                //// TODO: 2016-02-09 deactivate all alarms before deleting database!!
                                 DatabaseRepository.deleteWholeDatabase(MainActivity.this);
                                 alarmFragment.refreshList();
                                 pillFragment.refreshList();
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void showDialog(final Long pillId) {
+    private void displayDialog(final Long pillId, final Long alarmID) {
         final AlarmReceiver alarmReceiver = new AlarmReceiver();
         final Pill p = DatabaseRepository.getPillbyID(getApplicationContext(), pillId);
 
@@ -233,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                         p.setPillsRemaining(pillRemaining - pillDosage);
                         DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(p);
                     }
-                    alarmReceiver.cancelAlarm(getApplicationContext(), p.getId());
+                    alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
                 } else
                     Toast.makeText(getApplicationContext(), "Error: pill is null", Toast.LENGTH_SHORT).show();
             }
@@ -244,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                 AlarmReceiver.stopRingtone();
                 // cancel the alert box and put a Toast to the user
                 if (p != null)
-                    alarmReceiver.cancelAlarm(getApplicationContext(), p.getId());
+                    alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
                 dialog.cancel();
                 Toast.makeText(getApplicationContext(), "You chose a negative answer", Toast.LENGTH_LONG).show();
             }

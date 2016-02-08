@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,8 +22,8 @@ import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 
 
 public class AddPillActivity extends AppCompatActivity {
@@ -84,9 +83,9 @@ public class AddPillActivity extends AppCompatActivity {
         Intent i = new Intent(this, ScanBarcodeActivity.class);
         startActivityForResult(i, 1);
         String barcodeNumber = barcodeNumberEditText.getText().toString();
-        if (barcodeNumber != null) {
+       /* if (barcodeNumber != null) {
             Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumber, Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
     }
 

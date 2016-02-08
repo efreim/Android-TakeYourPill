@@ -1,15 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.data;
 
-import com.j256.ormlite.dao.ForeignCollection;
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-
-import java.sql.Time;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -42,8 +34,8 @@ public class Alarm {
     public Alarm() {
     }
 
-    public Alarm(int hour, int minute, Long pill, boolean isActive) {
-        this.pillId = pill;
+    public Alarm(int hour, int minute, Long pillId, boolean isActive) {
+        this.pillId = pillId;
         this.isActive = isActive;
         this.hour = hour;
         this.minute = minute;
@@ -89,5 +81,13 @@ public class Alarm {
 
     public void setMinute(int minute) {
         this.minute = minute;
+    }
+
+    public Long getPillId() {
+        return pillId;
+    }
+
+    public void setPillId(Long pillId) {
+        this.pillId = pillId;
     }
 }
