@@ -33,6 +33,7 @@ import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.map.Place;
 import pl.balazinski.jakub.takeyourpill.data.map.PlacesService;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**
  * Activity that creates map fragment
@@ -47,6 +48,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private String places;
     private Location loc;
     private LocationManager locationManager;
+    private OutputProvider outputProvider;
 
     private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
 
@@ -55,6 +57,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
+
 
         initCompo();
         places = getResources().getString(R.string.place);
@@ -79,6 +82,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void initCompo() {
+        outputProvider = new OutputProvider(this);
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
                 .getMap();
         mMap.setMyLocationEnabled(true);
@@ -114,20 +118,21 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.e(TAG, "location update : " + location);
+        outputProvider.displayLog(TAG, "location update : " + location);
+
         loc = location;
 
         if (location == null)
             return;
 
         if (loc.getLatitude() == location.getLatitude() && loc.getLatitude() == location.getLongitude()) {
-            Log.e(TAG, "location not changed.");
+            outputProvider.displayLog(TAG, "location not changed.");
             return;
         }
 
         loc.setLatitude(location.getLatitude());
         loc.setLongitude(location.getLongitude());
-        Log.i(TAG, "Location changed to (" + loc.getLatitude() + ", " + loc.getLatitude() + ")");
+        outputProvider.displayLog(TAG, "Location changed to (" + loc.getLatitude() + ", " + loc.getLatitude() + ")");
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -182,13 +187,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         @Override
         protected ArrayList<Place> doInBackground(Void... arg0) {
             PlacesService service = new PlacesService(API_KEY);
-            ArrayList<Place> findPlaces = service.findPlaces(loc.getLatitude(), // 28.632808
-                    loc.getLongitude(), places); // 77.218276
+            ArrayList<Place> findPlaces = service.findPlaces(loc.getLatitude(),
+                    loc.getLongitude(), places);
 
             for (int i = 0; i < findPlaces.size(); i++) {
 
                 Place placeDetail = findPlaces.get(i);
-                Log.e(TAG, "places : " + placeDetail.getName());
+                outputProvider.displayLog(TAG, "places : " + placeDetail.getName());
             }
             return findPlaces;
         }

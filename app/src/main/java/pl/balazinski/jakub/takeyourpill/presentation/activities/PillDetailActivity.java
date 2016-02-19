@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -39,14 +40,16 @@ import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**
  * Activity that shows up after clicking on list item (PillListFragment item)
  */
 public class PillDetailActivity extends AppCompatActivity {
 
+    private final String TAG = getClass().getSimpleName();
     private Pill pill;
-
+    private OutputProvider outputProvider;
     //Setting up components for view
     @Bind(R.id.description)
     TextView descriptionTextView;
@@ -82,23 +85,27 @@ public class PillDetailActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
-
+        outputProvider = new OutputProvider(this);
         //Loading clicked item position from intent
         Long mPosition;
         Intent intent = getIntent();
         mPosition = intent.getLongExtra(Constants.EXTRA_LONG_ID, -1);
-        Log.i("POZYCJA", String.valueOf(mPosition));
+        outputProvider.displayLog(TAG, "Position = " + String.valueOf(mPosition));
 
 
         //Getting chosen pill from database
         List<Pill> list = DatabaseRepository.getAllPills(this);
-        for (Pill p : list) {
-            if (p.getId().equals(mPosition))
-                pill = p;
-        }
-        //  pill = list.get(mPosition);
+
+        if (list != null) {
+            for (Pill p : list) {
+                if (p.getId().equals(mPosition))
+                    pill = p;
+            }
+        } else
+            outputProvider.displayShortToast("Error loading pills");
 
         final String pillName = pill.getName();
 
@@ -124,17 +131,17 @@ public class PillDetailActivity extends AppCompatActivity {
         else
             pillCountTextView.setText(String.valueOf(pill.getPillsCount()));
 
-        if(pill.getPillsRemaining() == -1)
+        if (pill.getPillsRemaining() == -1)
             pillCountLeftCardView.setVisibility(View.GONE);
         else
             pillCountLeftTextView.setText(String.valueOf(pill.getPillsRemaining()));
 
-        if(pill.getPrice().equals(""))
+        if (pill.getPrice().equals(""))
             pillPriceCardView.setVisibility(View.GONE);
         else
             priceTextView.setText(pill.getPrice());
 
-        if(pill.getBarcodeNumber() == -1)
+        if (pill.getBarcodeNumber() == -1)
             pillBarcodeCardView.setVisibility(View.GONE);
         else
             barcodeNumberTextView.setText(String.valueOf(pill.getBarcodeNumber()));

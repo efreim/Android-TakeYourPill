@@ -22,11 +22,15 @@ import net.sourceforge.zbar.SymbolSet;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.camera.CameraPreview;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 public class ScanBarcodeActivity extends Activity {
+    private final String TAG = getClass().getSimpleName();
+
     private Camera mCamera;
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
+    private OutputProvider outputProvider;
 
     TextView scanText;
     Button scanButton;
@@ -42,6 +46,7 @@ public class ScanBarcodeActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        outputProvider = new OutputProvider(this);
 
         setContentView(R.layout.activity_scan_barcode);
 
@@ -51,7 +56,7 @@ public class ScanBarcodeActivity extends Activity {
         int i = getCameraInformation();
         mCamera = getCameraInstance(i);
         if (mCamera == null) {
-            Toast.makeText(getApplicationContext(), "No rear camera available.", Toast.LENGTH_SHORT).show();
+            outputProvider.displayShortToast("No rear camera available.");
             finish();
         }
         /* Instance barcode scanner */
@@ -92,9 +97,9 @@ public class ScanBarcodeActivity extends Activity {
     public static Camera getCameraInstance(int i) {
         Camera c = null;
         try {
-            //int no = Camera.getNumberOfCameras();
+            //0 is rear camera, else camera is null and barcode cannot be scaned
             if (i == 0)
-                c = Camera.open(1);
+                c = Camera.open(0);
         } catch (Exception e) {
         }
         return c;
@@ -144,7 +149,7 @@ public class ScanBarcodeActivity extends Activity {
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
                     scanText.setText("barcode result " + sym.getData());
-                    Log.i("BARCODE", sym.getData());
+                    outputProvider.displayLog(TAG, "barcode = " + sym.getData());
                     barcodeScanned = true;
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("result", sym.getData());

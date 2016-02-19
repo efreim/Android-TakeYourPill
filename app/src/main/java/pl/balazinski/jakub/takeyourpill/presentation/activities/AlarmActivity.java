@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,8 +26,11 @@ import pl.balazinski.jakub.takeyourpill.data.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 public class AlarmActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    private final String TAG = getClass().getSimpleName();
 
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
@@ -38,16 +42,16 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
     @Bind(R.id.spinner)
     Spinner spinner;
 
-    private Pill pill;
+    private Pill pill = null;
     private List<Pill> pills;
-
+    private OutputProvider outputProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
         ButterKnife.bind(this);
-
+        outputProvider = new OutputProvider(this);
          /*
          * Setting up notification bar color:
          * 1. Clear FLAG_TRANSLUCENT_STATUS flag
@@ -67,13 +71,10 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
 
         timePicker.setIs24HourView(true);
         Calendar c = Calendar.getInstance();
-        if (Build.VERSION.SDK_INT >= 23 )
-        {
+        if (Build.VERSION.SDK_INT >= 23) {
             timePicker.setHour(c.get(Calendar.HOUR_OF_DAY));
             timePicker.setMinute(c.get(Calendar.MINUTE));
-        }
-        else
-        {
+        } else {
             timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
             timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
         }
@@ -82,20 +83,32 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         spinner.setOnItemSelectedListener(this);
 
         List<String> names = new ArrayList<>();
+
         pills = DatabaseRepository.getAllPills(this);
-        for (Pill p : pills)
-            names.add(p.getName());
 
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
+        if(pills!=null) {
 
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            for (Pill p : pills)
+                names.add(p.getName());
 
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
+            if(names.size()<1) {
+                spinner.setEnabled(false);
+                names.add("No pills detected");
+            }else {
+                names.add(0,"No pill chosen");
+                spinner.setEnabled(true);
+            }
 
-        spinner.setPrompt("Select Pill");
+                // Creating adapter for spinner
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
+            // Drop down layout style - list view with radio button
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // attaching data adapter to spinner
+            spinner.setAdapter(dataAdapter);
+            spinner.setPrompt("Select Pill");
+        }else
+            outputProvider.displayShortToast("Error loading pills");
     }
 
     @Override
@@ -127,12 +140,16 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
+        Long pillId = null;
 
-        Alarm alarm = new Alarm(hour, minute, pill.getId(), true);
+        if(pill!=null)
+            pillId = pill.getId();
+
+        Alarm alarm = new Alarm(hour, minute, pillId, true);
         DatabaseRepository.addAlarm(this, alarm);
 
         AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.setAlarm(getApplicationContext(), calendar, alarm.getPillId(), alarm.getId());
+        alarmReceiver.setAlarm(getApplicationContext(), calendar, pillId, alarm.getId());
 
         finish();
     }

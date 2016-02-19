@@ -12,20 +12,16 @@ public class Alarm {
     @DatabaseField(generatedId = true, columnName = "id")
     private Long mId;
 
-    //private Date date;
-  //  @DatabaseField
-  //  private Calendar time;
-
-    @DatabaseField
+    @DatabaseField(columnName = "hour")
     private int hour;
 
-    @DatabaseField
+    @DatabaseField(columnName = "minute")
     private int minute;
 
-    @DatabaseField
+    @DatabaseField(columnName = "active")
     private boolean isActive;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private Long pillId;
 
     /*@ForeignCollectionField(eager = false)

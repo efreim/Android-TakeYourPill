@@ -19,6 +19,7 @@ package pl.balazinski.jakub.takeyourpill.presentation.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,14 +36,12 @@ import pl.balazinski.jakub.takeyourpill.presentation.adapters.PillListAdapter;
 public class PillListFragment extends Fragment {
 
     private PillListAdapter pillListAdapter;
-    private RecyclerView rv;
 
-    //@Bind(R.id.fab)
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
+        RecyclerView rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
 
         setupRecyclerView(rv);
 
@@ -52,7 +51,10 @@ public class PillListFragment extends Fragment {
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        //pillListAdapter = PillListAdapter.getInstance(getActivity());
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setAddDuration(1000);
+        itemAnimator.setRemoveDuration(1000);
+        recyclerView.setItemAnimator(itemAnimator);
         pillListAdapter = new PillListAdapter(getActivity());
         recyclerView.setAdapter(pillListAdapter);
         pillListAdapter.notifyDataSetChanged();

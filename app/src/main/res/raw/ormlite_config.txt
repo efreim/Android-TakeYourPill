@@ -9,12 +9,15 @@ generatedId=true
 # --field-end--
 # --field-start--
 fieldName=hour
+columnName=hour
 # --field-end--
 # --field-start--
 fieldName=minute
+columnName=minute
 # --field-end--
 # --field-start--
 fieldName=isActive
+columnName=active
 # --field-end--
 # --field-start--
 fieldName=pillId

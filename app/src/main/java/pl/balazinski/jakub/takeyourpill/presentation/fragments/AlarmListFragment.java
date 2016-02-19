@@ -11,11 +11,10 @@ import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter.ListRefreshListener;
 
-/**
- * Created by Kuba on 2016-01-31.
- */
-public class AlarmListFragment extends Fragment{
+
+public class AlarmListFragment extends Fragment implements ListRefreshListener{
 
     private AlarmListAdapter alarmListAdapter;
     private RecyclerView rv;
@@ -36,9 +35,9 @@ public class AlarmListFragment extends Fragment{
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         //listAdapter = PillListAdapter.getInstance(getActivity());
         alarmListAdapter = new AlarmListAdapter(getActivity());
+        alarmListAdapter.setListRefreshListener(this);
         recyclerView.setAdapter(alarmListAdapter);
-        alarmListAdapter.notifyDataSetChanged();
-
+        refreshList();
     }
 
 
@@ -49,7 +48,13 @@ public class AlarmListFragment extends Fragment{
     }
 
     public void refreshList() {
-        if (alarmListAdapter != null)
+        if (alarmListAdapter != null) {
             alarmListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onListRefresh(){
+        refreshList();
     }
 }

@@ -24,21 +24,27 @@ import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 
-public class AddPillActivity extends AppCompatActivity {
+public class ChooseAddPillActivity extends AppCompatActivity {
+
+    private final String TAG = getClass().getSimpleName();
+
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
     @Bind(R.id.barcode_number_et)
     EditText barcodeNumberEditText;
 
+    private OutputProvider outputProvider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         ButterKnife.bind(this);
-
+        outputProvider = new OutputProvider(this);
         /*
          * Setting up notification bar color:
          * 1. Clear FLAG_TRANSLUCENT_STATUS flag
@@ -56,37 +62,13 @@ public class AddPillActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //displayDialog();
-    }
-
-    private void displayDialog() {
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Information").setMessage("Scan barcode with your app to add pill from database,you can also skip" +
-                "scanning by typing barcode on your own.\n You can also add your custom pill.");
-        alertDialogBuilder.setPositiveButton("I got it!", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface arg0, int arg1) {
-                arg0.dismiss();
-            }
-        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 
 
     @OnClick(R.id.scan_button)
     public void scanBarcode(View v) {
-        /*IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.initiateScan();*/
-
         Intent i = new Intent(this, ScanBarcodeActivity.class);
         startActivityForResult(i, 1);
-        String barcodeNumber = barcodeNumberEditText.getText().toString();
-       /* if (barcodeNumber != null) {
-            Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumber, Toast.LENGTH_SHORT).show();
-        }*/
-
     }
 
     @OnClick(R.id.search_by_barcode_button)
@@ -95,7 +77,7 @@ public class AddPillActivity extends AppCompatActivity {
             String number = barcodeNumberEditText.getText().toString();
             read(number);
         }
-        Toast.makeText(getApplicationContext(), "barcode number: " + barcodeNumberEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+        outputProvider.displayShortToast("barcode number: " + barcodeNumberEditText.getText().toString());
     }
 
     @OnClick(R.id.add_manually_button)
@@ -111,23 +93,14 @@ public class AddPillActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-       /* IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (scanResult != null) {
-            Snackbar snackbar = Snackbar
-                    .make(this.findViewById(android.R.id.content), "Barcode: " + scanResult.toString(), Snackbar.LENGTH_LONG);
-            snackbar.show();
-            read(scanResult.getContents());
-        }*/
+
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
                 read(result);
-                /*Snackbar snackbar = Snackbar
-                        .make(this.findViewById(android.R.id.content), "Barcode: " + result, Snackbar.LENGTH_LONG);
-                snackbar.show();*/
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
+                //TODO
             }
         }
     }
@@ -136,7 +109,7 @@ public class AddPillActivity extends AppCompatActivity {
         OuterPillDatabase outerPillDatabase = new OuterPillDatabase(getApplicationContext());
         Cursor cursor = outerPillDatabase.getReadableDatabase()
                 .rawQuery("SELECT * FROM " + Constants.TABLE_NAME + " where kod = " + code + ";", null);
-        Log.i("READ", code);
+        outputProvider.displayLog(TAG, "read = " + code);
         if (cursor.getCount() != 0) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
@@ -162,28 +135,8 @@ public class AddPillActivity extends AppCompatActivity {
 
             finish();
         } else
-            Toast.makeText(getApplicationContext(), "Pill not found, try again or add manually.", Toast.LENGTH_SHORT).show();
+            outputProvider.displayShortToast("Pill not found, try again or add manually.");
     }
 
-  /*  private int showDosageDialog(){
-        LayoutInflater inflater = (LayoutInflater)
-                getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View npView = inflater.inflate(R.layout.number_picker_dialog_layout, null);
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle("Dosage")
-                .setView(npView)
-                .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                npView.
-                            }
-                        }).create();
-                .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                .create();
-    }*/
 
 }

@@ -75,7 +75,7 @@
         </activity>
 
         <activity
-            android:name=".presentation.activities.AddPillActivity"
+            android:name=".presentation.activities.ChooseAddPillActivity"
             android:parentActivityName=".presentation.activities.MainActivity"
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden">

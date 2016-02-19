@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -34,12 +35,14 @@ import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**
  * Activity lets you add or edit pills
  */
 public class PillActivity extends AppCompatActivity {
 
+    private final String TAG = getClass().getSimpleName();
 
     //States for setting up components for adding or edition
 
@@ -75,6 +78,7 @@ public class PillActivity extends AppCompatActivity {
     @Bind(R.id.add_pill)
     public Button addPill;
 
+    private OutputProvider outputProvider;
     private String mName, mDesc;
     private int mDosage = -1;
     private State state;
@@ -88,6 +92,7 @@ public class PillActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pill);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
+        outputProvider = new OutputProvider(this);
         /*
          * If extras are empty state is new otherwise
          * state is edit and edited pill must be loaded
@@ -101,13 +106,17 @@ public class PillActivity extends AppCompatActivity {
             state = State.EDIT;
             Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
 
-            List<Pill> list = DatabaseRepository.getAllPills(this);
 
-            for (Pill p : list) {
-                if (p.getId().equals(mId)) {
-                    mPill = p;
+            List<Pill> list = DatabaseRepository.getAllPills(this);
+            if (list != null) {
+
+                for (Pill p : list) {
+                    if (p.getId().equals(mId)) {
+                        mPill = p;
+                    }
                 }
-            }
+            }else
+                outputProvider.displayShortToast("Error loading pills");
             if (mPill != null) {
                 setView(state);
                 imageUri = Uri.parse(mPill.getPhoto());

@@ -22,11 +22,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragmentViewPagerAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.AlarmListFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
@@ -37,8 +39,11 @@ import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private final String TAG = getClass().getSimpleName();
+
     private AlarmListFragment alarmFragment;
     private PillListFragment pillFragment;
+    private OutputProvider outputProvider;
 
     //Setting up components
     @Bind(R.id.toolbar)
@@ -56,28 +61,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        outputProvider = new OutputProvider(this);
         Intent intent = getIntent();
         if (intent != null) {
-            //String s = savedInstanceState.getString(Constants.MAIN_FROM_ALARM_KEY);
-            Long pillID = intent.getLongExtra("pillID", 0);
-            Long alarmID = intent.getLongExtra("alarmID", 0);
-            Log.i("MAIN", "pillID == " + String.valueOf(pillID));
-            Log.i("MAIN", "alarmID == " + String.valueOf(alarmID));
-            if (pillID != 0 && alarmID != 0) {
+            Long pillID = intent.getLongExtra("pillID", -1);
+            Long alarmID = intent.getLongExtra("alarmID", -1);
+            outputProvider.displayLog(TAG,"pillID == " + String.valueOf(pillID));
+            outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+            if (((pillID != -1) && (alarmID != -1)) || ((pillID == -1) && (alarmID != -1))) {
                 displayDialog(pillID, alarmID);
             }
         }
 
-        Bundle alarmBundle = new Bundle();
-        alarmBundle.putInt(Constants.ALARM_FRAGMENT, Constants.ALARM_FRAGMENT_VALUE);
-        alarmFragment = new AlarmListFragment();
-        alarmFragment.setArguments(alarmBundle);
-
-        Bundle pillBundle = new Bundle();
-        pillBundle.putInt(Constants.PILL_FRAGMENT, Constants.PILL_FRAGMENT_VALUE);
-        pillFragment = new PillListFragment();
-        pillFragment.setArguments(pillBundle);
+        createFragments();
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -100,6 +96,18 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    private void createFragments(){
+        Bundle alarmBundle = new Bundle();
+        alarmBundle.putInt(Constants.ALARM_FRAGMENT, Constants.ALARM_FRAGMENT_VALUE);
+        alarmFragment = new AlarmListFragment();
+        alarmFragment.setArguments(alarmBundle);
+
+        Bundle pillBundle = new Bundle();
+        pillBundle.putInt(Constants.PILL_FRAGMENT, Constants.PILL_FRAGMENT_VALUE);
+        pillFragment = new PillListFragment();
+        pillFragment.setArguments(pillBundle);
+    }
+
 
     @OnClick(R.id.fab)
     public void onClick(View v) {
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), AlarmActivity.class);
                 startActivity(intent);
             } else {
-                Intent intent = new Intent(getApplicationContext(), AddPillActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ChooseAddPillActivity.class);
                 startActivity(intent);
             }
         }
@@ -131,14 +139,13 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i("ITEM", String.valueOf(item.getItemId()));
-
+        outputProvider.displayLog(TAG, "(options) item id = " + String.valueOf(item.getItemId()));
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.delete_database:
-                Log.i("ITEM", String.valueOf(R.id.delete_database));
+                outputProvider.displayLog(TAG, "(delete db) item id = " + String.valueOf(R.id.delete_database));
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
                 alertDialogBuilder.setTitle("Delete database");
@@ -219,25 +226,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayDialog(final Long pillId, final Long alarmID) {
         final AlarmReceiver alarmReceiver = new AlarmReceiver();
-        final Pill p = DatabaseRepository.getPillbyID(getApplicationContext(), pillId);
-
+        Pill pill = null;
+        if(pillId!=null) {
+            pill = DatabaseRepository.getPillByID(this, pillId);
+            outputProvider.displayLog(TAG, "pillId is not null : " + pillId);
+        }
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setTitle("Take your pill!");
         alertDialogBuilder.setMessage("Did you take your pill?");
         // set positive button: Yes message
+        final Pill finalPill = pill;
+
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 AlarmReceiver.stopRingtone();
-                if (p != null) {
-                    int pillRemaining = p.getPillsRemaining();
-                    int pillDosage = p.getDosage();
+                alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
+                if (finalPill != null) {
+                    int pillRemaining = finalPill.getPillsRemaining();
+                    int pillDosage = finalPill.getDosage();
                     if (pillRemaining != -1 && pillDosage != -1) {
-                        p.setPillsRemaining(pillRemaining - pillDosage);
-                        DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(p);
+                        finalPill.setPillsRemaining(pillRemaining - pillDosage);
+                        DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(finalPill);
+                        alarmFragment.refreshList();
                     }
-                    alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
                 } else
-                    Toast.makeText(getApplicationContext(), "Error: pill is null", Toast.LENGTH_SHORT).show();
+                    outputProvider.displayShortToast("No pill added to alarm");
             }
         });
         // set negative button: No message
@@ -245,10 +258,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 AlarmReceiver.stopRingtone();
                 // cancel the alert box and put a Toast to the user
-                if (p != null)
+                if (finalPill != null) {
                     alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
+                    alarmFragment.refreshList();
+                }
                 dialog.cancel();
-                Toast.makeText(getApplicationContext(), "You chose a negative answer", Toast.LENGTH_LONG).show();
+                outputProvider.displayShortToast("You chose a negative answer");
             }
         });
 

@@ -13,7 +13,10 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import pl.balazinski.jakub.takeyourpill.data.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 
 /**
  * Created by Kuba on 2016-02-01.
@@ -73,6 +76,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     public void cancelAlarm(Context context, Long id)
     {
+        Alarm alarm = DatabaseRepository.getAlarmById(context, id);
+        if (alarm != null) {
+            alarm.setIsActive(false);
+            DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+        }
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, longToInt(id), intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

@@ -8,11 +8,14 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
@@ -31,35 +34,12 @@ public class PillListAdapter
 
     private int mBackground;
     private Context context;
-    //private List<Pill> pills;
 
     public PillListAdapter(Context context) {
         this.context = context;
         TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
-        //pills = DatabaseRepository.getAllPills(context);
-    }
-
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public Pill pill;
-
-        public final View mView;
-        public final ImageView mImageView;
-        public final TextView mTextView;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mImageView = (ImageView) view.findViewById(R.id.avatar);
-            mTextView = (TextView) view.findViewById(android.R.id.text1);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mTextView.getText();
-        }
     }
 
 
@@ -72,14 +52,21 @@ public class PillListAdapter
     }
 
     public Pill getItem(int position) {
-        return DatabaseRepository.getAllPills(context).get(position);
+        Pill pill = DatabaseRepository.getAllPills(context).get(position);
+        if (pill != null)
+            return pill;
+        else
+            return null;
+
     }
+
 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.pill = getItem(position);
         holder.mTextView.setText(holder.pill.getName());
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,15 +93,43 @@ public class PillListAdapter
             }
         });
 
-            Glide.with(holder.mImageView.getContext())
-                    .load(Uri.parse(getItem(position).getPhoto()))
-                    .fitCenter()
-                    .into(holder.mImageView);
+        Glide.with(holder.mImageView.getContext())
+                .load(Uri.parse(getItem(position).getPhoto()))
+                .fitCenter()
+                .into(holder.mImageView);
 
+    //    animate(holder);
+    }
+
+    public void animate(RecyclerView.ViewHolder viewHolder) {
+        final Animation animAnticipateOvershoot = AnimationUtils.loadAnimation(context, R.anim.bounce_interpolator);
+        viewHolder.itemView.setAnimation(animAnticipateOvershoot);
     }
 
     @Override
     public int getItemCount() {
         return DatabaseRepository.getAllPills(context).size();
     }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public Pill pill;
+
+        public final View mView;
+        public final ImageView mImageView;
+        public final TextView mTextView;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            mImageView = (ImageView) view.findViewById(R.id.avatar);
+            mTextView = (TextView) view.findViewById(android.R.id.text1);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + mTextView.getText();
+        }
+    }
+
+
 }
