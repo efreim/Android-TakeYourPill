@@ -7,22 +7,43 @@
 
     <FrameLayout
         android:id="@+id/cameraPreview"
+        android:layout_weight="0.7"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        />
+        android:layout_height="0dp" />
+
 
     <TextView
+        android:layout_weight="0.1"
         android:id="@+id/scanText"
         android:text="Scanning..."
-        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_height="0dp"
         android:layout_width="match_parent">
     </TextView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
+        android:orientation="horizontal">
+
     <Button
-        android:id="@+id/ScanButton"
-        android:text="Scan"
-        android:layout_width="wrap_content"
+        android:layout_gravity="bottom"
+        android:id="@+id/add_barcode_manually"
+        android:text="Add barcode manually"
+        android:layout_width="0dp"
+        android:layout_weight="0.5"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         />
+
+    <Button
+        android:layout_gravity="bottom"
+        android:id="@+id/add_pill_manually"
+        android:text="Add pill \nmanually"
+        android:layout_width="0dp"
+        android:layout_weight="0.5"
+        android:layout_height="wrap_content"
+        />
+    </LinearLayout>
 </LinearLayout>

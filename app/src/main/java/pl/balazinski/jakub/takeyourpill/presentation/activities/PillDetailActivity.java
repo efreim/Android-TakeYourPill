@@ -51,12 +51,11 @@ public class PillDetailActivity extends AppCompatActivity {
     private Pill pill;
     private OutputProvider outputProvider;
     //Setting up components for view
+
     @Bind(R.id.description)
     TextView descriptionTextView;
     @Bind(R.id.dosage)
     TextView dosageTextView;
-
-
     @Bind(R.id.pill_count)
     TextView pillCountTextView;
     @Bind(R.id.pill_count_left)
@@ -68,6 +67,10 @@ public class PillDetailActivity extends AppCompatActivity {
     @Bind(R.id.barcode_number)
     TextView barcodeNumberTextView;
 
+    @Bind(R.id.pill_description_cv)
+    CardView pillDescriptionCardView;
+    @Bind(R.id.pill_dosage_cv)
+    CardView pillDosageCardView;
     @Bind(R.id.pill_count_cv)
     CardView pillCountCardView;
     @Bind(R.id.pill_count_left_cv)
@@ -107,19 +110,43 @@ public class PillDetailActivity extends AppCompatActivity {
         } else
             outputProvider.displayShortToast("Error loading pills");
 
-        final String pillName = pill.getName();
-
 
         //Setting up toolbar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        setupView(pill);
+    }
+
+    /**
+     * Loads image from photo into views background
+     */
+    private void loadBackdrop() {
+        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+        Glide.with(this).load(Uri.parse(pill.getPhoto())).centerCrop().into(imageView);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sample_actions, menu);
+        return true;
+    }
+
+    private void setupView(Pill pill) {
+        final String pillName = pill.getName();
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(pillName);
-        descriptionTextView.setText(pill.getDescription());
-        dosageTextView.setText(String.valueOf(pill.getDosage()));
+        if (pill.getDescription().equals(""))
+            pillDescriptionCardView.setVisibility(View.GONE);
+        else
+            descriptionTextView.setText(pill.getDescription());
+
+        if (pill.getDosage() == -1)
+            pillDosageCardView.setVisibility(View.GONE);
+        else
+            dosageTextView.setText(String.valueOf(pill.getDosage()));
 
         if (pill.getActiveSubstance().equals(""))
             pillActiveSubCardView.setVisibility(View.GONE);
@@ -147,19 +174,5 @@ public class PillDetailActivity extends AppCompatActivity {
             barcodeNumberTextView.setText(String.valueOf(pill.getBarcodeNumber()));
 
         loadBackdrop();
-    }
-
-    /**
-     * Loads image from photo into views background
-     */
-    private void loadBackdrop() {
-        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        Glide.with(this).load(Uri.parse(pill.getPhoto())).centerCrop().into(imageView);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sample_actions, menu);
-        return true;
     }
 }

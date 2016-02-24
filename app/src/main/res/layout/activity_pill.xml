@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_weight="0.1"
+                android:layout_weight="0.5"
                 android:text="@string/pill_details" />
 
             <EditText
@@ -39,32 +39,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_weight="0.1"
+                android:layout_weight="0.5"
                 android:hint="Pill name"
                 android:maxLength="50"
                 android:singleLine="true" />
 
-            <EditText
-                android:id="@+id/pill_desc"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_weight="0.1"
-                android:hint="Pill description"
-                android:maxLength="100"
-                android:singleLine="false" />
 
-
-            <EditText
-                android:id="@+id/pill_dose"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="@dimen/pill_activity_item_margin"
-                android:layout_weight="0.1"
-                android:hint="Dosage"
-                android:inputType="numberDecimal"
-                android:maxLength="2"
-                android:singleLine="true" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -93,6 +73,28 @@
                 android:orientation="vertical"
                 android:visibility="gone"
                 android:id="@+id/optional_layout">
+                <EditText
+                    android:id="@+id/pill_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="Pill description"
+                    android:maxLength="100"
+                    android:singleLine="false" />
+
+
+                <EditText
+                    android:id="@+id/pill_dose"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.1"
+                    android:hint="Dosage"
+                    android:inputType="numberDecimal"
+                    android:maxLength="2"
+                    android:singleLine="true" />
+
 
                 <EditText
                     android:id="@+id/pill_count"

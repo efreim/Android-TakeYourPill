@@ -7,8 +7,12 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -20,11 +24,14 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.camera.CameraPreview;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
-public class ScanBarcodeActivity extends Activity {
+public class ScanBarcodeActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
 
     private Camera mCamera;
@@ -32,13 +39,13 @@ public class ScanBarcodeActivity extends Activity {
     private Handler autoFocusHandler;
     private OutputProvider outputProvider;
 
-    TextView scanText;
-    Button scanButton;
-
     ImageScanner scanner;
 
-    private boolean barcodeScanned = false;
+    private boolean isClicked = true;
     private boolean previewing = true;
+
+    @Bind(R.id.scanText)
+    TextView scanText;
 
     static {
         System.loadLibrary("iconv");
@@ -49,6 +56,20 @@ public class ScanBarcodeActivity extends Activity {
         outputProvider = new OutputProvider(this);
 
         setContentView(R.layout.activity_scan_barcode);
+        ButterKnife.bind(this);
+
+        //Setting up notification bar color
+        Window window = getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        // change the color
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
+
+
+        scanText.setText("Click to scan barcode!");
+        // barcodeScanned=false;
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -64,30 +85,61 @@ public class ScanBarcodeActivity extends Activity {
         scanner.setConfig(0, Config.X_DENSITY, 3);
         scanner.setConfig(0, Config.Y_DENSITY, 3);
 
+        setPreview();
+
+
+    }
+
+    private void setPreview() {
         mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
         FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
         preview.addView(mPreview);
+    }
 
-        scanText = (TextView) findViewById(R.id.scanText);
+    @OnClick(R.id.scanText)
+    public void onScanTextClick(View v) {
+        outputProvider.displayLog(TAG, "outside clicked");
+        if(isClicked) {
+            setPreview();
+            isClicked = false;
+        }
+        scanText.setText("Scanning...");
 
-        scanButton = (Button) findViewById(R.id.ScanButton);
+        /*if (!barcodeScanned) {
+            outputProvider.displayLog(TAG, "inside clicked");
+            mCamera.setPreviewCallback(previewCb);
+            mCamera.startPreview();
+            previewing = true;
+            mCamera.autoFocus(autoFocusCB);
+            barcodeScanned = true;
+        }*/
+    }
 
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (barcodeScanned) {
-                    barcodeScanned = false;
-                    scanText.setText("Scanning...");
-                    mCamera.setPreviewCallback(previewCb);
-                    mCamera.startPreview();
-                    previewing = true;
-                    mCamera.autoFocus(autoFocusCB);
-                }
-            }
-        });
+    @OnClick(R.id.add_barcode_manually)
+    public void onAddBarcodeClick(View v) {
+        Intent intent = new Intent(getApplicationContext(), ScanBarcodeChooserActivity.class);
+        intent.putExtra("SCAN_MANUALLY", true);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.add_pill_manually)
+    public void onAddPillClick(View v) {
+        startActivity(new Intent(getApplicationContext(), PillActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        mPreview.setVisibility(View.VISIBLE);
+        if (this.mCamera == null){
+            this.mCamera = getCameraInstance(0);
+            isClicked = true;
+        }
+        super.onResume();
     }
 
     public void onPause() {
         super.onPause();
+        mPreview.setVisibility(View.GONE);
         releaseCamera();
     }
 
@@ -117,17 +169,21 @@ public class ScanBarcodeActivity extends Activity {
 
     private void releaseCamera() {
         if (mCamera != null) {
+            scanText.setText("Click to scan barcode!");
             previewing = false;
             mCamera.setPreviewCallback(null);
             mCamera.release();
             mCamera = null;
+            mPreview.getHolder().removeCallback(mPreview);
         }
     }
 
     private Runnable doAutoFocus = new Runnable() {
         public void run() {
-            if (previewing)
+            if (previewing) {
+                scanText.setText("Scanning...");
                 mCamera.autoFocus(autoFocusCB);
+            }
         }
     };
 
@@ -150,7 +206,6 @@ public class ScanBarcodeActivity extends Activity {
                 for (Symbol sym : syms) {
                     scanText.setText("barcode result " + sym.getData());
                     outputProvider.displayLog(TAG, "barcode = " + sym.getData());
-                    barcodeScanned = true;
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("result", sym.getData());
                     setResult(Activity.RESULT_OK, returnIntent);

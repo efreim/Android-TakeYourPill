@@ -113,4 +113,15 @@ public class DatabaseRepository {
         }
     }
 
+    public static void deletePill(Context context, Pill pill){
+        RuntimeExceptionDao<Pill, Integer> pillDao = DatabaseHelper.getInstance(context).getPillDao();
+        DeleteBuilder<Pill,Integer> deleteBuilder = pillDao.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("id", pill.getId());
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

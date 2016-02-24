@@ -22,7 +22,9 @@
         android:id="@+id/timePicker"
         android:timePickerMode="clock"
         android:layout_below="@+id/toolbarPill"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:headerBackground="#673AB7"
+        />
 
     <Spinner
         android:layout_width="match_parent"

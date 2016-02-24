@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.PillListAdapter;
 
 /**
  * Created by Kuba on 15.02.2016.
@@ -28,9 +29,16 @@ public class OutputProvider {
         Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
     }
 
-    public void displayPopupMenu(AlarmListAdapter.ViewHolder holder, View v){
+    public void displayPopupMenu(PillListAdapter.ViewHolder holder, View v, int menuResource){
         PopupMenu popupMenu = new PopupMenu(context, v);
-        popupMenu.inflate(R.menu.alarm_context_menu);
+        popupMenu.inflate(menuResource);
+        popupMenu.setOnMenuItemClickListener(holder);
+        popupMenu.show();
+    }
+
+    public void displayPopupMenu(AlarmListAdapter.ViewHolder holder, View v, int menuResource){
+        PopupMenu popupMenu = new PopupMenu(context, v);
+        popupMenu.inflate(menuResource);
         popupMenu.setOnMenuItemClickListener(holder);
         popupMenu.show();
     }

@@ -1,20 +1,18 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,8 +24,10 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
-
-public class ChooseAddPillActivity extends AppCompatActivity {
+/**
+ * Created by Kuba on 23.02.2016.
+ */
+public class ScanBarcodeChooserActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -38,11 +38,13 @@ public class ChooseAddPillActivity extends AppCompatActivity {
     EditText barcodeNumberEditText;
 
     private OutputProvider outputProvider;
+    private Camera mCamera;
+    private boolean isScanManually = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_scan_chooser);
         ButterKnife.bind(this);
         outputProvider = new OutputProvider(this);
         /*
@@ -56,53 +58,22 @@ public class ChooseAddPillActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
-
+        Intent intent = getIntent();
+        if(intent.getExtras()!=null)
+            isScanManually = intent.getBooleanExtra("SCAN_MANUALLY", false);
         //Setting up toolbar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-    }
-
-
-    @OnClick(R.id.scan_button)
-    public void scanBarcode(View v) {
-        Intent i = new Intent(this, ScanBarcodeActivity.class);
-        startActivityForResult(i, 1);
-    }
-
-    @OnClick(R.id.search_by_barcode_button)
-    public void searchBarcode(View v) {
-        if (!barcodeNumberEditText.getText().toString().equals("")) {
-            String number = barcodeNumberEditText.getText().toString();
-            read(number);
+        int i = getCameraInformation();
+        if (i != 0 || isScanManually) {
+            outputProvider.displayShortToast("No rear camera available. \nAdd barcode number manually.");
+        }else{
+            isScanManually = false;
+            startActivityForResult(new Intent(this, ScanBarcodeActivity.class), 1);
         }
-        outputProvider.displayShortToast("barcode number: " + barcodeNumberEditText.getText().toString());
-    }
 
-    @OnClick(R.id.add_manually_button)
-    public void addManually(View v) {
-        startActivity(new Intent(getApplicationContext(), PillActivity.class));
-    }
-
-    /**
-     * @param requestCode Requests camera or select file
-     * @param resultCode  1 if result is valid
-     * @param data        Photo or Uri
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                String result = data.getStringExtra("result");
-                read(result);
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //TODO
-            }
-        }
     }
 
     public void read(String code) {
@@ -138,5 +109,45 @@ public class ChooseAddPillActivity extends AppCompatActivity {
             outputProvider.displayShortToast("Pill not found, try again or add manually.");
     }
 
+    /**
+     * @param requestCode Requests camera or select file
+     * @param resultCode  1 if result is valid
+     * @param data        Photo or Uri
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                read(result);
+                finish();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //TODO
+            }
+        }
+    }
+
+
+    @OnClick(R.id.search_by_barcode_button)
+    public void searchBarcode(View v) {
+        if (!barcodeNumberEditText.getText().toString().equals("")) {
+            String number = barcodeNumberEditText.getText().toString();
+            read(number);
+        }
+        outputProvider.displayShortToast("barcode number: " + barcodeNumberEditText.getText().toString());
+    }
+
+    private int getCameraInformation() {
+        PackageManager packageManager = getApplicationContext().getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            return 0;
+        else if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT))
+            return 1;
+        else
+            return -1;
+    }
 
 }

@@ -11,7 +11,16 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_scrollFlags="scroll|enterAlways|snap" />
+        app:layout_scrollFlags="scroll|enterAlways|snap" >
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:id="@+id/toolbar_refresh_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@android:drawable/ic_menu_mylocation"/>
+    </android.support.v7.widget.Toolbar>
 
     <fragment
         android:id="@+id/maps"

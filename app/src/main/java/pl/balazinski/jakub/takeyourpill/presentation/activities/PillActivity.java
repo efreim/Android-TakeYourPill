@@ -79,8 +79,7 @@ public class PillActivity extends AppCompatActivity {
     public Button addPill;
 
     private OutputProvider outputProvider;
-    private String mName, mDesc;
-    private int mDosage = -1;
+    private String mName;
     private State state;
     private Pill mPill = null;
     private Uri imageUri = null;
@@ -107,16 +106,11 @@ public class PillActivity extends AppCompatActivity {
             Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
 
 
-            List<Pill> list = DatabaseRepository.getAllPills(this);
-            if (list != null) {
-
-                for (Pill p : list) {
-                    if (p.getId().equals(mId)) {
-                        mPill = p;
-                    }
-                }
-            }else
+            //List<Pill> list = DatabaseRepository.getAllPills(this);
+            mPill = DatabaseRepository.getPillByID(this, mId);
+            if(mPill == null)
                 outputProvider.displayShortToast("Error loading pills");
+
             if (mPill != null) {
                 setView(state);
                 imageUri = Uri.parse(mPill.getPhoto());
@@ -155,9 +149,11 @@ public class PillActivity extends AppCompatActivity {
             addPhoto.setText("EDIT PHOTO");
 
             pillNameEditText.setText(mPill.getName());
-            pillDescEditText.setText(mPill.getDescription());
-            pillDosageEditText.setText(String.valueOf(mPill.getDosage()));
 
+            if(mPill.getDescription().equals(""))
+                pillDescEditText.setText(mPill.getDescription());
+            if(mPill.getDosage() != -1)
+                pillDosageEditText.setText(String.valueOf(mPill.getDosage()));
             if (mPill.getPillsCount() != -1)
                 pillCountEditText.setText(String.valueOf(mPill.getPillsCount()));
             if (!mPill.getActiveSubstance().equals(""))
@@ -172,6 +168,8 @@ public class PillActivity extends AppCompatActivity {
     @OnClick(R.id.add_pill)
     public void addPill(View view) {
         int mCount = -1;
+        int mDosage = -1;
+        String mDesc = "";
         String activeSubstance = "";
         String price = "";
         long barcode = -1;
@@ -197,11 +195,11 @@ public class PillActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(mName))
             pillNameEditText.setError("Set name to your pill");
-        else if (TextUtils.isEmpty(mDesc)) {
+        /*else if (TextUtils.isEmpty(mDesc)) {
             pillDescEditText.setError("Set description to your pill");
         } else if (mDosage == -1) {
-            pillDosageEditText.setError("Set dosage");
-        } else if (state == State.EDIT) {
+            pillDosageEditText.setError("Set dosage");*/
+        else if (state == State.EDIT) {
             mPill.setName(mName);
             mPill.setDescription(mDesc);
             mPill.setDosage(mDosage);

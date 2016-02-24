@@ -1,8 +1,8 @@
 package pl.balazinski.jakub.takeyourpill.presentation.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,19 +12,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
+import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
+import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -33,7 +32,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
     private int mBackground;
     private Context context;
-    private ListRefreshListener refreshListener;
+    private AlarmListRefreshListener refreshListener;
     private ViewHolder viewHolder;
     private View view;
     public AlarmListAdapter(Context context) {
@@ -46,11 +45,11 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     /**
      * Interface implemented in AlarmListFragment in order to refresh list after deleting item from.
      */
-    public interface ListRefreshListener {
+    public interface AlarmListRefreshListener {
         void onListRefresh();
     }
 
-    public void setListRefreshListener(ListRefreshListener l) {
+    public void setListRefreshListener(AlarmListRefreshListener l) {
         this.refreshListener = l;
     }
 
@@ -156,7 +155,9 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                     alarmActivator(this);
                     break;
                 case R.id.edit_alarm:
-                    outputProvider.displayShortToast("to be done");
+                    Intent intent = new Intent(context, AlarmActivity.class);
+                    intent.putExtra(Constants.EXTRA_LONG_ID, alarm.getId());
+                    context.startActivity(intent);
                     break;
                 case R.id.delete_alarm:
                     alarmDeleter();
@@ -204,7 +205,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
         @Override
         public boolean onLongClick(View v) {
-            outputProvider.displayPopupMenu(this, v);
+            outputProvider.displayPopupMenu(this, v, R.menu.alarm_context_menu);
             return false;
         }
     }

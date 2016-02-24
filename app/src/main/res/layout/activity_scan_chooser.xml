@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarPill"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_scrollFlags="scroll|enterAlways|snap" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true">
+
+
+        <EditText
+            android:id="@+id/barcode_number_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="76dp"
+            android:gravity="center"
+            android:textSize="@dimen/font_size"
+            android:hint="Click here to insert your barcode manually"
+            android:textAlignment="center"
+            android:inputType="numberDecimal"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/search_by_barcode_button" />
+
+        <Button
+            android:id="@+id/search_by_barcode_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Find pill"
+            android:layout_marginLeft="@dimen/pill_activity_item_margin"
+            android:layout_marginRight="@dimen/pill_activity_item_margin"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+</RelativeLayout>

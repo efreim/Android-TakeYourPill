@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter;
-import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter.ListRefreshListener;
+import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter.AlarmListRefreshListener;
 
 
-public class AlarmListFragment extends Fragment implements ListRefreshListener{
+public class AlarmListFragment extends Fragment implements AlarmListRefreshListener {
 
     private AlarmListAdapter alarmListAdapter;
     private RecyclerView rv;

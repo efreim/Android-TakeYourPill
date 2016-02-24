@@ -16,31 +16,31 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_one"
-            android:icon="@drawable/ic_dashboard"
-            android:title="Item 1" />
+            android:id="@+id/add_alarm_drawer"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Add alarm" />
         <item
-            android:id="@+id/nav_two"
-            android:icon="@drawable/ic_event"
-            android:title="Item 2" />
+            android:id="@+id/add_pill_drawer"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Add pill" />
         <item
-            android:id="@+id/nav_three"
-            android:icon="@drawable/ic_headset"
-            android:title="Item 3" />
+            android:id="@+id/settings_drawer"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="Settings" />
         <item
-            android:id="@+id/nav_four"
-            android:icon="@drawable/ic_forum"
-            android:title="Item 4" />
+            android:id="@+id/find_pharmacy_drawer"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="Find pharmacy" />
     </group>
 
     <item android:title="Other">
         <menu>
             <item
-                android:id="@+id/find_pharmacy"
-                android:icon="@android:drawable/ic_dialog_map"
-                android:title="Find pharmacy" />
+                android:id="@+id/about_drawer"
+                android:icon="@android:drawable/ic_dialog_info"
+                android:title="About" />
         </menu>
     </item>
 

@@ -12,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +21,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
@@ -116,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), AlarmActivity.class);
                 startActivity(intent);
             } else {
-                Intent intent = new Intent(getApplicationContext(), ChooseAddPillActivity.class);
+                Intent intent = new Intent(getApplicationContext(), AddPillChooserActivity.class);
                 startActivity(intent);
             }
         }
@@ -198,22 +196,29 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        Intent intent = null;
                         switch (menuItem.getItemId()) {
-                            case R.id.nav_one:
-                                Toast.makeText(getApplicationContext(), "First item", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.nav_two:
-                                Toast.makeText(getApplicationContext(), "Second item", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.nav_three:
-                                Toast.makeText(getApplicationContext(), "Third item", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.nav_four:
-                                Toast.makeText(getApplicationContext(), "Fourth item", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.find_pharmacy:
-                                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                            case R.id.add_alarm_drawer:
+                                intent = new Intent(getApplicationContext(), AlarmActivity.class);
                                 startActivity(intent);
+                                mDrawerLayout.closeDrawers();
+                                break;
+                            case R.id.add_pill_drawer:
+                                intent = new Intent(getApplicationContext(), AddPillChooserActivity.class);
+                                startActivity(intent);
+                                mDrawerLayout.closeDrawers();
+                                break;
+                            case R.id.settings_drawer:
+                                outputProvider.displayShortToast("To be done");
+                                mDrawerLayout.closeDrawers();
+                                break;
+                            case R.id.find_pharmacy_drawer:
+                                intent = new Intent(getApplicationContext(), MapsActivity.class);
+                                startActivity(intent);
+                                mDrawerLayout.closeDrawers();
+                                break;
+                            case R.id.about_drawer:
+                                outputProvider.displayShortToast("To be done");
                                 mDrawerLayout.closeDrawers();
                                 break;
                             default:

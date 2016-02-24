@@ -33,7 +33,7 @@ import pl.balazinski.jakub.takeyourpill.presentation.adapters.PillListAdapter;
 /**
  * Fragments which contains list inside viewpager.
  */
-public class PillListFragment extends Fragment {
+public class PillListFragment extends Fragment implements PillListAdapter.PillListRefreshListener {
 
     private PillListAdapter pillListAdapter;
 
@@ -56,9 +56,9 @@ public class PillListFragment extends Fragment {
         itemAnimator.setRemoveDuration(1000);
         recyclerView.setItemAnimator(itemAnimator);
         pillListAdapter = new PillListAdapter(getActivity());
+        pillListAdapter.setListRefreshListener(this);
         recyclerView.setAdapter(pillListAdapter);
-        pillListAdapter.notifyDataSetChanged();
-
+        refreshList();
     }
 
 
@@ -71,5 +71,11 @@ public class PillListFragment extends Fragment {
     public void refreshList() {
         if (pillListAdapter != null)
             pillListAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void onListRefresh(){
+        refreshList();
     }
 }

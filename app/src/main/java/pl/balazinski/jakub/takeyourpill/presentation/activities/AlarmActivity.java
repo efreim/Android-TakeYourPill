@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
@@ -31,6 +32,10 @@ import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 public class AlarmActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final String TAG = getClass().getSimpleName();
+
+    private enum State {
+        NEW, EDIT
+    }
 
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
@@ -45,13 +50,31 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
     private Pill pill = null;
     private List<Pill> pills;
     private OutputProvider outputProvider;
+    private State state;
+    Long mId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
         ButterKnife.bind(this);
+        Bundle extras = getIntent().getExtras();
         outputProvider = new OutputProvider(this);
+
+        /*
+         * If extras are empty state is new otherwise
+         * state is edit and edited pill must be loaded
+         * from database.
+         */
+
+        if (extras == null) {
+            state = State.NEW;
+            setView(state);
+        } else {
+            state = State.EDIT;
+            mId = extras.getLong(Constants.EXTRA_LONG_ID);
+        }
+
          /*
          * Setting up notification bar color:
          * 1. Clear FLAG_TRANSLUCENT_STATUS flag
@@ -64,51 +87,9 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
 
-        //Setting up toolbar
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        timePicker.setIs24HourView(true);
-        Calendar c = Calendar.getInstance();
-        if (Build.VERSION.SDK_INT >= 23) {
-            timePicker.setHour(c.get(Calendar.HOUR_OF_DAY));
-            timePicker.setMinute(c.get(Calendar.MINUTE));
-        } else {
-            timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
-            timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
-        }
+        setView(state);
 
-
-        spinner.setOnItemSelectedListener(this);
-
-        List<String> names = new ArrayList<>();
-
-        pills = DatabaseRepository.getAllPills(this);
-
-        if(pills!=null) {
-
-            for (Pill p : pills)
-                names.add(p.getName());
-
-            if(names.size()<1) {
-                spinner.setEnabled(false);
-                names.add("No pills detected");
-            }else {
-                names.add(0,"No pill chosen");
-                spinner.setEnabled(true);
-            }
-
-                // Creating adapter for spinner
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
-            // Drop down layout style - list view with radio button
-            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            // attaching data adapter to spinner
-            spinner.setAdapter(dataAdapter);
-            spinner.setPrompt("Select Pill");
-        }else
-            outputProvider.displayShortToast("Error loading pills");
     }
 
     @Override
@@ -123,6 +104,75 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
+    }
+
+    private void setView(State state){
+        //Setting up toolbar
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        timePicker.setIs24HourView(true);
+
+
+        spinner.setOnItemSelectedListener(this);
+
+        List<String> names = new ArrayList<>();
+        pills = DatabaseRepository.getAllPills(this);
+
+        if(pills!=null) {
+            for (Pill p : pills)
+                names.add(p.getName());
+
+            if(names.size()<1) {
+                spinner.setEnabled(false);
+                names.add("No pills detected");
+            }else {
+                names.add(0,"No pill chosen");
+                spinner.setEnabled(true);
+            }
+            // Creating adapter for spinner
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
+            // Drop down layout style - list view with radio button
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // attaching data adapter to spinner
+            spinner.setAdapter(dataAdapter);
+            spinner.setPrompt("Select Pill");
+        }else
+            outputProvider.displayShortToast("Error loading pills");
+
+        if(state == State.EDIT){
+            Alarm alarm = null;
+            int i = 0;
+            if(mId!=null)
+                alarm = DatabaseRepository.getAlarmById(this, mId);
+            if(alarm!=null){
+                for (Pill p : pills) {
+                    i++;
+                    if (alarm.getPillId() == p.getId())
+                        spinner.setSelection(i);
+                }
+                if (Build.VERSION.SDK_INT >= 23) {
+                    timePicker.setHour(alarm.getHour());
+                    timePicker.setMinute(alarm.getMinute());
+                }else{
+                    timePicker.setCurrentHour(alarm.getHour());
+                    timePicker.setCurrentMinute(alarm.getMinute());
+                }
+            }else
+                outputProvider.displayShortToast("Error loading alarm!");
+        }else{
+            Calendar c = Calendar.getInstance();
+            if (Build.VERSION.SDK_INT >= 23) {
+                timePicker.setHour(c.get(Calendar.HOUR_OF_DAY));
+                timePicker.setMinute(c.get(Calendar.MINUTE));
+            } else {
+                timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
+                timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
+            }
+        }
+
     }
 
     @OnClick(R.id.add_alarm)
