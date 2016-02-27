@@ -8,10 +8,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
 
 
 public class DatabaseRepository {
@@ -63,6 +61,25 @@ public class DatabaseRepository {
         return null;
     }
 
+    public static List<Long> getPillsbyAlarm(Context context, Long id){
+        RuntimeExceptionDao<PillToAlarm, Integer> dao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
+        QueryBuilder<PillToAlarm, Integer> qb = dao.queryBuilder();
+        List<PillToAlarm> pillToAlarms = new ArrayList<>();
+        try {
+            qb.where().eq("alarmId", id);
+            pillToAlarms = qb.query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        List<Long> pillIds = new ArrayList<>();
+
+        for(PillToAlarm pta : pillToAlarms)
+            pillIds.add(pta.getPillId());
+        return pillIds;
+    }
+
+
+
     public static void addPill(Context context, Pill pill) {
         RuntimeExceptionDao<Pill, Integer> dao = DatabaseHelper.getInstance(context).getPillDao();
         dao.create(pill);
@@ -71,6 +88,33 @@ public class DatabaseRepository {
     public static void addAlarm(Context context, Alarm alarm) {
         RuntimeExceptionDao<Alarm, Integer> dao = DatabaseHelper.getInstance(context).getAlarmDao();
         dao.create(alarm);
+    }
+
+    public static void addPillToAlarm(Context context, PillToAlarm pillToAlarm) {
+        RuntimeExceptionDao<PillToAlarm, Integer> dao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
+        dao.create(pillToAlarm);
+    }
+
+    public static void deleteAlarmToPill(Context context, Long alarmID){
+        RuntimeExceptionDao<PillToAlarm, Integer> pillToAlarmDao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
+        DeleteBuilder<PillToAlarm,Integer> deleteBuilder = pillToAlarmDao.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("alarmId", alarmID);
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deletePillToAlarm(Context context, Long pillId){
+        RuntimeExceptionDao<PillToAlarm, Integer> pillToAlarmDao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
+        DeleteBuilder<PillToAlarm,Integer> deleteBuilder = pillToAlarmDao.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("pillId", pillId);
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void deletePillDatabase(Context context){
@@ -94,9 +138,12 @@ public class DatabaseRepository {
     public static void deleteWholeDatabase(Context context){
         RuntimeExceptionDao<Pill, Integer> pillDao = DatabaseHelper.getInstance(context).getPillDao();
         RuntimeExceptionDao<Alarm, Integer> alarmDao = DatabaseHelper.getInstance(context).getAlarmDao();
+        RuntimeExceptionDao<PillToAlarm, Integer> pillToAlarmDao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
         try {
             TableUtils.clearTable(pillDao.getConnectionSource(), Pill.class);
             TableUtils.clearTable(alarmDao.getConnectionSource(), Alarm.class);
+            TableUtils.clearTable(pillToAlarmDao.getConnectionSource(), PillToAlarm.class);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -105,6 +152,7 @@ public class DatabaseRepository {
     public static void deleteAlarm(Context context, Alarm alarm){
         RuntimeExceptionDao<Alarm, Integer> alarmDao = DatabaseHelper.getInstance(context).getAlarmDao();
         DeleteBuilder<Alarm,Integer> deleteBuilder = alarmDao.deleteBuilder();
+        deleteAlarmToPill(context,alarm.getId());
         try {
             deleteBuilder.where().eq("id", alarm.getId());
             deleteBuilder.delete();
@@ -116,6 +164,7 @@ public class DatabaseRepository {
     public static void deletePill(Context context, Pill pill){
         RuntimeExceptionDao<Pill, Integer> pillDao = DatabaseHelper.getInstance(context).getPillDao();
         DeleteBuilder<Pill,Integer> deleteBuilder = pillDao.deleteBuilder();
+        deletePillToAlarm(context, pill.getId());
         try {
             deleteBuilder.where().eq("id", pill.getId());
             deleteBuilder.delete();

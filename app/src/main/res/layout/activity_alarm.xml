@@ -16,22 +16,39 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_scrollFlags="scroll|enterAlways|snap" />
 
-    <TimePicker
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/timePicker"
-        android:timePickerMode="clock"
-        android:layout_below="@+id/toolbarPill"
-        android:layout_centerHorizontal="true"
-        android:headerBackground="#673AB7"
-        />
-
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner"
+        android:layout_height="match_parent"
         android:layout_above="@+id/add_alarm"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/toolbarPill">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TimePicker
+                android:id="@+id/timePicker"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:headerBackground="#673AB7"
+                android:timePickerMode="clock" />
+
+            <HorizontalScrollView
+                android:id="@+id/horizontal_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5">
+
+                <GridLayout
+                    android:id="@+id/inside_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+        </LinearLayout>
+    </ScrollView>
 
     <Button
         android:id="@+id/add_alarm"
@@ -40,11 +57,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_gravity="bottom"
-        android:text="Add alarm"
-        android:layout_margin="@dimen/pill_activity_item_margin" />
-
-
-
+        android:layout_margin="@dimen/pill_activity_item_margin"
+        android:text="Add alarm" />
 
 
 </RelativeLayout>

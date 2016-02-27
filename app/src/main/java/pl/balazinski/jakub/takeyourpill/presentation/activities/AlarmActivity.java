@@ -1,5 +1,6 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -9,11 +10,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -22,14 +25,16 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
+import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
 
-public class AlarmActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class AlarmActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -44,11 +49,14 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
     @Bind(R.id.timePicker)
     TimePicker timePicker;
 
-    @Bind(R.id.spinner)
-    Spinner spinner;
+    @Bind(R.id.inside_horizontal)
+    GridLayout linearInsideHorizontal;
 
-    private Pill pill = null;
+    @Bind(R.id.add_alarm)
+    Button addAlarm;
+
     private List<Pill> pills;
+    private List<HorizontalScrollViewItem> viewList;
     private OutputProvider outputProvider;
     private State state;
     Long mId = null;
@@ -73,6 +81,7 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         } else {
             state = State.EDIT;
             mId = extras.getLong(Constants.EXTRA_LONG_ID);
+            setView(state);
         }
 
          /*
@@ -86,27 +95,10 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
-
-
-        setView(state);
-
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
-        for (Pill p : pills) {
-            if (p.getName().equals(item))
-                pill = p;
-        }
-    }
 
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    private void setView(State state){
+    private void setView(State state) {
         //Setting up toolbar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
@@ -114,55 +106,41 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
 
         timePicker.setIs24HourView(true);
 
-
-        spinner.setOnItemSelectedListener(this);
-
-        List<String> names = new ArrayList<>();
+        viewList = new ArrayList<>();
         pills = DatabaseRepository.getAllPills(this);
 
-        if(pills!=null) {
-            for (Pill p : pills)
-                names.add(p.getName());
-
-            if(names.size()<1) {
-                spinner.setEnabled(false);
-                names.add("No pills detected");
-            }else {
-                names.add(0,"No pill chosen");
-                spinner.setEnabled(true);
+        if (pills != null) {
+            for (Pill p : pills) {
+                HorizontalScrollViewItem item = new HorizontalScrollViewItem(getApplicationContext(), p.getPhoto(), p.getName(), p.getId());
+                linearInsideHorizontal.addView(item);
+                viewList.add(item);
             }
-            // Creating adapter for spinner
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
-            // Drop down layout style - list view with radio button
-            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            // attaching data adapter to spinner
-            spinner.setAdapter(dataAdapter);
-            spinner.setPrompt("Select Pill");
-        }else
+        } else
             outputProvider.displayShortToast("Error loading pills");
 
-        if(state == State.EDIT){
+        if (state == State.EDIT) {
+            addAlarm.setText("Update alarm");
             Alarm alarm = null;
             int i = 0;
-            if(mId!=null)
+            if (mId != null)
                 alarm = DatabaseRepository.getAlarmById(this, mId);
-            if(alarm!=null){
-                for (Pill p : pills) {
-                    i++;
-                    if (alarm.getPillId() == p.getId())
-                        spinner.setSelection(i);
+            if (alarm != null) {
+                List<Long> pillIds = DatabaseRepository.getPillsbyAlarm(getApplicationContext(), alarm.getId());
+                for(Long id : pillIds){
+                    getViewItem(id);
                 }
                 if (Build.VERSION.SDK_INT >= 23) {
                     timePicker.setHour(alarm.getHour());
                     timePicker.setMinute(alarm.getMinute());
-                }else{
+                } else {
                     timePicker.setCurrentHour(alarm.getHour());
                     timePicker.setCurrentMinute(alarm.getMinute());
                 }
-            }else
+            } else {
                 outputProvider.displayShortToast("Error loading alarm!");
-        }else{
+            }
+        } else {
+            addAlarm.setText("Add alarm");
             Calendar c = Calendar.getInstance();
             if (Build.VERSION.SDK_INT >= 23) {
                 timePicker.setHour(c.get(Calendar.HOUR_OF_DAY));
@@ -171,6 +149,8 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
                 timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
                 timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
             }
+
+
         }
 
     }
@@ -190,18 +170,33 @@ public class AlarmActivity extends AppCompatActivity implements AdapterView.OnIt
         final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
-        Long pillId = null;
 
-        if(pill!=null)
-            pillId = pill.getId();
 
-        Alarm alarm = new Alarm(hour, minute, pillId, true);
+
+        Alarm alarm = new Alarm(hour, minute, true);
         DatabaseRepository.addAlarm(this, alarm);
 
+        if(state == State.EDIT){
+            DatabaseRepository.deleteAlarmToPill(getApplicationContext(), alarm.getId());
+        }
+
+        for (HorizontalScrollViewItem item : viewList) {
+            if (item.isChecked()) {
+                DatabaseRepository.addPillToAlarm(getApplicationContext(), new PillToAlarm(alarm.getId(), item.getPillId()));
+            }
+        }
+
         AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.setAlarm(getApplicationContext(), calendar, pillId, alarm.getId());
+        alarmReceiver.setAlarm(getApplicationContext(), calendar, alarm.getId());
 
         finish();
+    }
+
+    private void getViewItem(Long id){
+        for(HorizontalScrollViewItem item : viewList){
+            if(item.getPillId().equals(id))
+                item.setClick();
+        }
     }
 
 }

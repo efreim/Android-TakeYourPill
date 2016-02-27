@@ -1,8 +1,6 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -10,16 +8,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
-import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 

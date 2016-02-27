@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +20,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -102,7 +103,10 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             String price = cursor.getString(5);
             int dosage = 1;
 
-            DatabaseRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, "", activeSubstance, price, barcode));
+            Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill);
+            String path = uri.toString();
+
+            DatabaseRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, path, activeSubstance, price, barcode));
 
             finish();
         } else

@@ -13,7 +13,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
@@ -43,7 +43,6 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         i.setClassName(Constants.MAIN_PACKAGE_NAME, Constants.MAIN_ACTIVITY_NAME);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //i.putExtra(Constants.MAIN_FROM_ALARM_KEY, Constants.MAIN_FROM_ALARM);
-        i.putExtra("pillID", bundle.getLong("pillID"));
         i.putExtra("alarmID", bundle.getLong("alarmID"));
         context.startActivity(i);
 
@@ -54,7 +53,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         setResultCode(Activity.RESULT_OK);*/
     }
 
-    public void setAlarm(Context context, Calendar calendar, Long pillID, Long alarmID)
+    public void setAlarm(Context context, Calendar calendar, Long alarmID)
     {
         Calendar now = Calendar.getInstance();
         long alarmTimeInMillis = 0;
@@ -66,12 +65,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra("pillID", pillID);
         intent.putExtra("alarmID", alarmID);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
         Log.i("setAlarm", "alarmID == " + String.valueOf(alarmID));
-        Log.i("setAlarm", "pillID == " + String.valueOf(pillID));
     }
 
     public void cancelAlarm(Context context, Long id)

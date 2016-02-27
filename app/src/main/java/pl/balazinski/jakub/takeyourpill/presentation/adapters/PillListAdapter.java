@@ -17,13 +17,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.List;
-
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;

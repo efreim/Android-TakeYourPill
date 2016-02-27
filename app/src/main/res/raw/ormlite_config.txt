@@ -1,5 +1,5 @@
 # --table-start--
-dataClass=pl.balazinski.jakub.takeyourpill.data.Alarm
+dataClass=pl.balazinski.jakub.takeyourpill.data.database.Alarm
 tableName=alarm
 # --table-fields-start--
 # --field-start--
@@ -19,14 +19,11 @@ columnName=minute
 fieldName=isActive
 columnName=active
 # --field-end--
-# --field-start--
-fieldName=pillId
-# --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=pl.balazinski.jakub.takeyourpill.data.Pill
+dataClass=pl.balazinski.jakub.takeyourpill.data.database.Pill
 tableName=pill
 # --table-fields-start--
 # --field-start--
@@ -61,6 +58,21 @@ fieldName=mPrice
 # --field-end--
 # --field-start--
 fieldName=mPillsRemaining
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm
+tableName=pilltoalarm
+# --table-fields-start--
+# --field-start--
+fieldName=pillId
+columnName=pillId
+# --field-end--
+# --field-start--
+fieldName=alarmId
+columnName=alarmId
 # --field-end--
 # --table-fields-end--
 # --table-end--

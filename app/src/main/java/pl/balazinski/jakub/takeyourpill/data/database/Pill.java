@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.balazinski.jakub.takeyourpill.data;
+package pl.balazinski.jakub.takeyourpill.data.database;
 
 import android.net.Uri;
 import android.util.Log;
@@ -72,25 +72,10 @@ public class Pill {
         this.mPrice = price;
         this.mBarcodeNumber = barcodeNumber;
         this.mPillsRemaining = count;
-    }
+        //if (photo.equals(""))
+            //this.mPhoto = getResources().getIdentifier(name,"drawable", getPackageName());
 
-    public Pill(String name, String desc, int count, String photo, String activeSubstance, String price, long barcodeNumber) {
-        this.mName = name;
-        this.mDescription = desc;
-        this.mPillsCount = count;
-        this.mPhoto = "";
-        this.mActiveSubstance = activeSubstance;
-        this.mPrice = price;
-        this.mBarcodeNumber = barcodeNumber;
-        this.mPillsRemaining = count;
     }
-
-    public Pill(String name, String desc, int dosage) {
-        this.mName = name;
-        this.mDescription = desc;
-        this.mPhoto = "";
-    }
-
 
 
     public int getDosage() {

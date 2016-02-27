@@ -23,8 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,7 +30,7 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -215,8 +213,12 @@ public class PillActivity extends AppCompatActivity {
             //If path equals "" pill image is empty.
             if (getImageUri() != null)
                 path = getImageUri().toString();
-            else
-                path = "";
+            else {
+                Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill);
+                path = uri.toString();
+            }
+
+            //    path = "";
 
             Pill pill = new Pill(mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
             DatabaseRepository.addPill(this, pill);

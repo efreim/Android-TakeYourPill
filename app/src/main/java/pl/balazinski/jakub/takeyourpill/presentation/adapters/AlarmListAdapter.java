@@ -16,14 +16,13 @@ import android.widget.TextView;
 import java.util.Calendar;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
-import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -193,7 +192,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                 holder.alarm.setIsActive(true);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                 holder.alarmItem.setBackgroundColor(Color.WHITE);
-                alarmReceiver.setAlarm(context, calendar, holder.alarm.getPillId(), holder.alarm.getId());
+                alarmReceiver.setAlarm(context, calendar, holder.alarm.getId());
                 adapter.refreshListener.onListRefresh();
             }
         }

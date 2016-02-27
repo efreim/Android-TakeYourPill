@@ -1,4 +1,4 @@
-package pl.balazinski.jakub.takeyourpill.data;
+package pl.balazinski.jakub.takeyourpill.data.database;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -21,17 +21,10 @@ public class Alarm {
     @DatabaseField(columnName = "active")
     private boolean isActive;
 
-    @DatabaseField(canBeNull = true)
-    private Long pillId;
-
-    /*@ForeignCollectionField(eager = false)
-    private ForeignCollection<Long> pillIdList;*/
-
     public Alarm() {
     }
 
-    public Alarm(int hour, int minute, Long pillId, boolean isActive) {
-        this.pillId = pillId;
+    public Alarm(int hour, int minute, boolean isActive) {
         this.isActive = isActive;
         this.hour = hour;
         this.minute = minute;
@@ -46,14 +39,6 @@ public class Alarm {
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
-
-  /*  public List<Long> getPillIdList() {
-        return pillIdList;
-    }
-
-    public void setPillIdList(List<Long> pillIdList) {
-        this.pillIdList = pillIdList;
-    }*/
 
     public Long getId() {
         return mId;
@@ -79,11 +64,4 @@ public class Alarm {
         this.minute = minute;
     }
 
-    public Long getPillId() {
-        return pillId;
-    }
-
-    public void setPillId(Long pillId) {
-        this.pillId = pillId;
-    }
 }

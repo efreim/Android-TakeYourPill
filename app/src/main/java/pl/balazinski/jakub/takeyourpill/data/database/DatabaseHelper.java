@@ -11,9 +11,7 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-import pl.balazinski.jakub.takeyourpill.data.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.Pill;
 
 /**
  * Class that stores pill objects in database
@@ -23,6 +21,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static DatabaseHelper instance;
     private RuntimeExceptionDao<Pill, Integer> pillDao;
     private RuntimeExceptionDao<Alarm, Integer> alarmDao;
+    private RuntimeExceptionDao<PillToAlarm, Integer> pillToAlarmDao;
 
 
     public DatabaseHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion) {
@@ -53,6 +52,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(connectionSource, Pill.class);
             TableUtils.dropTable(connectionSource, Alarm.class, true);
             TableUtils.createTableIfNotExists(connectionSource, Alarm.class);
+            TableUtils.dropTable(connectionSource, PillToAlarm.class, true);
+            TableUtils.createTableIfNotExists(connectionSource, PillToAlarm.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -72,6 +73,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return alarmDao;
     }
 
+    public RuntimeExceptionDao<PillToAlarm, Integer> getPillToAlarmDao() {
+        if (pillToAlarmDao == null) {
+            pillToAlarmDao = getRuntimeExceptionDao(PillToAlarm.class);
+        }
+        return pillToAlarmDao;
+    }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -80,5 +88,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         super.close();
         pillDao = null;
         alarmDao = null;
+        pillToAlarmDao = null;
     }
 }
