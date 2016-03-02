@@ -25,13 +25,32 @@
     android:paddingBottom="8dp"
     android:layout_margin="8dp"
     android:gravity="center_vertical"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
 
     <TextView
         android:id="@+id/alarm_time"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
         android:textAppearance="?attr/textAppearanceListItem"/>
+
+    <HorizontalScrollView
+        android:id="@+id/expendable_item"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:clickable="false"
+        android:visibility="gone">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:orientation="horizontal">
+
+        </GridLayout>
+    </HorizontalScrollView>
 
 </LinearLayout>

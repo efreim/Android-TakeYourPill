@@ -104,12 +104,10 @@ public class PillActivity extends AppCompatActivity {
             Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
 
 
-            //List<Pill> list = DatabaseRepository.getAllPills(this);
             mPill = DatabaseRepository.getPillByID(this, mId);
             if(mPill == null)
                 outputProvider.displayShortToast("Error loading pills");
-
-            if (mPill != null) {
+            else{
                 setView(state);
                 imageUri = Uri.parse(mPill.getPhoto());
             }

@@ -1,6 +1,5 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -9,12 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.util.ArrayList;
@@ -27,6 +22,7 @@ import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
@@ -59,7 +55,7 @@ public class AlarmActivity extends AppCompatActivity {
     private List<HorizontalScrollViewItem> viewList;
     private OutputProvider outputProvider;
     private State state;
-    Long mId = null;
+    private Alarm mAlarm = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +76,14 @@ public class AlarmActivity extends AppCompatActivity {
             setView(state);
         } else {
             state = State.EDIT;
-            mId = extras.getLong(Constants.EXTRA_LONG_ID);
-            setView(state);
+            Long id = extras.getLong(Constants.EXTRA_LONG_ID);
+
+            mAlarm = DatabaseRepository.getAlarmById(this, id);
+            if (mAlarm == null)
+                outputProvider.displayShortToast("Error loading pills");
+            else {
+                setView(state);
+            }
         }
 
          /*
@@ -94,6 +96,7 @@ public class AlarmActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
+
 
     }
 
@@ -118,28 +121,8 @@ public class AlarmActivity extends AppCompatActivity {
         } else
             outputProvider.displayShortToast("Error loading pills");
 
-        if (state == State.EDIT) {
-            addAlarm.setText("Update alarm");
-            Alarm alarm = null;
-            int i = 0;
-            if (mId != null)
-                alarm = DatabaseRepository.getAlarmById(this, mId);
-            if (alarm != null) {
-                List<Long> pillIds = DatabaseRepository.getPillsbyAlarm(getApplicationContext(), alarm.getId());
-                for(Long id : pillIds){
-                    getViewItem(id);
-                }
-                if (Build.VERSION.SDK_INT >= 23) {
-                    timePicker.setHour(alarm.getHour());
-                    timePicker.setMinute(alarm.getMinute());
-                } else {
-                    timePicker.setCurrentHour(alarm.getHour());
-                    timePicker.setCurrentMinute(alarm.getMinute());
-                }
-            } else {
-                outputProvider.displayShortToast("Error loading alarm!");
-            }
-        } else {
+        if ((state == State.NEW)) {
+
             addAlarm.setText("Add alarm");
             Calendar c = Calendar.getInstance();
             if (Build.VERSION.SDK_INT >= 23) {
@@ -149,8 +132,23 @@ public class AlarmActivity extends AppCompatActivity {
                 timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
                 timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
             }
-
-
+        } else {
+            addAlarm.setText("Update alarm");
+            if (mAlarm != null) {
+                List<Long> pillIds = DatabaseRepository.getPillsByAlarm(getApplicationContext(), mAlarm.getId());
+                for (Long id : pillIds) {
+                    getViewItem(id);
+                }
+                if (Build.VERSION.SDK_INT >= 23) {
+                    timePicker.setHour(mAlarm.getHour());
+                    timePicker.setMinute(mAlarm.getMinute());
+                } else {
+                    timePicker.setCurrentHour(mAlarm.getHour());
+                    timePicker.setCurrentMinute(mAlarm.getMinute());
+                }
+            } else {
+                outputProvider.displayShortToast("Error loading alarm!");
+            }
         }
 
     }
@@ -171,30 +169,38 @@ public class AlarmActivity extends AppCompatActivity {
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
 
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
 
+        if (state == State.NEW) {
+            mAlarm = new Alarm(hour, minute, true);
+            DatabaseRepository.addAlarm(this, mAlarm);
+            alarmReceiver.setAlarm(getApplicationContext(), calendar, mAlarm.getId());
+        }
 
-        Alarm alarm = new Alarm(hour, minute, true);
-        DatabaseRepository.addAlarm(this, alarm);
-
-        if(state == State.EDIT){
-            DatabaseRepository.deleteAlarmToPill(getApplicationContext(), alarm.getId());
+        if (state == State.EDIT) {
+            mAlarm.setHour(hour);
+            mAlarm.setMinute(minute);
+            DatabaseHelper.getInstance(this).getAlarmDao().update(mAlarm);
+            DatabaseRepository.deleteAlarmToPill(getApplicationContext(), mAlarm.getId());
+            if (mAlarm.isActive())
+                alarmReceiver.setAlarm(getApplicationContext(), calendar, mAlarm.getId());
+            else
+                alarmReceiver.cancelAlarm(this, mAlarm.getId());
         }
 
         for (HorizontalScrollViewItem item : viewList) {
             if (item.isChecked()) {
-                DatabaseRepository.addPillToAlarm(getApplicationContext(), new PillToAlarm(alarm.getId(), item.getPillId()));
+                DatabaseRepository.addPillToAlarm(getApplicationContext(), new PillToAlarm(mAlarm.getId(), item.getPillId()));
             }
         }
 
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.setAlarm(getApplicationContext(), calendar, alarm.getId());
 
         finish();
     }
 
-    private void getViewItem(Long id){
-        for(HorizontalScrollViewItem item : viewList){
-            if(item.getPillId().equals(id))
+    private void getViewItem(Long id) {
+        for (HorizontalScrollViewItem item : viewList) {
+            if (item.getPillId().equals(id))
                 item.setClick();
         }
     }

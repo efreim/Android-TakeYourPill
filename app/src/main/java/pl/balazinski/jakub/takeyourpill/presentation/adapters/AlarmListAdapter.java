@@ -9,20 +9,26 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.security.Policy;
 import java.util.Calendar;
+import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
+import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -32,13 +38,14 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     private int mBackground;
     private Context context;
     private AlarmListRefreshListener refreshListener;
-    private ViewHolder viewHolder;
-    private View view;
+    private OutputProvider outputProvider;
+
     public AlarmListAdapter(Context context) {
         this.context = context;
         TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
+        outputProvider = new OutputProvider(context);
     }
 
     /**
@@ -55,10 +62,10 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.alarm_list_item, parent, false);
         view.setBackgroundResource(mBackground);
-        viewHolder = new ViewHolder(view,this);
+        ViewHolder viewHolder = new ViewHolder(view, this);
         return viewHolder;
     }
 
@@ -73,19 +80,39 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         int hour = holder.alarm.getHour();
         int minute = holder.alarm.getMinute();
 
-        final Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-
         String text = buildString(minute, hour);
 
         holder.mTextView.setText(text);
 
-        if (holder.alarm.isActive())
+
+        GridLayout gridLayout = (GridLayout) holder.expendableItem.getChildAt(0);
+        gridLayout.removeAllViews();
+
+        List<Long> items = DatabaseRepository.getPillsByAlarm(context, holder.alarm.getId());
+        if (items != null) {
+            for (Long pillId : items) {
+                Pill p = DatabaseRepository.getPillByID(context, pillId);
+                HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, p.getPhoto(), p.getName(), p.getId());
+                item.setCheckboxGone();
+                item.setClickable(false);
+                gridLayout.addView(item);
+            }
+        } else {
+            HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, "", "No pills attached to alarm", null);
+            item.setCheckboxGone();
+            item.setClickable(false);
+            gridLayout.addView(item);
+        }
+
+
+        if (holder.alarm.isActive()) {
             holder.alarmItem.setBackgroundColor(Color.WHITE);
-        else
+            holder.expendableItem.setBackgroundColor(Color.WHITE);
+        }
+        else {
             holder.alarmItem.setBackgroundColor(Color.GRAY);
+            holder.expendableItem.setBackgroundColor(Color.GRAY);
+        }
 
     }
 
@@ -118,19 +145,23 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         public final View mView;
         public final TextView mTextView;
         public final LinearLayout alarmItem;
+        public final HorizontalScrollView expendableItem;
         public final Context context;
         private AlarmReceiver alarmReceiver;
         private OutputProvider outputProvider;
         private AlarmListAdapter adapter;
+        private boolean isExpended = false;
 
         public ViewHolder(View view, AlarmListAdapter adapter) {
             super(view);
             mView = view;
             alarmItem = (LinearLayout) view.findViewById(R.id.alarm_item);
             mTextView = (TextView) view.findViewById(R.id.alarm_time);
+            expendableItem = (HorizontalScrollView) view.findViewById(R.id.expendable_item);
             context = view.getContext();
             alarmReceiver = new AlarmReceiver();
             outputProvider = new OutputProvider(context);
+            expendableItem.setOnClickListener(this);
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);
             this.adapter = adapter;
@@ -199,7 +230,16 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
         @Override
         public void onClick(View v) {
-            alarmActivator(this);
+            if(!isExpended){
+                expendableItem.setVisibility(View.VISIBLE);
+                isExpended = true;
+                return;
+            }else{
+                expendableItem.setVisibility(View.GONE);
+                isExpended = false;
+                return;
+            }
+
         }
 
         @Override
@@ -208,6 +248,5 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             return false;
         }
     }
-
 
 }

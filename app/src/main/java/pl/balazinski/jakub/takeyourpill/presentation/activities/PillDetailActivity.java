@@ -34,8 +34,10 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -64,6 +66,8 @@ public class PillDetailActivity extends AppCompatActivity {
     TextView priceTextView;
     @Bind(R.id.barcode_number)
     TextView barcodeNumberTextView;
+    @Bind(R.id.alarms_attached)
+    TextView alarmsAttachedTextView;
 
     @Bind(R.id.pill_description_cv)
     CardView pillDescriptionCardView;
@@ -79,6 +83,8 @@ public class PillDetailActivity extends AppCompatActivity {
     CardView pillPriceCardView;
     @Bind(R.id.barcode_number_cv)
     CardView pillBarcodeCardView;
+    @Bind(R.id.alarms_attached_cv)
+    CardView alarmsAttachedCardView;
 
     @Bind(R.id.toolbar_detail)
     Toolbar toolbar;
@@ -171,6 +177,42 @@ public class PillDetailActivity extends AppCompatActivity {
         else
             barcodeNumberTextView.setText(String.valueOf(pill.getBarcodeNumber()));
 
+        List<Long> alarmIds = DatabaseRepository.getAlarmsByPill(this,pill.getId());
+        if (alarmIds.isEmpty())
+            alarmsAttachedCardView.setVisibility(View.GONE);
+        else {
+            StringBuilder stringBuilder = new StringBuilder();
+            for(Long l : alarmIds){
+                Alarm alarm = DatabaseRepository.getAlarmById(this, l);
+                if(alarm!=null) {
+                    String s = buildString(alarm.getMinute(), alarm.getHour());
+                    stringBuilder.append("id = ");
+                    stringBuilder.append(alarm.getId().toString());
+                    stringBuilder.append(", time  ");
+                    stringBuilder.append(s);
+                    stringBuilder.append("\n");
+                }
+            }
+            alarmsAttachedTextView.setText(stringBuilder.toString());
+        }
+
         loadBackdrop();
+    }
+
+    private String buildString(int minute, int hour) {
+        String s = " : ";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.valueOf(hour));
+        stringBuilder.append(s);
+        if (minute < 10)
+            stringBuilder.append(String.valueOf(0));
+        stringBuilder.append(String.valueOf(minute));
+        return stringBuilder.toString();
+    }
+
+    @OnClick(R.id.internet_info_button)
+    public void onInternetSearch(View v){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.bazalekow.mp.pl/leki/szukaj.html?item_name=" + pill.getName()));
+        startActivity(browserIntent);
     }
 }

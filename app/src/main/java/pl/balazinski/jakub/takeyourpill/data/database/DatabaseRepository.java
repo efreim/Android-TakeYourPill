@@ -61,7 +61,7 @@ public class DatabaseRepository {
         return null;
     }
 
-    public static List<Long> getPillsbyAlarm(Context context, Long id){
+    public static List<Long> getPillsByAlarm(Context context, Long id){
         RuntimeExceptionDao<PillToAlarm, Integer> dao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
         QueryBuilder<PillToAlarm, Integer> qb = dao.queryBuilder();
         List<PillToAlarm> pillToAlarms = new ArrayList<>();
@@ -78,6 +78,23 @@ public class DatabaseRepository {
         return pillIds;
     }
 
+    public static List<Long> getAlarmsByPill(Context context, Long id){
+        RuntimeExceptionDao<PillToAlarm, Integer> dao = DatabaseHelper.getInstance(context).getPillToAlarmDao();
+        QueryBuilder<PillToAlarm, Integer> qb = dao.queryBuilder();
+        List<PillToAlarm> pillToAlarms = new ArrayList<>();
+        try {
+            qb.where().eq("pillId", id);
+            pillToAlarms = qb.query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        List<Long> alarmIds = new ArrayList<>();
+
+        for(PillToAlarm pta : pillToAlarms)
+            alarmIds.add(pta.getAlarmId());
+
+        return alarmIds;
+    }
 
 
     public static void addPill(Context context, Pill pill) {

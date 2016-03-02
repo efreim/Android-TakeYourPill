@@ -30,8 +30,6 @@ public class Alarm {
         this.minute = minute;
     }
 
-
-
     public boolean isActive() {
         return isActive;
     }

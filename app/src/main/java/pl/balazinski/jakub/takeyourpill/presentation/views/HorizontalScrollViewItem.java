@@ -29,13 +29,13 @@ public class HorizontalScrollViewItem extends LinearLayout implements View.OnCli
 
     private final String TAG = getClass().getSimpleName();
 
-    CheckBox checkBox;
+    private CheckBox checkBox;
     // @Bind(R.id.circle_image_horizontal_item)
-    ImageView imageView;
+    private ImageView imageView;
 
     //  @Bind(R.id.pill_name_horizontal_item)
-    TextView textView;
-    RelativeLayout relativeLayout;
+    private TextView textView;
+    private RelativeLayout relativeLayout;
 
     private Context context;
     private boolean wasClicked = false;
@@ -133,5 +133,9 @@ public class HorizontalScrollViewItem extends LinearLayout implements View.OnCli
 
     public Long getPillId() {
         return pillId;
+    }
+
+    public void setCheckboxGone(){
+        checkBox.setVisibility(GONE);
     }
 }

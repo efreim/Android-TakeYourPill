@@ -163,7 +163,4 @@ public class PillListAdapter
         }
     }
 
-
-
-
 }

@@ -122,7 +122,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         boolean isGpsOn = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkOn = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if(!isGpsOn && (isNetworkOn||isInternetOn))
+        if(!isGpsOn && (!isNetworkOn||!isInternetOn))
             createGPSErrorDialog();
 
 

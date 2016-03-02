@@ -55,6 +55,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     public void setAlarm(Context context, Calendar calendar, Long alarmID)
     {
+        Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
+        if (alarm != null) {
+            alarm.setIsActive(true);
+            DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+        }
+
         Calendar now = Calendar.getInstance();
         long alarmTimeInMillis = 0;
 

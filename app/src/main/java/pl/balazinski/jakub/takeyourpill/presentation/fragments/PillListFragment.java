@@ -71,6 +71,7 @@ public class PillListFragment extends Fragment implements PillListAdapter.PillLi
     public void refreshList() {
         if (pillListAdapter != null)
             pillListAdapter.notifyDataSetChanged();
+
     }
 
 

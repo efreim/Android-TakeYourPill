@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -90,8 +91,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (viewPager != null) {
             setupViewPager(viewPager);
+            tabLayout.setupWithViewPager(viewPager);
         }
-        tabLayout.setupWithViewPager(viewPager);
+
+
     }
 
     private void createFragments() {
@@ -180,10 +183,29 @@ public class MainActivity extends AppCompatActivity {
      * @param viewPager layout component
      */
     private void setupViewPager(ViewPager viewPager) {
-        FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
+        final FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(alarmFragment, "Alarms");
         adapter.addFragment(pillFragment, "Pills");
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0)
+                    alarmFragment.refreshList();
+                else
+                    pillFragment.refreshList();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     /**
@@ -233,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         final AlarmReceiver alarmReceiver = new AlarmReceiver();
         List<Long> pillIds = new ArrayList<>();
         if (alarmID != null) {
-            pillIds = DatabaseRepository.getPillsbyAlarm(this, alarmID);
+            pillIds = DatabaseRepository.getPillsByAlarm(this, alarmID);
         }
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
