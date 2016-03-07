@@ -15,50 +15,71 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_scrollFlags="scroll|enterAlways|snap" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_below="@id/toolbarPill"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
-    <ScrollView
+        <RelativeLayout
+            android:id="@+id/repeatable_relative"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Repeatable alarm"
+                android:textAlignment="center"
+                android:id="@+id/repeatable_text" />
+            <CheckBox
+                android:id="@+id/repeatable_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/repeatable_text"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/interval_relative"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Interval alarm"
+                android:textAlignment="center"
+                android:id="@+id/interval_text" />
+            <CheckBox
+                android:id="@+id/interval_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/interval_text"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/add_alarm"
-        android:layout_below="@+id/toolbarPill">
+        android:layout_below="@+id/linearLayout"
+        android:layout_above="@+id/add_alarm">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    </FrameLayout>
 
-            <TimePicker
-                android:id="@+id/timePicker"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:headerBackground="#673AB7"
-                android:timePickerMode="clock" />
-
-            <HorizontalScrollView
-                android:id="@+id/horizontal_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5">
-
-                <GridLayout
-                    android:id="@+id/inside_horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
-        </LinearLayout>
-    </ScrollView>
 
     <Button
         android:id="@+id/add_alarm"
         android:layout_width="match_parent"
         android:layout_height="75dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
         android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/pill_activity_item_margin"
         android:text="Add alarm" />
-
 
 </RelativeLayout>

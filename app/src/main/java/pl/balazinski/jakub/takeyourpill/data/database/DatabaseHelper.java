@@ -3,6 +3,7 @@ package pl.balazinski.jakub.takeyourpill.data.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -37,7 +38,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
-        recreateDatabase(connectionSource);
+        try {
+            TableUtils.createTableIfNotExists(connectionSource, Pill.class);
+            TableUtils.createTableIfNotExists(connectionSource, Alarm.class);
+            TableUtils.createTableIfNotExists(connectionSource, PillToAlarm.class);
+
+        }catch (SQLException e){
+            Log.e(DatabaseHelper.class.getName(), "Unable to create datbases", e);
+        }
     }
 
 

@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.tabs)
     TabLayout tabLayout;
-
+    @Bind(R.id.fab)
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
         }
 
-
+        button.setText("Add alarm");
     }
 
     private void createFragments() {
@@ -195,10 +198,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position == 0)
+                if (position == 0) {
+                    button.setText("Add alarm");
                     alarmFragment.refreshList();
-                else
+                }
+                else {
+                    button.setText("Add pill");
                     pillFragment.refreshList();
+                }
             }
 
             @Override
@@ -267,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 AlarmReceiver.stopRingtone();
-                alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
                 if (!finalPillIds.isEmpty()) {
                     for (Long pillId : finalPillIds) {
                         Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
@@ -290,7 +296,6 @@ public class MainActivity extends AppCompatActivity {
                 AlarmReceiver.stopRingtone();
 
                 // cancel the alert box and put a Toast to the user
-                alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
                 alarmFragment.refreshList();
                 dialog.cancel();
                 outputProvider.displayShortToast("You chose a negative answer");

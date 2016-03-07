@@ -47,7 +47,8 @@ public class DatabaseRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        List<Alarm> alarms = new ArrayList<>();
+        return alarms;
     }
 
     public static Alarm getAlarmById(Context context, Long id) {

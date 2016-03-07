@@ -8,12 +8,12 @@ public class Constants {
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
 
-    public static final String DATABASE_NAME = "takeyourpill.db";
-    public static final int DATABASE_VERSION = 17;
+    public static final String DATABASE_NAME = "takeyourpill3.db";
+    public static final int DATABASE_VERSION = 25;
 
     public static final String EXTRA_LONG_ID = "id";
 
-    public static final String ALARM_FRAGMENT = "alaram";
+    public static final String ALARM_FRAGMENT = "alarm";
     public static final String PILL_FRAGMENT = "pill";
 
     public static final Integer ALARM_FRAGMENT_VALUE = 0;

@@ -15,13 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.security.Policy;
 import java.util.Calendar;
 import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
@@ -106,12 +105,24 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
 
         if (holder.alarm.isActive()) {
-            holder.alarmItem.setBackgroundColor(Color.WHITE);
-            holder.expendableItem.setBackgroundColor(Color.WHITE);
-        }
-        else {
-            holder.alarmItem.setBackgroundColor(Color.GRAY);
-            holder.expendableItem.setBackgroundColor(Color.GRAY);
+            if (holder.alarm.isRepeatable()) {
+                holder.alarmItem.setBackgroundColor(Color.WHITE);
+                holder.expendableItem.setBackgroundColor(Color.WHITE);
+            }
+            else{
+                holder.alarmItem.setBackgroundColor(Color.GREEN);
+                holder.expendableItem.setBackgroundColor(Color.GREEN);
+            }
+
+        } else {
+            if (holder.alarm.isRepeatable()) {
+                holder.alarmItem.setBackgroundColor(Color.GRAY);
+                holder.expendableItem.setBackgroundColor(Color.GRAY);
+            }
+            else{
+                holder.alarmItem.setBackgroundColor(Color.DKGRAY);
+                holder.expendableItem.setBackgroundColor(Color.DKGRAY);
+            }
         }
 
     }
@@ -223,18 +234,18 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                 holder.alarm.setIsActive(true);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                 holder.alarmItem.setBackgroundColor(Color.WHITE);
-                alarmReceiver.setAlarm(context, calendar, holder.alarm.getId());
+                alarmReceiver.setRepeatingAlarm(context, holder.alarm.getId());
                 adapter.refreshListener.onListRefresh();
             }
         }
 
         @Override
         public void onClick(View v) {
-            if(!isExpended){
+            if (!isExpended) {
                 expendableItem.setVisibility(View.VISIBLE);
                 isExpended = true;
                 return;
-            }else{
+            } else {
                 expendableItem.setVisibility(View.GONE);
                 isExpended = false;
                 return;

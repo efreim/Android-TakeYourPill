@@ -1,7 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,32 +9,26 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.TimePicker;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import android.widget.CheckBox;
+import android.widget.RelativeLayout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
-import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
-import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
+import pl.balazinski.jakub.takeyourpill.presentation.fragments.IntervalAlarmFragment;
+import pl.balazinski.jakub.takeyourpill.presentation.fragments.RepeatingAlarmFragment;
 
 public class AlarmActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
-    private enum State {
+    public enum State {
         NEW, EDIT
     }
 
@@ -42,20 +36,23 @@ public class AlarmActivity extends AppCompatActivity {
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
 
-    @Bind(R.id.timePicker)
-    TimePicker timePicker;
+    @Bind(R.id.repeatable_checkbox)
+    CheckBox repeatableCheckbox;
 
-    @Bind(R.id.inside_horizontal)
-    GridLayout linearInsideHorizontal;
-
+    @Bind(R.id.interval_checkbox)
+    CheckBox intervalCheckbox;
+    @Bind(R.id.repeatable_relative)
+    RelativeLayout repeatableRelative;
+    @Bind(R.id.interval_relative)
+    RelativeLayout intervalRelative;
     @Bind(R.id.add_alarm)
     Button addAlarm;
 
-    private List<Pill> pills;
-    private List<HorizontalScrollViewItem> viewList;
+
     private OutputProvider outputProvider;
     private State state;
-    private Alarm mAlarm = null;
+    private IntervalAlarmFragment intervalFragment;
+    private RepeatingAlarmFragment repeatableFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,20 +67,38 @@ public class AlarmActivity extends AppCompatActivity {
          * state is edit and edited pill must be loaded
          * from database.
          */
-
+        repeatableFragment = new RepeatingAlarmFragment();
+        intervalFragment = new IntervalAlarmFragment();
         if (extras == null) {
-            state = State.NEW;
-            setView(state);
+            state = AlarmActivity.State.NEW;
+            intervalRelative.setVisibility(View.VISIBLE);
+            repeatableRelative.setVisibility(View.VISIBLE);
+            repeatableCheckbox.setChecked(true);
+            addAlarm.setText("Add alarm");
         } else {
-            state = State.EDIT;
+            addAlarm.setText("Edit alarm");
+            intervalRelative.setVisibility(View.INVISIBLE);
+            repeatableRelative.setVisibility(View.INVISIBLE);
+            state = AlarmActivity.State.EDIT;
             Long id = extras.getLong(Constants.EXTRA_LONG_ID);
 
-            mAlarm = DatabaseRepository.getAlarmById(this, id);
+            Alarm mAlarm = DatabaseRepository.getAlarmById(this, id);
+            Bundle bundle = new Bundle();
+            bundle.putLong(Constants.EXTRA_LONG_ID, id);
+
+
             if (mAlarm == null)
                 outputProvider.displayShortToast("Error loading pills");
             else {
-                setView(state);
+                if (mAlarm.isRepeatable()) {
+                    repeatableFragment.setArguments(bundle);
+                    repeatableCheckbox.setChecked(true);
+                } else {
+                    intervalFragment.setArguments(bundle);
+                    intervalCheckbox.setChecked(true);
+                }
             }
+
         }
 
          /*
@@ -97,112 +112,52 @@ public class AlarmActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
-
-    }
-
-
-    private void setView(State state) {
         //Setting up toolbar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-        timePicker.setIs24HourView(true);
 
-        viewList = new ArrayList<>();
-        pills = DatabaseRepository.getAllPills(this);
-
-        if (pills != null) {
-            for (Pill p : pills) {
-                HorizontalScrollViewItem item = new HorizontalScrollViewItem(getApplicationContext(), p.getPhoto(), p.getName(), p.getId());
-                linearInsideHorizontal.addView(item);
-                viewList.add(item);
-            }
-        } else
-            outputProvider.displayShortToast("Error loading pills");
-
-        if ((state == State.NEW)) {
-
-            addAlarm.setText("Add alarm");
-            Calendar c = Calendar.getInstance();
-            if (Build.VERSION.SDK_INT >= 23) {
-                timePicker.setHour(c.get(Calendar.HOUR_OF_DAY));
-                timePicker.setMinute(c.get(Calendar.MINUTE));
-            } else {
-                timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
-                timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
-            }
+    @OnCheckedChanged(R.id.repeatable_checkbox)
+    public void onRepeatableChecked(boolean checked) {
+        getSupportFragmentManager().popBackStack();
+        if (checked) {
+            intervalCheckbox.setChecked(false);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, repeatableFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         } else {
-            addAlarm.setText("Update alarm");
-            if (mAlarm != null) {
-                List<Long> pillIds = DatabaseRepository.getPillsByAlarm(getApplicationContext(), mAlarm.getId());
-                for (Long id : pillIds) {
-                    getViewItem(id);
-                }
-                if (Build.VERSION.SDK_INT >= 23) {
-                    timePicker.setHour(mAlarm.getHour());
-                    timePicker.setMinute(mAlarm.getMinute());
-                } else {
-                    timePicker.setCurrentHour(mAlarm.getHour());
-                    timePicker.setCurrentMinute(mAlarm.getMinute());
-                }
-            } else {
-                outputProvider.displayShortToast("Error loading alarm!");
-            }
+            intervalCheckbox.setChecked(true);
         }
 
     }
 
-    @OnClick(R.id.add_alarm)
-    public void addAlarm(View v) {
-        int hour = 0;
-        int minute = 0;
-        if (Build.VERSION.SDK_INT >= 23) {
-            hour = timePicker.getHour();
-            minute = timePicker.getMinute();
+    @OnCheckedChanged(R.id.interval_checkbox)
+    public void onIntervalChecked(boolean checked) {
+        getSupportFragmentManager().popBackStack();
+        if (checked) {
+            repeatableCheckbox.setChecked(false);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, intervalFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         } else {
-            hour = timePicker.getCurrentHour();
-            minute = timePicker.getCurrentMinute();
+            repeatableCheckbox.setChecked(true);
         }
+    }
 
-        final Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
 
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-
-        if (state == State.NEW) {
-            mAlarm = new Alarm(hour, minute, true);
-            DatabaseRepository.addAlarm(this, mAlarm);
-            alarmReceiver.setAlarm(getApplicationContext(), calendar, mAlarm.getId());
-        }
-
-        if (state == State.EDIT) {
-            mAlarm.setHour(hour);
-            mAlarm.setMinute(minute);
-            DatabaseHelper.getInstance(this).getAlarmDao().update(mAlarm);
-            DatabaseRepository.deleteAlarmToPill(getApplicationContext(), mAlarm.getId());
-            if (mAlarm.isActive())
-                alarmReceiver.setAlarm(getApplicationContext(), calendar, mAlarm.getId());
-            else
-                alarmReceiver.cancelAlarm(this, mAlarm.getId());
-        }
-
-        for (HorizontalScrollViewItem item : viewList) {
-            if (item.isChecked()) {
-                DatabaseRepository.addPillToAlarm(getApplicationContext(), new PillToAlarm(mAlarm.getId(), item.getPillId()));
-            }
-        }
-
+    @OnClick(R.id.add_alarm)
+    public void addAlarmButton(View v) {
+        if (repeatableCheckbox.isChecked())
+            repeatableFragment.addAlarm(state);
+        else
+            intervalFragment.addAlarm(state);
 
         finish();
     }
 
-    private void getViewItem(Long id) {
-        for (HorizontalScrollViewItem item : viewList) {
-            if (item.getPillId().equals(id))
-                item.setClick();
-        }
-    }
 
 }

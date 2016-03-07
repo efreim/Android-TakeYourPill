@@ -8,16 +8,41 @@ columnName=id
 generatedId=true
 # --field-end--
 # --field-start--
-fieldName=hour
+fieldName=mHour
 columnName=hour
 # --field-end--
 # --field-start--
-fieldName=minute
+fieldName=mMinute
 columnName=minute
 # --field-end--
 # --field-start--
-fieldName=isActive
+fieldName=mInterval
+# --field-end--
+# --field-start--
+fieldName=mUsageNumber
+# --field-end--
+# --field-start--
+fieldName=mDay
+columnName=day
+# --field-end--
+# --field-start--
+fieldName=mMonth
+columnName=month
+# --field-end--
+# --field-start--
+fieldName=mYear
+columnName=year
+# --field-end--
+# --field-start--
+fieldName=mIsActive
 columnName=active
+# --field-end--
+# --field-start--
+fieldName=mIsRepeatable
+columnName=repeatable
+# --field-end--
+# --field-start--
+fieldName=mDaysRepeating
 # --field-end--
 # --table-fields-end--
 # --table-end--
