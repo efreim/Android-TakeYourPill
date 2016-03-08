@@ -36,13 +36,19 @@ public class Alarm {
     @DatabaseField(columnName = "repeatable")
     private boolean mIsRepeatable;
 
+    @DatabaseField(columnName = "interval")
+    private boolean mIsInterval;
+
+    @DatabaseField(columnName = "single")
+    private boolean mIsSingle;
+
     @DatabaseField
     private String mDaysRepeating;
 
     public Alarm() {
     }
 
-    public Alarm(int hour, int minute, int interval, int usageNumber, int day, int month, int year, boolean isActive, boolean isRepeatable, String daysRepeating) {
+    public Alarm(int hour, int minute, int interval, int usageNumber, int day, int month, int year, boolean isActive, boolean isRepeatable, boolean isInterval, boolean isSingle, String daysRepeating) {
         this.mHour = hour;
         this.mMinute = minute;
         this.mInterval = interval;
@@ -52,6 +58,8 @@ public class Alarm {
         this.mYear = year;
         this.mIsActive = isActive;
         this.mIsRepeatable = isRepeatable;
+        this.mIsInterval = isInterval;
+        this.mIsSingle = isSingle;
         this.mDaysRepeating = daysRepeating;
     }
 
@@ -74,6 +82,22 @@ public class Alarm {
         this.hour = hour;
         this.minute = minute;
     }*/
+
+    public boolean isInterval() {
+        return mIsInterval;
+    }
+
+    public void setisInterval(boolean mIsInterval) {
+        this.mIsInterval = mIsInterval;
+    }
+
+    public boolean isSingle() {
+        return mIsSingle;
+    }
+
+    public void setIsSingle(boolean mIsSingle) {
+        this.mIsSingle = mIsSingle;
+    }
 
     public boolean isActive() {
         return mIsActive;

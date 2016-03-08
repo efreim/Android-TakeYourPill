@@ -25,7 +25,7 @@
         <RelativeLayout
             android:id="@+id/repeatable_relative"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.33"
             android:layout_height="wrap_content">
             <TextView
                 android:layout_width="match_parent"
@@ -45,7 +45,7 @@
         <RelativeLayout
             android:id="@+id/interval_relative"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.33"
             android:layout_height="wrap_content">
             <TextView
                 android:layout_width="match_parent"
@@ -59,6 +59,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/interval_text"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/single_relative"
+            android:layout_width="0dp"
+            android:layout_weight="0.33"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Single alarm"
+                android:textAlignment="center"
+                android:id="@+id/single_text" />
+            <CheckBox
+                android:id="@+id/single_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/single_text"
                 android:layout_centerHorizontal="true" />
         </RelativeLayout>
 

@@ -42,6 +42,14 @@ fieldName=mIsRepeatable
 columnName=repeatable
 # --field-end--
 # --field-start--
+fieldName=mIsInterval
+columnName=interval
+# --field-end--
+# --field-start--
+fieldName=mIsSingle
+columnName=single
+# --field-end--
+# --field-start--
 fieldName=mDaysRepeating
 # --field-end--
 # --table-fields-end--

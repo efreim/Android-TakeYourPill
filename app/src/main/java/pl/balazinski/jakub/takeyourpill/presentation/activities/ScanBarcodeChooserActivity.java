@@ -101,7 +101,7 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             int count = Integer.parseInt(countSplit[0]);
             long barcode = Long.parseLong(code);
             String price = cursor.getString(5);
-            int dosage = 1;
+            int dosage = -1;
 
             Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill);
             String path = uri.toString();

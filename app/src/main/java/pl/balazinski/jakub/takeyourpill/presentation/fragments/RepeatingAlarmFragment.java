@@ -90,7 +90,7 @@ public class RepeatingAlarmFragment extends Fragment {
         pillViewList = new ArrayList<>();
         weekViewListList = new ArrayList<>();
         pills = DatabaseRepository.getAllPills(context);
-        numberOfUsageEditText.setText("100");
+        //numberOfUsageEditText.setText("");
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
             DayOfWeekView dayOfWeekView = new DayOfWeekView(context, dayOfWeek.getId(), dayOfWeek.getDay());
@@ -112,7 +112,7 @@ public class RepeatingAlarmFragment extends Fragment {
             Calendar calendar = Calendar.getInstance();
             mMinute = calendar.get(Calendar.MINUTE);
             mHour = calendar.get(Calendar.HOUR_OF_DAY);
-            changeTimeButton.setText(buildString(mMinute,mHour));
+            changeTimeButton.setText(buildString(mMinute, mHour));
         } else {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
@@ -124,11 +124,11 @@ public class RepeatingAlarmFragment extends Fragment {
                 getViewItem(id);
             }
             String daysOfWeek = mAlarm.getDaysRepeating();
-            outputProvider.displayLog(TAG,"days of week:  " + daysOfWeek);
+            outputProvider.displayLog(TAG, "days of week:  " + daysOfWeek);
             char[] daysArray = daysOfWeek.toCharArray();
 
             for (int i = 0; i < daysArray.length; i++) {
-                outputProvider.displayLog(TAG, "daysArray["+i+"] = " + daysArray[i]);
+                outputProvider.displayLog(TAG, "daysArray[" + i + "] = " + daysArray[i]);
                 if (daysArray[i] == '1')
                     weekViewListList.get(i).setClick();
             }
@@ -165,7 +165,7 @@ public class RepeatingAlarmFragment extends Fragment {
 
 
     public void addAlarm(AlarmActivity.State state) {
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        AlarmReceiver alarmReceiver = new AlarmReceiver(context);
         String numberOfUsage = numberOfUsageEditText.getText().toString();
         StringBuilder stringBuilder = new StringBuilder();
         for (DayOfWeekView dayOfWeekView : weekViewListList) {
@@ -179,7 +179,7 @@ public class RepeatingAlarmFragment extends Fragment {
 
             if (!numberOfUsage.equals("")) {
                 int nou = Integer.parseInt(numberOfUsage);
-                mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, stringBuilder.toString());
+                mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, false, false, stringBuilder.toString());
 
                 DatabaseRepository.addAlarm(context, mAlarm);
                 alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
@@ -194,7 +194,7 @@ public class RepeatingAlarmFragment extends Fragment {
             DatabaseHelper.getInstance(context).getAlarmDao().update(mAlarm);
             DatabaseRepository.deleteAlarmToPill(context, mAlarm.getId());
             if (mAlarm.isActive())
-               alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
+                alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
             else
                 alarmReceiver.cancelAlarm(context, mAlarm.getId());
         }

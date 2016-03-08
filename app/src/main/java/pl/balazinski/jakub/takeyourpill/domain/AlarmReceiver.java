@@ -35,6 +35,13 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     private static Ringtone mRingtone = null;
     private OutputProvider outputProvider;
 
+    public AlarmReceiver() {
+    }
+
+    public AlarmReceiver(Context context) {
+        outputProvider = new OutputProvider(context);
+    }
+
     @Override
     public void onReceive(final Context context, Intent intent) {
 
@@ -63,110 +70,175 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         setResultCode(Activity.RESULT_OK);*/
     }
 
+    /**
+     * Method sets repeating alarm what means that you choose hour,minute and days
+     * you want alarm to repeat. If you won't choose days to repeat alarm will fire
+     * in given hour next day.
+     *
+     * @param context application context
+     * @param alarmID id of alarm
+     */
     public void setRepeatingAlarm(Context context, Long alarmID) {
-        outputProvider = new OutputProvider(context);
 
-        boolean isSingleAlarm = true;
+        boolean isRepeatingNoDays = true;
         List<Long> daysList = new ArrayList<>();
+        String daysOfWeek;
+        char[] daysOfWeekArray = new char[0];
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
         if (alarm != null) {
             alarm.setIsActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+
+            daysOfWeek = alarm.getDaysRepeating();
+            daysOfWeekArray = daysOfWeek.toCharArray();
+            for (char dayOfWeek : daysOfWeekArray)
+                if (dayOfWeek == '1')
+                    isRepeatingNoDays = false;
         }
 
-        String daysOfWeek = alarm.getDaysRepeating();
-        char[] daysOfWeekArray = daysOfWeek.toCharArray();
-        for (int i = 0; i < daysOfWeekArray.length; i++)
-            if (daysOfWeekArray[i] == '1')
-                isSingleAlarm = false;
 
         Calendar now = Calendar.getInstance();
         outputProvider.displayLog(TAG, "NOW day = " + now.get(Calendar.DAY_OF_WEEK) + "; timeinMillis = " + now.getTimeInMillis() + ";  date: " + now.getTime());
 
+        long alarmTimeInMillis;
 
-        long alarmTimeInMillis = 0;
 
-        if (isSingleAlarm) {
+        if (isRepeatingNoDays) {
+            /*
+            No days to repeat were given.
+             */
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
             calendar.set(Calendar.MINUTE, alarm.getMinute());
+            int day = now.get(Calendar.DAY_OF_MONTH);
+            outputProvider.displayLog(TAG, " single day now = " + now.get(Calendar.DAY_OF_MONTH));
 
+            if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
+                outputProvider.displayLog(TAG, " single day = " + calendar.get(Calendar.DAY_OF_MONTH));
+                calendar.set(Calendar.DAY_OF_MONTH, ++day);
+                outputProvider.displayLog(TAG, " single day = " + calendar.get(Calendar.DAY_OF_MONTH));
+            }
 
-            if (calendar.getTimeInMillis() <= now.getTimeInMillis())
-                alarmTimeInMillis = calendar.getTimeInMillis() + (AlarmManager.INTERVAL_DAY + 1);
-            else
-                alarmTimeInMillis = calendar.getTimeInMillis();
+            alarmTimeInMillis = calendar.getTimeInMillis();
+            alarm.setDay(calendar.get(Calendar.DAY_OF_MONTH));
+            alarm.setMonth(calendar.get(Calendar.MONTH));
+            alarm.setYear(calendar.get(Calendar.YEAR));
+            DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, AlarmReceiver.class);
             intent.putExtra("alarmID", alarmID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
-            outputProvider.displayLog(TAG, "SINGLE ALARM day = " + calendar.get(Calendar.DAY_OF_WEEK) + "; timeinMillis = " + calendar.getTimeInMillis() + ";  date: " + calendar.getTime());
+            outputProvider.displayLog(TAG, "SINGLE ALARM day = " + calendar.get(Calendar.DAY_OF_WEEK) + "; timeInMillis = " + calendar.getTimeInMillis() + ";  date: " + calendar.getTime());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             String dateString = formatter.format(new Date(alarmTimeInMillis));
             Toast.makeText(context, "Alarm will fire in: " + dateString, Toast.LENGTH_LONG).show();
         } else {
+            /*
+            Days to repeat were given.
+             */
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
             calendar.set(Calendar.MINUTE, alarm.getMinute());
             int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH);
             int month = calendar.get(Calendar.MONTH);
             int year = calendar.get(Calendar.YEAR);
-            outputProvider.displayLog(TAG,"alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
-            outputProvider.displayLog(TAG,"calendar HOUR = " + now.get(Calendar.HOUR_OF_DAY) + ";  calendar MINUTE = " + now.get(Calendar.MINUTE));
-            for (int i = 0; i < daysOfWeekArray.length; i++) {
+            outputProvider.displayLog(TAG, "alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
+            outputProvider.displayLog(TAG, "calendar HOUR = " + now.get(Calendar.HOUR_OF_DAY) + ";  calendar MINUTE = " + now.get(Calendar.MINUTE));
+            int i;
+            for (i = 0; i < daysOfWeekArray.length; i++) {
                 if (daysOfWeekArray[i] == '1') {
                     if (i < 6) {
                         calendar.set(Calendar.DAY_OF_WEEK, i + 2);
-                        if(i+2 == now.get(Calendar.DAY_OF_WEEK)) {
+                        weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
+                        if (i + 2 == now.get(Calendar.DAY_OF_WEEK)) {
+                            outputProvider.displayLog(TAG, "i + 2 == dayofweek");
                             if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
                                 if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
                                     weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                    calendar.set(Calendar.WEEK_OF_MONTH, ++weekOfMonth);
+                                    weekOfMonth = weekOfMonth + 1;
+                                    calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+                                    int day = i + 2;
+                                    calendar.set(Calendar.DAY_OF_WEEK, day);
                                 }
-                            } else if (alarm.getHour() < now.get(Calendar.HOUR)) {
+                            } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
                                 weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                calendar.set(Calendar.WEEK_OF_MONTH, ++weekOfMonth);
+                                weekOfMonth = weekOfMonth + 1;
+                                calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+                                int day = i + 2;
+                                calendar.set(Calendar.DAY_OF_WEEK, day);
                             }
-                        }else
-                            --weekOfMonth;
+                        }else if(i+2 < now.get(Calendar.DAY_OF_WEEK)){
+                            weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
+                            weekOfMonth = weekOfMonth + 1;
+                            calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+                            int day = i + 2;
+                            calendar.set(Calendar.DAY_OF_WEEK, day);
+                        }
 
 
-                        if (calendar.get(Calendar.WEEK_OF_MONTH) < now.get(Calendar.WEEK_OF_MONTH))
-                            calendar.set(Calendar.WEEK_OF_MONTH, ++weekOfMonth);
-                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH))
-                            calendar.set(Calendar.MONTH, ++month);
-                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR))
-                            calendar.set(Calendar.YEAR, ++year);
+                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH)) {
+                            month++;
+                            calendar.set(Calendar.MONTH, month);
+                        }
+                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {
+                            year++;
+                            calendar.set(Calendar.YEAR, year);
+                        }
 
                         daysList.add(calendar.getTimeInMillis());
 
-                        if(i+2 == now.get(Calendar.DAY_OF_WEEK))
-                            --weekOfMonth;
-                            outputProvider.displayLog(TAG, "i = " + i + ";  day = " + (i + 2) + "; timeinMillis = " + calendar.getTimeInMillis() +
+                        outputProvider.displayLog(TAG, "i = " + i + ";  day = " + (i + 2) + "; timeInMillis = " + calendar.getTimeInMillis() +
                                 ";  date: " + calendar.getTime());
 
                     } else if (i == 6) {
                         calendar.set(Calendar.DAY_OF_WEEK, 1);
-                        if (calendar.get(Calendar.WEEK_OF_MONTH) < now.get(Calendar.WEEK_OF_MONTH))
-                            calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth++);
-                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH))
-                            calendar.set(Calendar.MONTH, month++);
-                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR))
-                            calendar.set(Calendar.YEAR, year++);
+                        int sunday = 1;
+                        if (sunday == now.get(Calendar.DAY_OF_WEEK)) {
+                            outputProvider.displayLog(TAG, "i  == dayofweek");
+                            if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
+                                if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
+                                    weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
+                                    weekOfMonth = weekOfMonth + 1;
+                                    calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+                                    calendar.set(Calendar.DAY_OF_WEEK, sunday);
+                                }
+                            } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
+                                weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
+                                weekOfMonth = weekOfMonth + 1;
+                                calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+                                calendar.set(Calendar.DAY_OF_WEEK, sunday);
+                            }
+                        }
+
+                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH)) {
+                            month++;
+                            calendar.set(Calendar.MONTH, month);
+                        }
+                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {
+                            year++;
+                            calendar.set(Calendar.YEAR, year);
+                        }
 
                         daysList.add(calendar.getTimeInMillis());
-                        outputProvider.displayLog(TAG, "i = " + i + ";  day = " + 1 + "; timeinMillis = " + calendar.getTimeInMillis() +
+                        outputProvider.displayLog(TAG, "i = " + i + ";  day = " + 1 + "; timeInMillis = " + calendar.getTimeInMillis() +
                                 ";  date: " + calendar.getTime().toString());
 
+                    }
+
+                    if (i + 2 <= now.get(Calendar.DAY_OF_WEEK)) {
+                        int week = now.get(Calendar.WEEK_OF_MONTH);
+                        calendar.set(Calendar.WEEK_OF_MONTH, week);
                     }
                 }
             }
             outputProvider.displayLog(TAG, "collections min = " + Collections.min(daysList));
 
 
-           /* AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, AlarmReceiver.class);
             intent.putExtra("alarmID", alarmID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
@@ -174,11 +246,17 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             Log.i("setRepeatingAlarm", "alarmID == " + String.valueOf(alarmID));
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             String dateString = formatter.format(new Date(Collections.min(daysList)));
-            Toast.makeText(context, "Alarm will fire in: " + dateString, Toast.LENGTH_LONG).show();*/
+            Toast.makeText(context, "Alarm will fire in: " + dateString, Toast.LENGTH_LONG).show();
 
         }
     }
 
+    /**
+     * Method sets alarm with interval. Alarm will fire from chosen date every given time (minute/hour)
+     *
+     * @param context application context
+     * @param alarmID id of alarm
+     */
     public void setIntervalAlarm(Context context, Long alarmID) {
 
         int interval = 1, day, month, year;
@@ -209,6 +287,54 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         Log.i("setIntervalAlarm", "alarmID == " + String.valueOf(alarmID));
     }
 
+    /**
+     * Method sets single alarm what means it will fire only once at exact time and date.
+     * You can reenable alarm by changing it's date in edit alarm option. Chosen pill will
+     * stay with alarm.
+     *
+     * @param context application context
+     * @param alarmID id of alarm
+     */
+    public void setSingleAlarm(Context context, Long alarmID) {
+
+        int day, month, year;
+        Calendar calendar = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
+        if (alarm != null) {
+            day = alarm.getDay();
+            month = alarm.getMonth();
+            year = alarm.getYear();
+
+
+            calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
+            calendar.set(Calendar.MINUTE, alarm.getMinute());
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.YEAR, year);
+            if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
+                outputProvider.displayShortToast("Add new date to single alarm to activate.");
+                alarm.setIsActive(false);
+                DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+            } else {
+                alarm.setIsActive(true);
+                DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                intent.putExtra("alarmID", alarmID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                Log.i("setSingleAlarm", "alarmID == " + String.valueOf(alarmID));
+            }
+        }
+    }
+
+    /**
+     * Cancel every type of alarm. You can reactive alarm by setting it again with same alarm id.
+     *
+     * @param context
+     * @param id
+     */
     public void cancelAlarm(Context context, Long id) {
         Alarm alarm = DatabaseRepository.getAlarmById(context, id);
         if (alarm != null) {
@@ -223,10 +349,19 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     }
 
+    /**
+     * Stops annoying ringtone from ringing!!
+     */
     public static void stopRingtone() {
         mRingtone.stop();
     }
 
+    /**
+     * Converts Long value to int value.
+     *
+     * @param l Long value we want to transform.
+     * @return Transformed int value.
+     */
     private int longToInt(Long l) {
         return (int) (long) l;
     }

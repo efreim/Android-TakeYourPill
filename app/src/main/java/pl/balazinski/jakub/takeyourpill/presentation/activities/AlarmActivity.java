@@ -23,6 +23,7 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.IntervalAlarmFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.RepeatingAlarmFragment;
+import pl.balazinski.jakub.takeyourpill.presentation.fragments.SingleAlarmFragment;
 
 public class AlarmActivity extends AppCompatActivity {
 
@@ -38,21 +39,26 @@ public class AlarmActivity extends AppCompatActivity {
 
     @Bind(R.id.repeatable_checkbox)
     CheckBox repeatableCheckbox;
-
     @Bind(R.id.interval_checkbox)
     CheckBox intervalCheckbox;
+    @Bind(R.id.single_checkbox)
+    CheckBox singleCheckbox;
+
     @Bind(R.id.repeatable_relative)
     RelativeLayout repeatableRelative;
     @Bind(R.id.interval_relative)
     RelativeLayout intervalRelative;
+    @Bind(R.id.single_relative)
+    RelativeLayout singleRelative;
+
     @Bind(R.id.add_alarm)
     Button addAlarm;
 
 
-    private OutputProvider outputProvider;
     private State state;
     private IntervalAlarmFragment intervalFragment;
     private RepeatingAlarmFragment repeatableFragment;
+    private SingleAlarmFragment singleFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +66,7 @@ public class AlarmActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alarm);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
-        outputProvider = new OutputProvider(this);
+        OutputProvider outputProvider = new OutputProvider(this);
 
         /*
          * If extras are empty state is new otherwise
@@ -69,16 +75,19 @@ public class AlarmActivity extends AppCompatActivity {
          */
         repeatableFragment = new RepeatingAlarmFragment();
         intervalFragment = new IntervalAlarmFragment();
+        singleFragment = new SingleAlarmFragment();
         if (extras == null) {
             state = AlarmActivity.State.NEW;
             intervalRelative.setVisibility(View.VISIBLE);
             repeatableRelative.setVisibility(View.VISIBLE);
+            singleRelative.setVisibility(View.VISIBLE);
             repeatableCheckbox.setChecked(true);
             addAlarm.setText("Add alarm");
         } else {
             addAlarm.setText("Edit alarm");
             intervalRelative.setVisibility(View.INVISIBLE);
             repeatableRelative.setVisibility(View.INVISIBLE);
+            singleRelative.setVisibility(View.INVISIBLE);
             state = AlarmActivity.State.EDIT;
             Long id = extras.getLong(Constants.EXTRA_LONG_ID);
 
@@ -93,9 +102,12 @@ public class AlarmActivity extends AppCompatActivity {
                 if (mAlarm.isRepeatable()) {
                     repeatableFragment.setArguments(bundle);
                     repeatableCheckbox.setChecked(true);
-                } else {
+                } else if(mAlarm.isInterval()){
                     intervalFragment.setArguments(bundle);
                     intervalCheckbox.setChecked(true);
+                }else if(mAlarm.isSingle()){
+                    singleFragment.setArguments(bundle);
+                    singleCheckbox.setChecked(true);
                 }
             }
 
@@ -124,12 +136,13 @@ public class AlarmActivity extends AppCompatActivity {
         getSupportFragmentManager().popBackStack();
         if (checked) {
             intervalCheckbox.setChecked(false);
+            singleCheckbox.setChecked(false);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, repeatableFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         } else {
-            intervalCheckbox.setChecked(true);
+            //
         }
 
     }
@@ -139,12 +152,28 @@ public class AlarmActivity extends AppCompatActivity {
         getSupportFragmentManager().popBackStack();
         if (checked) {
             repeatableCheckbox.setChecked(false);
+            singleCheckbox.setChecked(false);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, intervalFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         } else {
-            repeatableCheckbox.setChecked(true);
+            //repeatableCheckbox.setChecked(true);
+        }
+    }
+
+    @OnCheckedChanged(R.id.single_checkbox)
+    public void onSingleChecked(boolean checked) {
+        getSupportFragmentManager().popBackStack();
+        if (checked) {
+            repeatableCheckbox.setChecked(false);
+            intervalCheckbox.setChecked(false);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, singleFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        } else {
+           // repeatableCheckbox.setChecked(true);
         }
     }
 
@@ -153,8 +182,10 @@ public class AlarmActivity extends AppCompatActivity {
     public void addAlarmButton(View v) {
         if (repeatableCheckbox.isChecked())
             repeatableFragment.addAlarm(state);
-        else
+        else if(intervalCheckbox.isChecked())
             intervalFragment.addAlarm(state);
+        else if(singleCheckbox.isChecked())
+            singleFragment.addAlarm(state);
 
         finish();
     }

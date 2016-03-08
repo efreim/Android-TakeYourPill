@@ -259,7 +259,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayDialog(final Long alarmID) {
-        final AlarmReceiver alarmReceiver = new AlarmReceiver();
+        final AlarmReceiver alarmReceiver = new AlarmReceiver(getApplicationContext());
+        final Alarm alarm = DatabaseRepository.getAlarmById(getApplicationContext(),alarmID);
         List<Long> pillIds = new ArrayList<>();
         if (alarmID != null) {
             pillIds = DatabaseRepository.getPillsByAlarm(this, alarmID);
@@ -278,12 +279,37 @@ public class MainActivity extends AppCompatActivity {
                     for (Long pillId : finalPillIds) {
                         Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
 
-                        int pillRemaining = pill.getPillsRemaining();
-                        int pillDosage = pill.getDosage();
-                        if (pillRemaining != -1 && pillDosage != -1) {
-                            pill.setPillsRemaining(pillRemaining - pillDosage);
-                            DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(pill);
-                            alarmFragment.refreshList();
+                        int pillRemaining = -1, pillDosage = -1;
+                        if (pill != null) {
+                            pillRemaining = pill.getPillsRemaining();
+                            pillDosage = pill.getDosage();
+
+                            if (pillRemaining != -1 && pillDosage != -1) {
+                                pill.setPillsRemaining(pillRemaining - pillDosage);
+                                DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(pill);
+                                alarmFragment.refreshList();
+                                outputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
+                            }
+                        }
+
+                    }
+                    if (alarm != null) {
+                        if (alarm.getUsageNumber() != -1) {
+                            if (alarm.getUsageNumber() > 0) {
+                                alarm.setUsageNumber(alarm.getUsageNumber() - 1);
+                                if (alarm.isRepeatable()) {
+                                    alarmReceiver.cancelAlarm(getApplicationContext(),alarmID);
+                                    alarmReceiver.setRepeatingAlarm(getApplicationContext(),alarmID);
+                                } else if (alarm.isSingle()) {
+                                    alarm.setIsActive(false);
+                                    alarmFragment.refreshList();
+                                }
+                            } else if(alarm.getUsageNumber()==0){
+                                outputProvider.displayShortToast("Alarm usage used");
+                                alarmReceiver.cancelAlarm(getApplicationContext(),alarmID);
+                                alarm.setIsActive(false);
+                                DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
+                            }
                         }
                     }
                 } else
@@ -295,10 +321,28 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 AlarmReceiver.stopRingtone();
 
+                if (alarm != null) {
+                    if (alarm.getUsageNumber() != -1) {
+                        if (alarm.getUsageNumber() > 0) {
+                            alarm.setUsageNumber(alarm.getUsageNumber() - 1);
+                            if (alarm.isRepeatable()) {
+                                alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
+                                alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmID);
+                            } else if (alarm.isSingle()) {
+                                alarm.setIsActive(false);
+                                alarmFragment.refreshList();
+                            }
+                        } else if(alarm.getUsageNumber()==0){
+                            outputProvider.displayShortToast("Alarm usage used");
+                            alarm.setIsActive(false);
+                            DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
+                        }
+                    }
+                }
                 // cancel the alert box and put a Toast to the user
                 alarmFragment.refreshList();
                 dialog.cancel();
-                outputProvider.displayShortToast("You chose a negative answer");
+                outputProvider.displayShortToast("You didn't take your pill :(");
             }
 
         });

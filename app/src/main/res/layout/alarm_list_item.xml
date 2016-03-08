@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,29 +18,56 @@
     android:id="@+id/alarm_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@android:color/white"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:layout_margin="8dp"
-    android:gravity="center_vertical"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:paddingTop="8dp">
 
-
-    <TextView
-        android:id="@+id/alarm_time"
+    <LinearLayout
+        android:id="@+id/inner_alarm_item"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/alarm_time_list_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_weight="0.4"
+            android:singleLine="false"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@+id/alarm_type_list_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="top"
+            android:layout_weight="0.5"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <ImageButton
+            android:id="@+id/image_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="0.1"
+            android:background="@android:drawable/ic_popup_reminder" />
+    </LinearLayout>
+
 
     <HorizontalScrollView
         android:id="@+id/expendable_item"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:clickable="false"
+        android:clickable="true"
         android:visibility="gone">
 
         <GridLayout

@@ -8,8 +8,8 @@ public class Constants {
     public static final int REQUEST_CAMERA = 1;
     public static final int SELECT_FILE = 2;
 
-    public static final String DATABASE_NAME = "takeyourpill3.db";
-    public static final int DATABASE_VERSION = 25;
+    public static final String DATABASE_NAME = "takeyourpill4.db";
+    public static final int DATABASE_VERSION = 1;
 
     public static final String EXTRA_LONG_ID = "id";
 
