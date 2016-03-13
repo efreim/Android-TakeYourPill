@@ -1,6 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,7 +25,10 @@ public class AddPillChooserActivity extends AppCompatActivity {
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
-
+    @Bind(R.id.scan_button)
+    Button scanButton;
+    @Bind(R.id.add_manually_button)
+    Button addManuallyButton;
 
     private OutputProvider outputProvider;
 
@@ -49,6 +54,16 @@ public class AddPillChooserActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            scanButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+            addManuallyButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+
+        } else {
+            scanButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+            addManuallyButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
 
     }
 

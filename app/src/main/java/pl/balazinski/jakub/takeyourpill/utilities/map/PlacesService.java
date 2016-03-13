@@ -1,4 +1,4 @@
-package pl.balazinski.jakub.takeyourpill.data.map;
+package pl.balazinski.jakub.takeyourpill.utilities.map;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

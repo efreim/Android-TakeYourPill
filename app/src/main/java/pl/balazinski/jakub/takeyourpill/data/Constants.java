@@ -23,6 +23,7 @@ public class Constants {
 
     public static final String MAIN_PACKAGE_NAME = "pl.balazinski.jakub.takeyourpill";
     public static final String MAIN_ACTIVITY_NAME = "pl.balazinski.jakub.takeyourpill.presentation.activities.MainActivity";
+    public static final String RECEIVER_ACTIVITY_NAME = "pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmReceiverActivity";
 
     public static final String MAIN_FROM_ALARM_KEY = "RETURNING_KEY";
     public static final String MAIN_FROM_ALARM = "RETURNING";

@@ -2,6 +2,7 @@ package pl.balazinski.jakub.takeyourpill.presentation;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -37,7 +38,7 @@ public class OutputProvider {
     }
 
     public void displayPopupMenu(AlarmListAdapter.ViewHolder holder, View v, int menuResource){
-        PopupMenu popupMenu = new PopupMenu(context, v);
+        PopupMenu popupMenu = new PopupMenu(context, v, Gravity.CENTER);
         popupMenu.inflate(menuResource);
         popupMenu.setOnMenuItemClickListener(holder);
         popupMenu.show();

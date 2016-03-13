@@ -19,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,8 +37,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.map.Place;
-import pl.balazinski.jakub.takeyourpill.data.map.PlacesService;
+import pl.balazinski.jakub.takeyourpill.utilities.map.Place;
+import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**

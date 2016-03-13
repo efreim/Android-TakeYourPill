@@ -1,38 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
+        <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="0px"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/pill_activity_item_margin"
+            android:layout_weight="0.1"
+            android:text="Alarm details" />
+
+        <EditText
             android:id="@+id/change_time_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="5dp"
-            android:layout_weight="0.25"
             android:layout_gravity="center|top"
-            android:textAlignment="center"
-            />
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.26"
+            android:focusableInTouchMode="false"
+            android:clickable="true"
+            android:hint="Alarm time"
+            android:textAlignment="center" />
 
-        <Button
+        <EditText
             android:id="@+id/change_day_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="5dp"
-            android:layout_weight="0.20"
             android:layout_gravity="center|top"
-            android:textAlignment="center"
-            />
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.26"
+            android:focusableInTouchMode="false"
+            android:clickable="true"
+            android:hint="Alarm date"
+            android:textAlignment="center" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/pill_activity_item_margin"
+            android:layout_weight="0.1"
+            android:text="Select pill for your alarm" />
 
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.20">
+            android:layout_weight="0.26">
 
             <GridLayout
                 android:id="@+id/inside_horizontal"

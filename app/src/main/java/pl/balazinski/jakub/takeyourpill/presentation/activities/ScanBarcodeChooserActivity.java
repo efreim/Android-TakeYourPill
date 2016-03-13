@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import butterknife.Bind;
@@ -37,6 +39,10 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
     Toolbar toolbar;
     @Bind(R.id.barcode_number_et)
     EditText barcodeNumberEditText;
+    @Bind(R.id.search_by_barcode_button)
+    Button searchByBarcodeButton;
+    @Bind(R.id.add_pill_manually_chooser)
+    Button addPillManually;
 
     private OutputProvider outputProvider;
     private Camera mCamera;
@@ -75,6 +81,16 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             startActivityForResult(new Intent(this, ScanBarcodeActivity.class), 1);
         }
 
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            searchByBarcodeButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+            addPillManually.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+
+        } else {
+            searchByBarcodeButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+            addPillManually.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
+
     }
 
     public void read(String code) {
@@ -103,12 +119,14 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             String price = cursor.getString(5);
             int dosage = -1;
 
-            Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill);
+            Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill_white_background);
             String path = uri.toString();
 
             DatabaseRepository.addPill(getApplicationContext(), new Pill(name, description, count, dosage, path, activeSubstance, price, barcode));
 
-            finish();
+            Intent i = new Intent(ScanBarcodeChooserActivity.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         } else
             outputProvider.displayShortToast("Pill not found, try again or add manually.");
     }

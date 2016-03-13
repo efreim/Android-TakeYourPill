@@ -1,12 +1,16 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -27,14 +31,14 @@ import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragmentViewPagerAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.AlarmListFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
+import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
 
 /**
@@ -70,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null) {
             Long alarmID = intent.getLongExtra("alarmID", -1);
             outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
-            if (alarmID != -1) {
+          /*  if (alarmID != -1) {
                 displayDialog(alarmID);
-            }
+            }*/
         }
 
         createFragments();
@@ -97,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
         }
 
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            button.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+        } else {
+            button.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
         button.setText("Add alarm");
     }
 
@@ -171,7 +181,11 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                 AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.show();
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(getApplicationContext(), AppPreferences.class));
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -201,8 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 if (position == 0) {
                     button.setText("Add alarm");
                     alarmFragment.refreshList();
-                }
-                else {
+                } else {
                     button.setText("Add pill");
                     pillFragment.refreshList();
                 }
@@ -238,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                                 mDrawerLayout.closeDrawers();
                                 break;
                             case R.id.settings_drawer:
-                                outputProvider.displayShortToast("To be done");
+                                startActivity(new Intent(getApplicationContext(), AppPreferences.class));
                                 mDrawerLayout.closeDrawers();
                                 break;
                             case R.id.find_pharmacy_drawer:
@@ -247,7 +260,8 @@ public class MainActivity extends AppCompatActivity {
                                 mDrawerLayout.closeDrawers();
                                 break;
                             case R.id.about_drawer:
-                                outputProvider.displayShortToast("To be done");
+                               intent = new Intent(getApplicationContext(), AboutActivity.class);
+                                startActivity(intent);
                                 mDrawerLayout.closeDrawers();
                                 break;
                             default:
@@ -256,100 +270,6 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-    }
-
-    private void displayDialog(final Long alarmID) {
-        final AlarmReceiver alarmReceiver = new AlarmReceiver(getApplicationContext());
-        final Alarm alarm = DatabaseRepository.getAlarmById(getApplicationContext(),alarmID);
-        List<Long> pillIds = new ArrayList<>();
-        if (alarmID != null) {
-            pillIds = DatabaseRepository.getPillsByAlarm(this, alarmID);
-        }
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        alertDialogBuilder.setTitle("Take your pill!");
-        alertDialogBuilder.setMessage("Did you take your pill?");
-        // set positive button: Yes message
-
-        final List<Long> finalPillIds = pillIds;
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                AlarmReceiver.stopRingtone();
-                if (!finalPillIds.isEmpty()) {
-                    for (Long pillId : finalPillIds) {
-                        Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
-
-                        int pillRemaining = -1, pillDosage = -1;
-                        if (pill != null) {
-                            pillRemaining = pill.getPillsRemaining();
-                            pillDosage = pill.getDosage();
-
-                            if (pillRemaining != -1 && pillDosage != -1) {
-                                pill.setPillsRemaining(pillRemaining - pillDosage);
-                                DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(pill);
-                                alarmFragment.refreshList();
-                                outputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
-                            }
-                        }
-
-                    }
-                    if (alarm != null) {
-                        if (alarm.getUsageNumber() != -1) {
-                            if (alarm.getUsageNumber() > 0) {
-                                alarm.setUsageNumber(alarm.getUsageNumber() - 1);
-                                if (alarm.isRepeatable()) {
-                                    alarmReceiver.cancelAlarm(getApplicationContext(),alarmID);
-                                    alarmReceiver.setRepeatingAlarm(getApplicationContext(),alarmID);
-                                } else if (alarm.isSingle()) {
-                                    alarm.setIsActive(false);
-                                    alarmFragment.refreshList();
-                                }
-                            } else if(alarm.getUsageNumber()==0){
-                                outputProvider.displayShortToast("Alarm usage used");
-                                alarmReceiver.cancelAlarm(getApplicationContext(),alarmID);
-                                alarm.setIsActive(false);
-                                DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
-                            }
-                        }
-                    }
-                } else
-                    outputProvider.displayShortToast("No pill added to alarm");
-            }
-        });
-        // set negative button: No message
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                AlarmReceiver.stopRingtone();
-
-                if (alarm != null) {
-                    if (alarm.getUsageNumber() != -1) {
-                        if (alarm.getUsageNumber() > 0) {
-                            alarm.setUsageNumber(alarm.getUsageNumber() - 1);
-                            if (alarm.isRepeatable()) {
-                                alarmReceiver.cancelAlarm(getApplicationContext(), alarmID);
-                                alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmID);
-                            } else if (alarm.isSingle()) {
-                                alarm.setIsActive(false);
-                                alarmFragment.refreshList();
-                            }
-                        } else if(alarm.getUsageNumber()==0){
-                            outputProvider.displayShortToast("Alarm usage used");
-                            alarm.setIsActive(false);
-                            DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
-                        }
-                    }
-                }
-                // cancel the alert box and put a Toast to the user
-                alarmFragment.refreshList();
-                dialog.cancel();
-                outputProvider.displayShortToast("You didn't take your pill :(");
-            }
-
-        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        // show alert
-        alertDialog.show();
     }
 
 }

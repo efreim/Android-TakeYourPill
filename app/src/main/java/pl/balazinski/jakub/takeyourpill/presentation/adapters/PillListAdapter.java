@@ -3,6 +3,8 @@ package pl.balazinski.jakub.takeyourpill.presentation.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -81,6 +84,14 @@ public class PillListAdapter
         holder.pill = getItem(position);
         holder.mTextView.setText(holder.pill.getName());
 
+        final int version = Build.VERSION.SDK_INT;
+
+        if (version >= 23) {
+            holder.pillItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_active_background));
+        } else {
+            holder.pillItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
+        }
+
         Glide.with(holder.mImageView.getContext())
                 .load(Uri.parse(getItem(position).getPhoto()))
                 .fitCenter()
@@ -104,6 +115,7 @@ public class PillListAdapter
         public final View mView;
         public final ImageView mImageView;
         public final TextView mTextView;
+        public final LinearLayout pillItem;
         private PillListAdapter adapter;
         private OutputProvider outputProvider;
         private Context context;
@@ -115,6 +127,7 @@ public class PillListAdapter
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.avatar);
             mTextView = (TextView) view.findViewById(android.R.id.text1);
+            pillItem = (LinearLayout) view.findViewById(R.id.pill_item);
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);
             this.adapter = adapter;

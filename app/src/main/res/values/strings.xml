@@ -46,4 +46,12 @@
     <string name="none"/>
     <string name="pill_details">Pill details</string>
     <string name="pill_optional">Optional</string>
+
+    <string name="about_text"><![CDATA[<b>Simulation</b> is about creating worms, in a board of hexes, which can move in randomly chosen direction.
+        Each time worm steps into the hex where bacteria is on worm life will be expanded. Otherwise worm will loose one unit of health.
+        After gaining maximum of health units the worm will expand into two. When health pool is equal to 0 worm dies. Simulation lasts until all worms are dead.
+        <br><b>The board</b> makes a whole. Worm can go from top to bottom and from right to left.<br><br>
+        <b>Board size:</b> choose a board size of simulation, you can set width and height from 3 to 18 hexes long.<br><br>
+        <b>Worm count:</b> set number of worms that will appear randomly on the board. The number of worms can be equal from 1 to half area of the board.<br><br>
+        <b>Bacteria factor:</b> set the possibility of bacteria appearance in each and every hex of the board.]]></string>
 </resources>

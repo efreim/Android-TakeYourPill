@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/info_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_linear" />
+
+    <LinearLayout
+        android:id="@+id/button_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_pill_button"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:layout_gravity="bottom"
+            android:layout_weight="0.5"
+            android:text="Pill not taken"
+            android:layout_margin="8dp"
+            android:textColor="@color/alarm_list_item_text" />
+
+        <Button
+            android:id="@+id/take_pill_button"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:layout_weight="0.5"
+            android:layout_gravity="bottom"
+            android:text="Pill taken"
+            android:layout_margin="8dp"
+            android:textColor="@color/alarm_list_item_text" />
+
+    </LinearLayout>
+
+</RelativeLayout>

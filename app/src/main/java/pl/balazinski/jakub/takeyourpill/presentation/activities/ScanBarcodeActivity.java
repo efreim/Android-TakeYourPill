@@ -5,18 +5,17 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.sourceforge.zbar.Config;
 import net.sourceforge.zbar.Image;
@@ -28,7 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.camera.CameraPreview;
+import pl.balazinski.jakub.takeyourpill.utilities.camera.CameraPreview;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 public class ScanBarcodeActivity extends AppCompatActivity {
@@ -46,7 +45,10 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
     @Bind(R.id.scanText)
     TextView scanText;
-
+    @Bind(R.id.add_barcode_manually)
+    Button addBarcodeManually;
+    @Bind(R.id.add_pill_manually)
+    Button addPillManually;
     static {
         System.loadLibrary("iconv");
     }
@@ -70,6 +72,15 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
         scanText.setText("Click to scan barcode!");
         // barcodeScanned=false;
+
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            addBarcodeManually.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+            addPillManually.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+        } else {
+            addBarcodeManually.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+            addPillManually.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -105,14 +116,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         }
         scanText.setText("Scanning...");
 
-        /*if (!barcodeScanned) {
-            outputProvider.displayLog(TAG, "inside clicked");
-            mCamera.setPreviewCallback(previewCb);
-            mCamera.startPreview();
-            previewing = true;
-            mCamera.autoFocus(autoFocusCB);
-            barcodeScanned = true;
-        }*/
     }
 
     @OnClick(R.id.add_barcode_manually)

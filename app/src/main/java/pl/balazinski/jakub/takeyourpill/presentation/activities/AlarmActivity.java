@@ -1,5 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
+import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -12,14 +14,18 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.IntervalAlarmFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.RepeatingAlarmFragment;
@@ -102,10 +108,10 @@ public class AlarmActivity extends AppCompatActivity {
                 if (mAlarm.isRepeatable()) {
                     repeatableFragment.setArguments(bundle);
                     repeatableCheckbox.setChecked(true);
-                } else if(mAlarm.isInterval()){
+                } else if (mAlarm.isInterval()) {
                     intervalFragment.setArguments(bundle);
                     intervalCheckbox.setChecked(true);
-                }else if(mAlarm.isSingle()){
+                } else if (mAlarm.isSingle()) {
                     singleFragment.setArguments(bundle);
                     singleCheckbox.setChecked(true);
                 }
@@ -128,13 +134,22 @@ public class AlarmActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            addAlarm.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+
+        } else {
+            addAlarm.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
     }
 
 
     @OnCheckedChanged(R.id.repeatable_checkbox)
     public void onRepeatableChecked(boolean checked) {
-        getSupportFragmentManager().popBackStack();
         if (checked) {
+            getSupportFragmentManager().popBackStack();
             intervalCheckbox.setChecked(false);
             singleCheckbox.setChecked(false);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -142,15 +157,15 @@ public class AlarmActivity extends AppCompatActivity {
             transaction.addToBackStack(null);
             transaction.commit();
         } else {
-            //
+            intervalCheckbox.setChecked(true);
         }
 
     }
 
     @OnCheckedChanged(R.id.interval_checkbox)
     public void onIntervalChecked(boolean checked) {
-        getSupportFragmentManager().popBackStack();
         if (checked) {
+            getSupportFragmentManager().popBackStack();
             repeatableCheckbox.setChecked(false);
             singleCheckbox.setChecked(false);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -158,14 +173,14 @@ public class AlarmActivity extends AppCompatActivity {
             transaction.addToBackStack(null);
             transaction.commit();
         } else {
-            //repeatableCheckbox.setChecked(true);
+            singleCheckbox.setChecked(true);
         }
     }
 
     @OnCheckedChanged(R.id.single_checkbox)
     public void onSingleChecked(boolean checked) {
-        getSupportFragmentManager().popBackStack();
         if (checked) {
+            getSupportFragmentManager().popBackStack();
             repeatableCheckbox.setChecked(false);
             intervalCheckbox.setChecked(false);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -173,22 +188,33 @@ public class AlarmActivity extends AppCompatActivity {
             transaction.addToBackStack(null);
             transaction.commit();
         } else {
-           // repeatableCheckbox.setChecked(true);
+            repeatableCheckbox.setChecked(true);
         }
     }
 
 
     @OnClick(R.id.add_alarm)
     public void addAlarmButton(View v) {
-        if (repeatableCheckbox.isChecked())
-            repeatableFragment.addAlarm(state);
-        else if(intervalCheckbox.isChecked())
-            intervalFragment.addAlarm(state);
-        else if(singleCheckbox.isChecked())
-            singleFragment.addAlarm(state);
+        boolean isOk = false;
+        if (repeatableCheckbox.isChecked()) {
+            isOk = repeatableFragment.addAlarm(state);
+        } else if (intervalCheckbox.isChecked()) {
+            isOk = intervalFragment.addAlarm(state);
+        } else if (singleCheckbox.isChecked()) {
+            isOk = singleFragment.addAlarm(state);
+        }
 
-        finish();
+        if (isOk)
+            finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() == 0) {
+            this.finish();
+        } else {
+            getFragmentManager().popBackStack();
+        }
+    }
 
 }

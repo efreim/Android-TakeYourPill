@@ -2,9 +2,11 @@ package pl.balazinski.jakub.takeyourpill.presentation.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,10 +27,10 @@ import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
-import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
+import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
 /**
  * Created by Kuba on 2016-01-31.
@@ -77,7 +79,6 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.alarm = getItem(position);
-        boolean isSingleAlarm = true;
         int hour = holder.alarm.getHour();
         int minute = holder.alarm.getMinute();
         StringBuilder stringBuilder = new StringBuilder();
@@ -86,96 +87,79 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         String daysOfWeek = holder.alarm.getDaysRepeating();
         char[] daysOfWeekArray = daysOfWeek.toCharArray();
         DayOfWeek[] dayOfWeekEnum = DayOfWeek.values();
-        holder.alarmTimeTextView.setText(text);
+
         if (holder.alarm.isRepeatable()) {
             for (int i = 0; i < daysOfWeekArray.length; i++) {
                 if (daysOfWeekArray[i] == '1') {
                     stringBuilder.append(dayOfWeekEnum[i].getDay());
                     stringBuilder.append(" ");
-                    isSingleAlarm = false;
                 }
             }
-
-            if (isSingleAlarm) {
-                holder.alarmTimeTextView.append(" ");
-                holder.alarmTimeTextView.append(buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
-                holder.alarmTypeTextView.setText("Repeatable alarm, no days added");
-            } else {
-                holder.alarmTimeTextView.append("\nDays repeating : \n" + stringBuilder.toString());
+                holder.alarmTimeTextView.setText(text + "\n ");
+                holder.alarmInfoTextView.setText("Days repeating : \n" + stringBuilder.toString());
                 holder.alarmTypeTextView.setText("Repeatable alarm");
-            }
 
         } else if (holder.alarm.isInterval()) {
-            holder.alarmTimeTextView.append(" " + buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()) + "\nInterval:\n" + holder.alarm.getInterval() + " minutes");
+            holder.alarmTimeTextView.setText(text + "\n" + buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
+            holder.alarmInfoTextView.setText("Interval:\n" + holder.alarm.getInterval() + " minutes");
             holder.alarmTypeTextView.setText("Interval alarm");
         } else if (holder.alarm.isSingle()) {
             holder.alarmTypeTextView.setText("Single alarm");
-            holder.alarmTimeTextView.append(buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
+            holder.alarmTimeTextView.setText(text + buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
+
         }
 
-        GridLayout gridLayout = (GridLayout) holder.expendableItem.getChildAt(0);
+        GridLayout gridLayout = (GridLayout) holder.pillList.getChildAt(0);
         gridLayout.removeAllViews();
 
         List<Long> items = DatabaseRepository.getPillsByAlarm(context, holder.alarm.getId());
-        if (items != null) {
+        if (!items.isEmpty()) {
             for (Long pillId : items) {
                 Pill p = DatabaseRepository.getPillByID(context, pillId);
                 HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, p.getPhoto(), p.getName(), p.getId());
                 item.setCheckboxGone();
+                item.setTextColorWhite();
                 item.setClickable(false);
                 gridLayout.addView(item);
             }
         } else {
             HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, "", "No pills attached to alarm", null);
+            item.setGravity(Gravity.CENTER);
             item.setCheckboxGone();
+            item.setImageGone();
+            item.setTextColorWhite();
             item.setClickable(false);
             gridLayout.addView(item);
         }
 
 
+        final int version = Build.VERSION.SDK_INT;
+
         if (holder.alarm.isActive()) {
-            if (holder.alarm.isRepeatable()) {
-                holder.alarmItem.setBackgroundColor(Color.WHITE);
-                holder.expendableItem.setBackgroundColor(Color.WHITE);
-                holder.innerAlarmItem.setBackgroundColor(Color.WHITE);
-            } else if (holder.alarm.isInterval()) {
-                holder.alarmItem.setBackgroundColor(Color.GREEN);
-                holder.expendableItem.setBackgroundColor(Color.GREEN);
-                holder.innerAlarmItem.setBackgroundColor(Color.GREEN);
-            } else if (holder.alarm.isSingle()) {
-                holder.alarmItem.setBackgroundColor(Color.CYAN);
-                holder.expendableItem.setBackgroundColor(Color.CYAN);
-                holder.innerAlarmItem.setBackgroundColor(Color.CYAN);
+            if (version >= 23) {
+                holder.alarmItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_active_background));
+                holder.pillList.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners_active));
+            } else {
+                holder.alarmItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
+                holder.pillList.setBackground(context.getResources().getDrawable(R.drawable.rounded_corners_active));
             }
-
         } else {
-            if (holder.alarm.isRepeatable()) {
-                holder.alarmItem.setBackgroundColor(Color.GRAY);
-                holder.expendableItem.setBackgroundColor(Color.GRAY);
-                holder.innerAlarmItem.setBackgroundColor(Color.GRAY);
-            } else if (holder.alarm.isInterval()) {
-                holder.alarmItem.setBackgroundColor(Color.DKGRAY);
-                holder.expendableItem.setBackgroundColor(Color.DKGRAY);
-                holder.innerAlarmItem.setBackgroundColor(Color.DKGRAY);
+            if (version >= 23) {
+                holder.alarmItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_inactive_background));
+                holder.pillList.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners_inactive));
+            } else {
+                holder.alarmItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_inactive_background));
+                holder.pillList.setBackground(context.getResources().getDrawable(R.drawable.rounded_corners_inactive));
 
-            } else if (holder.alarm.isInterval()) {
-                holder.alarmItem.setBackgroundColor(Color.BLUE);
-                holder.expendableItem.setBackgroundColor(Color.BLUE);
-                holder.innerAlarmItem.setBackgroundColor(Color.BLUE);
             }
         }
-
-        holder.imageButton.setOnClickListener(new View.OnClickListener()
-
-                                              {
+        holder.imageButton.setOnClickListener(new View.OnClickListener() {
                                                   @Override
                                                   public void onClick(View v) {
                                                       holder.alarmActivator(holder);
                                                   }
                                               }
-
         );
-
     }
 
     @Override
@@ -256,11 +240,12 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnClickListener, View.OnLongClickListener {
         public Alarm alarm;
         public final View mView;
-        public final TextView alarmTimeTextView, alarmTypeTextView;
-        public final LinearLayout alarmItem, innerAlarmItem;
+        public final TextView alarmTimeTextView, alarmTypeTextView, alarmInfoTextView;
+        public final LinearLayout alarmItem, innerAlarmItem, expandableAlarmItem;
         public final ImageButton imageButton;
-        public final HorizontalScrollView expendableItem;
+        public final HorizontalScrollView pillList;
         public final Context context;
+        public final GridLayout gridLayout;
         private AlarmReceiver alarmReceiver;
         private OutputProvider outputProvider;
         private AlarmListAdapter adapter;
@@ -271,15 +256,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             mView = view;
             alarmItem = (LinearLayout) view.findViewById(R.id.alarm_item);
             innerAlarmItem = (LinearLayout) view.findViewById(R.id.inner_alarm_item);
+            expandableAlarmItem = (LinearLayout) view.findViewById(R.id.expandable_item);
             alarmTimeTextView = (TextView) view.findViewById(R.id.alarm_time_list_item);
+            alarmInfoTextView = (TextView) view.findViewById(R.id.expandable_item_textview);
             alarmTypeTextView = (TextView) view.findViewById(R.id.alarm_type_list_item);
-            expendableItem = (HorizontalScrollView) view.findViewById(R.id.expendable_item);
+            pillList = (HorizontalScrollView) view.findViewById(R.id.pill_list);
+            gridLayout = (GridLayout) view.findViewById(R.id.grid_in_pill_list);
             imageButton = (ImageButton) view.findViewById(R.id.image_button);
             context = view.getContext();
             alarmReceiver = new AlarmReceiver(context);
             outputProvider = new OutputProvider(context);
-            expendableItem.setOnClickListener(this);
 
+            expandableAlarmItem.setOnClickListener(this);
+            expandableAlarmItem.setOnLongClickListener(this);
+            pillList.setOnClickListener(this);
+            pillList.setOnLongClickListener(this);
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);
             this.adapter = adapter;
@@ -334,21 +325,17 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             if (holder.alarm.isActive()) {
                 holder.alarm.setIsActive(false);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
-                //holder.alarmItem.setBackgroundColor(Color.GRAY);
-                //holder.innerAlarmItem.setBackgroundColor(Color.GRAY);
                 alarmReceiver.cancelAlarm(context, holder.alarm.getId());
                 adapter.refreshListener.onListRefresh();
             } else {
 
                 holder.alarm.setIsActive(true);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
-                //holder.alarmItem.setBackgroundColor(Color.WHITE);
-                //holder.innerAlarmItem.setBackgroundColor(Color.WHITE);
-                if(holder.alarm.isRepeatable())
+                if (holder.alarm.isRepeatable())
                     alarmReceiver.setRepeatingAlarm(context, holder.alarm.getId());
-                else if(holder.alarm.isInterval())
-                    alarmReceiver.setIntervalAlarm(context,holder.alarm.getId());
-                else if(holder.alarm.isSingle())
+                else if (holder.alarm.isInterval())
+                    alarmReceiver.setIntervalAlarm(context, holder.alarm.getId());
+                else if (holder.alarm.isSingle())
                     alarmReceiver.setSingleAlarm(context, holder.alarm.getId());
 
                 adapter.refreshListener.onListRefresh();
@@ -358,11 +345,11 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         @Override
         public void onClick(View v) {
             if (!isExpended) {
-                expendableItem.setVisibility(View.VISIBLE);
+                expandableAlarmItem.setVisibility(View.VISIBLE);
                 isExpended = true;
                 return;
             } else {
-                expendableItem.setVisibility(View.GONE);
+                expandableAlarmItem.setVisibility(View.GONE);
                 isExpended = false;
                 return;
             }

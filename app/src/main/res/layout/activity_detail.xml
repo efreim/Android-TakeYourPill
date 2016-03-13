@@ -72,7 +72,8 @@
                 android:id="@+id/pill_description_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/card_margin">
+                android:layout_margin="@dimen/card_margin"
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -100,7 +101,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
-                android:layout_marginRight="@dimen/card_margin">
+                android:layout_marginRight="@dimen/card_margin"
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -123,12 +125,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/pill_count_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/pill_count_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -151,12 +154,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/pill_count_left_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/pill_count_left_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -179,12 +183,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/active_substance_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/active_substance_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -208,12 +213,13 @@
 
 
             <android.support.v7.widget.CardView
+                android:id="@+id/pill_price_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/pill_price_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -236,12 +242,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/barcode_number_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/barcode_number_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -264,12 +271,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/alarms_attached_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin"
                 android:layout_marginLeft="@dimen/card_margin"
                 android:layout_marginRight="@dimen/card_margin"
-                android:id="@+id/alarms_attached_cv">
+                android:background="@drawable/rounded_cardview">
 
                 <LinearLayout
                     style="@style/Widget.CardContent"
@@ -291,19 +299,58 @@
 
             </android.support.v7.widget.CardView>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/card_margin"
+                android:layout_marginLeft="@dimen/card_margin"
+                android:layout_marginRight="@dimen/card_margin"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/refill_button"
+                    android:layout_width="0dp"
+                    android:layout_height="75dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginEnd="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.5"
+                    android:text="Click or shake to refill pill"
+                    android:textColor="@color/alarm_list_item_text" />
+
+                <Button
+                    android:id="@+id/search_web_button"
+                    android:layout_width="0dp"
+                    android:layout_height="75dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/pill_activity_item_margin"
+                    android:layout_weight="0.5"
+                    android:text="Find pill on internet"
+                    android:textColor="@color/alarm_list_item_text" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/internet_info_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"
-        android:src="@android:drawable/ic_dialog_info"
-        app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom|right|end" />
-
 
 </android.support.design.widget.CoordinatorLayout>
+
+    <!--
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/refill_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Shake phone or click to refill pills" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_web_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_size="mini"
+            fab:fab_title="Your pill on internet" />
+    -->

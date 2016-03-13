@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ScrollView;
@@ -28,7 +27,7 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
-import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.DayOfWeekView;
@@ -45,7 +44,7 @@ public class RepeatingAlarmFragment extends Fragment {
     @Bind(R.id.day_of_week_grid)
     GridLayout dayOfWeekGrid;
     @Bind(R.id.change_time_button)
-    Button changeTimeButton;
+    EditText changeTimeButton;
     @Bind(R.id.number_of_usage)
     EditText numberOfUsageEditText;
     private ScrollView scrollView;
@@ -90,7 +89,7 @@ public class RepeatingAlarmFragment extends Fragment {
         pillViewList = new ArrayList<>();
         weekViewListList = new ArrayList<>();
         pills = DatabaseRepository.getAllPills(context);
-        //numberOfUsageEditText.setText("");
+
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
             DayOfWeekView dayOfWeekView = new DayOfWeekView(context, dayOfWeek.getId(), dayOfWeek.getDay());
@@ -112,13 +111,16 @@ public class RepeatingAlarmFragment extends Fragment {
             Calendar calendar = Calendar.getInstance();
             mMinute = calendar.get(Calendar.MINUTE);
             mHour = calendar.get(Calendar.HOUR_OF_DAY);
-            changeTimeButton.setText(buildString(mMinute, mHour));
+            //changeTimeButton.setText(buildString(mMinute, mHour));
         } else {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
             mHour = mAlarm.getHour();
             changeTimeButton.setText(buildString(mMinute, mHour));
 
+            if (mAlarm.getUsageNumber() != -1) {
+                numberOfUsageEditText.setText(String.valueOf(mAlarm.getUsageNumber()));
+            }
             List<Long> pillIds = DatabaseRepository.getPillsByAlarm(context, mAlarm.getId());
             for (Long id : pillIds) {
                 getViewItem(id);
@@ -164,39 +166,76 @@ public class RepeatingAlarmFragment extends Fragment {
     }
 
 
-    public void addAlarm(AlarmActivity.State state) {
+    public boolean addAlarm(AlarmActivity.State state) {
+        boolean isDayChecked = false;
         AlarmReceiver alarmReceiver = new AlarmReceiver(context);
         String numberOfUsage = numberOfUsageEditText.getText().toString();
         StringBuilder stringBuilder = new StringBuilder();
         for (DayOfWeekView dayOfWeekView : weekViewListList) {
-            if (dayOfWeekView.isChecked())
+            if (dayOfWeekView.isChecked()) {
+                isDayChecked= true;
                 stringBuilder.append("1");
+            }
             else
                 stringBuilder.append("0");
         }
+
         outputProvider.displayLog(TAG, "addAlarm days list " + stringBuilder.toString());
         if (state == AlarmActivity.State.NEW) {
 
-            if (!numberOfUsage.equals("")) {
-                int nou = Integer.parseInt(numberOfUsage);
-                mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, false, false, stringBuilder.toString());
+            if (changeTimeButton.getText().toString().equals("")) {
+                changeTimeButton.setError("Choose alarm time");
+                return false;
+            }else
+                changeTimeButton.setError(null);
 
+            if(!isDayChecked){
+                outputProvider.displayShortToast("Set repeating days or use single alarm");
+                return false;
+            }
+
+            if (numberOfUsage.equals("")) {
+                int nou = -1;
+                mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, false, false, stringBuilder.toString());
                 DatabaseRepository.addAlarm(context, mAlarm);
                 alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
+            } else if (!numberOfUsage.equals("") && !numberOfUsage.startsWith(".")) {
+                int nou = Integer.parseInt(numberOfUsage);
+                mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, false, false, stringBuilder.toString());
+                DatabaseRepository.addAlarm(context, mAlarm);
+                alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
+            } else {
+                outputProvider.displayShortToast("Number of alarms can't be .   :(");
+                return false;
             }
+
+
+
+
         } else {
-            if (!numberOfUsage.equals(""))
+
+            if (numberOfUsage.equals("")) {
+                mAlarm.setUsageNumber(-1);
+            } else if (!numberOfUsage.equals("") && !numberOfUsage.startsWith("."))
                 mAlarm.setUsageNumber(Integer.parseInt(numberOfUsage));
+            else {
+                outputProvider.displayShortToast("Error with number of alarms field");
+                return false;
+            }
+
+            if(!isDayChecked){
+                outputProvider.displayShortToast("Set repeating days or use single alarm");
+                return false;
+            }
 
             mAlarm.setMinute(mMinute);
             mAlarm.setHour(mHour);
             mAlarm.setDaysRepeating(stringBuilder.toString());
+            mAlarm.setIsActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(mAlarm);
             DatabaseRepository.deleteAlarmToPill(context, mAlarm.getId());
-            if (mAlarm.isActive())
-                alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
-            else
-                alarmReceiver.cancelAlarm(context, mAlarm.getId());
+            alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
+
         }
 
         for (HorizontalScrollViewItem item : pillViewList) {
@@ -204,7 +243,7 @@ public class RepeatingAlarmFragment extends Fragment {
                 DatabaseRepository.addPillToAlarm(getContext(), new PillToAlarm(mAlarm.getId(), item.getPillId()));
             }
         }
-
+        return true;
     }
 
     private void getViewItem(Long id) {

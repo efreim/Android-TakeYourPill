@@ -1,4 +1,4 @@
-package pl.balazinski.jakub.takeyourpill.data.camera;
+package pl.balazinski.jakub.takeyourpill.utilities.camera;
 
 import android.content.Context;
 import android.hardware.Camera;

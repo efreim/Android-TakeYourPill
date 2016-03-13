@@ -35,17 +35,40 @@
             android:textAlignment="center"
             android:inputType="numberDecimal"
             android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/search_by_barcode_button" />
+            android:layout_alignStart="@+id/button_linear" />
 
-        <Button
-            android:id="@+id/search_by_barcode_button"
+
+        <LinearLayout
+            android:layout_alignParentBottom="true"
+            android:id="@+id/button_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Find pill"
-            android:layout_marginLeft="@dimen/pill_activity_item_margin"
-            android:layout_marginRight="@dimen/pill_activity_item_margin"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/card_margin"
+            android:layout_marginLeft="@dimen/card_margin"
+            android:layout_marginRight="@dimen/card_margin">
+
+            <Button
+                android:id="@+id/search_by_barcode_button"
+                android:layout_width="0dp"
+                android:layout_height="75dp"
+                android:layout_weight="0.5"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="@dimen/pill_activity_item_margin"
+                android:textColor="@color/alarm_list_item_text"
+                android:text="Find pill \nby barcode" />
+
+            <Button
+                android:id="@+id/add_pill_manually_chooser"
+                android:text="Add pill \nmanually"
+                android:layout_width="0dp"
+                android:layout_height="75dp"
+                android:layout_weight="0.5"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="@dimen/pill_activity_item_margin"
+                android:textColor="@color/alarm_list_item_text"
+                />
+        </LinearLayout>
 
     </RelativeLayout>
 </RelativeLayout>

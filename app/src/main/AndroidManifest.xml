@@ -8,6 +8,7 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_GPS" />
@@ -15,6 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -104,10 +106,36 @@
                 android:value=".presentation.activities.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".presentation.activities.AppPreferences"
+            android:parentActivityName=".presentation.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".presentation.activities.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".presentation.activities.AlarmReceiverActivity"
+            android:showOnLockScreen="true"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/Theme.AppCompat.Translucent"
+            >
+        </activity>
+
+        <activity
+            android:name=".presentation.activities.AboutActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.CustomTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".presentation.activities.MainActivity" />
+        </activity>
+
         <service
-            android:name=".domain.AlarmService"
+            android:name=".utilities.AlarmService"
             android:enabled="true" />
-        <receiver android:name=".domain.AlarmReceiver" />
+        <receiver android:name=".utilities.AlarmReceiver" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -30,10 +29,10 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
-import pl.balazinski.jakub.takeyourpill.domain.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
+import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
 /**
  * Created by Kuba on 07.03.2016.
@@ -45,17 +44,17 @@ public class SingleAlarmFragment extends Fragment {
     GridLayout linearInsideHorizontal;
 
     @Bind(R.id.change_time_button)
-    Button changeTimeButton;
+    EditText changeTimeButton;
 
     @Bind(R.id.change_day_button)
-    Button changeDayButton;
+    EditText changeDayButton;
 
 
     private List<HorizontalScrollViewItem> pillViewList;
     private Alarm mAlarm;
     private OutputProvider outputProvider;
     private Context context;
-    private int mMinute = 0, mHour = 0, mNumberOfAlarms = 0, mDay = 0, mMonth = 0, mYear = 0;
+    private int mMinute = 0, mHour = 0, mDay = 0, mMonth = 0, mYear = 0;
 
     @Nullable
     @Override
@@ -106,8 +105,6 @@ public class SingleAlarmFragment extends Fragment {
             mDay = calendar.get(Calendar.DAY_OF_MONTH);
             mMonth = calendar.get(Calendar.MONTH);
             mYear = calendar.get(Calendar.YEAR);
-            changeTimeButton.setText(buildString(mMinute, mHour));
-            changeDayButton.setText(buildString(mDay, mMonth, mYear));
         } else {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
@@ -180,9 +177,22 @@ public class SingleAlarmFragment extends Fragment {
     }
 
 
-    public void addAlarm(AlarmActivity.State state) {
+    public boolean addAlarm(AlarmActivity.State state) {
         AlarmReceiver alarmReceiver = new AlarmReceiver(context);
         if (state == AlarmActivity.State.NEW) {
+
+            if (changeTimeButton.getText().toString().equals("")) {
+                changeTimeButton.setError("Choose alarm time");
+                return false;
+            } else
+                changeTimeButton.setError(null);
+
+            if (changeDayButton.getText().toString().equals("")) {
+                changeDayButton.setError("Choose alarm date");
+                return false;
+            } else
+                changeTimeButton.setError(null);
+
             mAlarm = new Alarm(mHour, mMinute, -1, -1, mDay, mMonth, mYear, true, false, false, true, "");
 
             DatabaseRepository.addAlarm(context, mAlarm);
@@ -195,12 +205,11 @@ public class SingleAlarmFragment extends Fragment {
             mAlarm.setYear(mYear);
             mAlarm.setMinute(mMinute);
             mAlarm.setHour(mHour);
+            mAlarm.setIsActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(mAlarm);
             DatabaseRepository.deleteAlarmToPill(context, mAlarm.getId());
-            if (mAlarm.isActive())
-                alarmReceiver.setIntervalAlarm(context, mAlarm.getId());
-            else
-                alarmReceiver.cancelAlarm(context, mAlarm.getId());
+            alarmReceiver.setIntervalAlarm(context, mAlarm.getId());
+
         }
 
         for (HorizontalScrollViewItem item : pillViewList) {
@@ -208,7 +217,7 @@ public class SingleAlarmFragment extends Fragment {
                 DatabaseRepository.addPillToAlarm(getContext(), new PillToAlarm(mAlarm.getId(), item.getPillId()));
             }
         }
-
+        return true;
     }
 
     private void getViewItem(Long id) {

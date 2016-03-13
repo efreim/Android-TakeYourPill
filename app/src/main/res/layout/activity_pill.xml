@@ -16,6 +16,14 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_scrollFlags="scroll|enterAlways|snap" />
 
+    <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,7 +42,7 @@
                 android:layout_weight="0.5"
                 android:text="@string/pill_details" />
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/pill_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -42,7 +50,8 @@
                 android:layout_weight="0.5"
                 android:hint="Pill name"
                 android:maxLength="50"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:ems="10"/>
 
 
 
@@ -142,6 +151,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="@dimen/pill_activity_item_margin"
                     android:layout_marginTop="@dimen/card_margin"
+                    android:textColor="@color/alarm_list_item_text"
                     android:layout_weight="0.1" />
             </LinearLayout>
         </LinearLayout>
@@ -154,5 +164,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_gravity="bottom"
+        android:textColor="@color/alarm_list_item_text"
         android:layout_margin="@dimen/pill_activity_item_margin" />
 </RelativeLayout>

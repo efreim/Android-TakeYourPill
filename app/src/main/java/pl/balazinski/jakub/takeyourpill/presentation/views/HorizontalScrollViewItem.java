@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -127,6 +128,15 @@ public class HorizontalScrollViewItem extends RelativeLayout implements View.OnC
         return (checkBox.isChecked());
     }
 
+    public void setTextColorWhite(){
+        final int version = Build.VERSION.SDK_INT;
+        if (version >= 23) {
+            textView.setTextColor(ContextCompat.getColor(context, R.color.alarm_list_item_text));
+        } else {
+            textView.setTextColor(context.getResources().getColor( R.color.alarm_list_item_text));
+        }
+    }
+
     public String getText() {
         return text;
     }
@@ -137,5 +147,9 @@ public class HorizontalScrollViewItem extends RelativeLayout implements View.OnC
 
     public void setCheckboxGone(){
         checkBox.setVisibility(GONE);
+    }
+
+    public void setImageGone(){
+        imageView.setVisibility(GONE);
     }
 }
