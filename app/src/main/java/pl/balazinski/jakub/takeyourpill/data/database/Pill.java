@@ -17,7 +17,6 @@
 package pl.balazinski.jakub.takeyourpill.data.database;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -73,7 +72,7 @@ public class Pill {
         this.mBarcodeNumber = barcodeNumber;
         this.mPillsRemaining = count;
         //if (photo.equals(""))
-            //this.mPhoto = getResources().getIdentifier(name,"drawable", getPackageName());
+        //this.mPhoto = getResources().getIdentifier(name,"drawable", getPackageName());
 
     }
 

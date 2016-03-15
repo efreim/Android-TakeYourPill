@@ -1,21 +1,12 @@
 package pl.balazinski.jakub.takeyourpill.utilities;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmReceiverActivity;
-import pl.balazinski.jakub.takeyourpill.presentation.activities.MainActivity;
 
-/**
- * Created by Kuba on 2016-02-01.
- */
 public class AlarmService extends IntentService {
 
 
@@ -25,11 +16,10 @@ public class AlarmService extends IntentService {
 
     @Override
     public void onHandleIntent(Intent intent) {
-        //sendNotification("Wake Up! Wake Up!");
         Bundle bundle = intent.getExtras();
-        intent.putExtra("alarmID", bundle.getLong("alarmID"));
+        intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, bundle.getLong(Constants.EXTRA_LONG_ALARM_ID));
         Intent i = new Intent(this, AlarmReceiverActivity.class);
-        i.putExtra("alarmID", bundle.getLong("alarmID"));
+        i.putExtra(Constants.EXTRA_LONG_ALARM_ID, bundle.getLong(Constants.EXTRA_LONG_ALARM_ID));
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplicationContext().startActivity(i);
     }

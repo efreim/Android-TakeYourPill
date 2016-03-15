@@ -63,26 +63,6 @@ public class Alarm {
         this.mDaysRepeating = daysRepeating;
     }
 
-    /* public Alarm(int hour, int minute, int day, int month, int year, int usageNumber, boolean isActive, boolean isRepeatable, boolean isInterval, String ringtone, boolean isVibrating) {
-        this.isActive = isActive;
-        this.hour = hour;
-        this.minute = minute;
-        this.day = day;
-        this.month = month;
-        this.year = year;
-        this.usageNumber = usageNumber;
-        this.isRepeatable = isRepeatable;
-        this.isInterval = isInterval;
-        this.ringtone = ringtone;
-        this.isVibrating = isVibrating;
-    }*/
-
-   /* public Alarm(int hour, int minute, boolean isActive) {
-        this.isActive = isActive;
-        this.hour = hour;
-        this.minute = minute;
-    }*/
-
     public boolean isInterval() {
         return mIsInterval;
     }

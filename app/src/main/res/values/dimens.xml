@@ -25,4 +25,9 @@
     <dimen name="pill_activity_item_margin">16dp</dimen>
 
     <dimen name="font_size">16sp</dimen>
+
+
+    <dimen name="icon_left_padding">16dp</dimen>
+    <dimen name="list_item_left_padding">72dp</dimen>
+    <dimen name="list_item_right_padding">16dp</dimen>
 </resources>

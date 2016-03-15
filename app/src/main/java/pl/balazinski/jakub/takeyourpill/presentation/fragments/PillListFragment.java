@@ -27,34 +27,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.PillListAdapter;
 
-/**
- * Fragments which contains list inside viewpager.
- */
+
 public class PillListFragment extends Fragment implements PillListAdapter.PillListRefreshListener {
 
     private PillListAdapter pillListAdapter;
-
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RecyclerView rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
-
         setupRecyclerView(rv);
-
         return rv;
     }
 
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
-        itemAnimator.setAddDuration(1000);
-        itemAnimator.setRemoveDuration(1000);
-        recyclerView.setItemAnimator(itemAnimator);
         pillListAdapter = new PillListAdapter(getActivity());
         pillListAdapter.setListRefreshListener(this);
         recyclerView.setAdapter(pillListAdapter);
@@ -76,7 +66,7 @@ public class PillListFragment extends Fragment implements PillListAdapter.PillLi
 
 
     @Override
-    public void onListRefresh(){
+    public void onListRefresh() {
         refreshList();
     }
 }

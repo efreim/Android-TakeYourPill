@@ -34,42 +34,46 @@ import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
 import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
-/**
- * Created by Kuba on 02.03.2016.
- */
 public class IntervalAlarmFragment extends Fragment {
 
-    private final String TAG = "INTERVAL_ALARM_FRAGMENT";
+    private final String TAG = getClass().getSimpleName();
+
     @Bind(R.id.inside_horizontal)
     GridLayout linearInsideHorizontal;
-
     @Bind(R.id.change_time_button)
     EditText changeTimeButton;
-
     @Bind(R.id.change_day_button)
     EditText changeDayButton;
-
     @Bind(R.id.interval_time)
     EditText intervalTimeEditText;
-
     @Bind(R.id.number_of_usage)
     EditText numberOfUsageEditText;
 
-    private List<HorizontalScrollViewItem> pillViewList;
+    private List<HorizontalScrollViewItem> mPillViewList;
     private Alarm mAlarm;
-    private OutputProvider outputProvider;
-    private Context context;
-    private int mMinute = 0, mHour = 0, mNumberOfAlarms = 0, mDay = 0, mMonth = 0, mYear = 0, mInterval = 0;
+    private OutputProvider mOutputProvider;
+    private Context mContext;
+    private int mMinute = 0;
+    private int mHour = 0;
+    private int mDay = 0;
+    private int mMonth = 0;
+    private int mYear = 0;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_interval_alarm, container, false);
-        context = getContext();
-        outputProvider = new OutputProvider(context);
+        mContext = getContext();
+        mOutputProvider = new OutputProvider(mContext);
         ButterKnife.bind(this, scrollView);
 
         Bundle bundle = getArguments();
+        setupContent(bundle);
+
+        return scrollView;
+    }
+
+    private void setupContent(Bundle bundle) {
         AlarmActivity.State state;
         if (bundle == null) {
             state = AlarmActivity.State.NEW;
@@ -78,30 +82,28 @@ public class IntervalAlarmFragment extends Fragment {
             state = AlarmActivity.State.EDIT;
             Long alarmId = bundle.getLong(Constants.EXTRA_LONG_ID);
 
-            mAlarm = DatabaseRepository.getAlarmById(context, alarmId);
+            mAlarm = DatabaseRepository.getAlarmById(mContext, alarmId);
             if (mAlarm == null)
-                outputProvider.displayShortToast("Error loading pills");
+                mOutputProvider.displayShortToast(getString(R.string.error_loading_pills));
             else {
                 setupView(state);
             }
         }
-
-        return scrollView;
     }
 
     private void setupView(AlarmActivity.State state) {
-        pillViewList = new ArrayList<>();
-        List<Pill> pills = DatabaseRepository.getAllPills(context);
+        mPillViewList = new ArrayList<>();
+        List<Pill> pills = DatabaseRepository.getAllPills(mContext);
 
 
         if (pills != null) {
             for (Pill p : pills) {
-                HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, p.getPhoto(), p.getName(), p.getId());
+                HorizontalScrollViewItem item = new HorizontalScrollViewItem(mContext, p.getPhoto(), p.getName(), p.getId());
                 linearInsideHorizontal.addView(item);
-                pillViewList.add(item);
+                mPillViewList.add(item);
             }
         } else
-            outputProvider.displayShortToast("Error loading pills");
+            mOutputProvider.displayShortToast(getString(R.string.error_loading_pills));
 
 
         if (state == AlarmActivity.State.NEW) {
@@ -117,20 +119,22 @@ public class IntervalAlarmFragment extends Fragment {
             mDay = mAlarm.getDay();
             mMonth = mAlarm.getMonth();
             mYear = mAlarm.getYear();
-            mInterval = mAlarm.getInterval();
-            mNumberOfAlarms = mAlarm.getUsageNumber();
+            int interval = mAlarm.getInterval();
+            int numberOfAlarms = mAlarm.getUsageNumber();
             changeTimeButton.setText(buildString(mMinute, mHour));
             changeDayButton.setText(buildString(mDay, mMonth, mYear));
+            numberOfUsageEditText.setText(String.valueOf(numberOfAlarms));
 
-            if (mAlarm.getUsageNumber() != -1) {
-                numberOfUsageEditText.setText(String.valueOf(mAlarm.getUsageNumber()));
+
+            if (numberOfAlarms != -1) {
+                numberOfUsageEditText.setText(String.valueOf(numberOfAlarms));
             }
 
-            if (mAlarm.getInterval() != -1) {
-                intervalTimeEditText.setText(String.valueOf(mInterval));
+            if (interval != -1) {
+                intervalTimeEditText.setText(String.valueOf(interval));
             }
 
-            List<Long> pillIds = DatabaseRepository.getPillsByAlarm(context, mAlarm.getId());
+            List<Long> pillIds = DatabaseRepository.getPillsByAlarm(mContext, mAlarm.getId());
             for (Long id : pillIds) {
                 getViewItem(id);
             }
@@ -149,7 +153,7 @@ public class IntervalAlarmFragment extends Fragment {
             mMinute = mCurrentTime.get(Calendar.MINUTE);
         }
         TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+        mTimePicker = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 changeTimeButton.setText(buildString(selectedMinute, selectedHour));
@@ -157,7 +161,7 @@ public class IntervalAlarmFragment extends Fragment {
                 mHour = selectedHour;
             }
         }, mHour, mMinute, true);
-        mTimePicker.setTitle("Select Time");
+        mTimePicker.setTitle(getString(R.string.select_time));
         mTimePicker.show();
 
     }
@@ -165,9 +169,8 @@ public class IntervalAlarmFragment extends Fragment {
     @OnClick(R.id.change_day_button)
     public void onDayTimeClick(View v) {
         Calendar mCurrentTime = Calendar.getInstance();
-        // int day, month, year;
-        if (mAlarm != null) {
 
+        if (mAlarm != null) {
             mDay = mAlarm.getDay();
             mMonth = mAlarm.getMonth();
             mYear = mAlarm.getYear();
@@ -177,7 +180,7 @@ public class IntervalAlarmFragment extends Fragment {
             mYear = mCurrentTime.get(Calendar.YEAR);
         }
         DatePickerDialog mDatePicker;
-        mDatePicker = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
+        mDatePicker = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
@@ -187,13 +190,13 @@ public class IntervalAlarmFragment extends Fragment {
                 mYear = year;
             }
         }, mYear, mMonth, mDay);
-        mDatePicker.setTitle("Select starting date");
+        mDatePicker.setTitle(getString(R.string.select_starting_date));
         mDatePicker.show();
     }
 
 
     public boolean addAlarm(AlarmActivity.State state) {
-        AlarmReceiver alarmReceiver = new AlarmReceiver(context);
+        AlarmReceiver alarmReceiver = new AlarmReceiver(mContext);
         String numberOfUsageString = numberOfUsageEditText.getText().toString();
         String intervalString = intervalTimeEditText.getText().toString();
         int numberOfUsage, interval;
@@ -205,32 +208,30 @@ public class IntervalAlarmFragment extends Fragment {
             numberOfUsage = Integer.parseInt(numberOfUsageString);
             interval = Integer.parseInt(intervalString);
         } else {
-            intervalTimeEditText.setError("Set interval time!");
+            intervalTimeEditText.setError(getString(R.string.error_set_interval));
             return false;
         }
 
         if (state == AlarmActivity.State.NEW) {
 
             if (changeTimeButton.getText().toString().equals("")) {
-                changeTimeButton.setError("Choose alarm time");
+                changeTimeButton.setError(getString(R.string.error_choose_alarm_time));
                 return false;
             } else
                 changeTimeButton.setError(null);
 
             if (changeDayButton.getText().toString().equals("")) {
-                changeDayButton.setError("Choose alarm date");
+                changeDayButton.setError(getString(R.string.error_choose_alarm_date));
                 return false;
             } else
                 changeTimeButton.setError(null);
 
 
             mAlarm = new Alarm(mHour, mMinute, interval, numberOfUsage, mDay, mMonth, mYear, true, false, true, false, "");
-            DatabaseRepository.addAlarm(context, mAlarm);
-            alarmReceiver.setIntervalAlarm(context, mAlarm.getId());
-
+            DatabaseRepository.addAlarm(mContext, mAlarm);
+            alarmReceiver.setIntervalAlarm(mContext, mAlarm.getId());
 
         } else {
-
             mAlarm.setInterval(interval);
             mAlarm.setUsageNumber(numberOfUsage);
             mAlarm.setDay(mDay);
@@ -239,13 +240,12 @@ public class IntervalAlarmFragment extends Fragment {
             mAlarm.setMinute(mMinute);
             mAlarm.setHour(mHour);
             mAlarm.setIsActive(true);
-            DatabaseHelper.getInstance(context).getAlarmDao().update(mAlarm);
-            DatabaseRepository.deleteAlarmToPill(context, mAlarm.getId());
-            alarmReceiver.setIntervalAlarm(context, mAlarm.getId());
-
+            DatabaseHelper.getInstance(mContext).getAlarmDao().update(mAlarm);
+            DatabaseRepository.deleteAlarmToPill(mContext, mAlarm.getId());
+            alarmReceiver.setIntervalAlarm(mContext, mAlarm.getId());
         }
 
-        for (HorizontalScrollViewItem item : pillViewList) {
+        for (HorizontalScrollViewItem item : mPillViewList) {
             if (item.isChecked()) {
                 DatabaseRepository.addPillToAlarm(getContext(), new PillToAlarm(mAlarm.getId(), item.getPillId()));
             }
@@ -254,7 +254,7 @@ public class IntervalAlarmFragment extends Fragment {
     }
 
     private void getViewItem(Long id) {
-        for (HorizontalScrollViewItem item : pillViewList) {
+        for (HorizontalScrollViewItem item : mPillViewList) {
             if (item.getPillId().equals(id))
                 item.setClick();
         }
@@ -283,7 +283,6 @@ public class IntervalAlarmFragment extends Fragment {
 
     /**
      * Builds string
-     *
      * @param day   alarm day
      * @param month alarm month
      * @param year  alarm year

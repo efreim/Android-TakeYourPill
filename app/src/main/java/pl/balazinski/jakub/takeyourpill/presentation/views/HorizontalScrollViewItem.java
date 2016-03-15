@@ -9,41 +9,31 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
-/**
- * Created by Kuba on 26.02.2016.
- */
+
 public class HorizontalScrollViewItem extends RelativeLayout implements View.OnClickListener {
 
     private final String TAG = getClass().getSimpleName();
 
-    private CheckBox checkBox;
-    // @Bind(R.id.circle_image_horizontal_item)
-    private ImageView imageView;
+    private CheckBox mCheckBox;
+    private ImageView mImageView;
+    private TextView mTextView;
 
-    //  @Bind(R.id.pill_name_horizontal_item)
-    private TextView textView;
-    private RelativeLayout relativeLayout;
-
-    private Context context;
+    private Context mContext;
     private boolean wasClicked = false;
-    private OutputProvider outputProvider;
-    private String imagePath;
-    private String text;
-    private Long pillId;
+    private OutputProvider mOutputProvider;
+    private String mImagePath;
+    private String mText;
+    private Long mPillId;
 
     public HorizontalScrollViewItem(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -55,59 +45,46 @@ public class HorizontalScrollViewItem extends RelativeLayout implements View.OnC
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.horizontal_scroll_view_item, this, true);
-        this.context = context;
-        ButterKnife.bind(this);
+        inflater.inflate(R.layout.view_horizontal_scroll_item, this, true);
+        this.mContext = context;
+        this.mImagePath = imagePath;
+        this.mText = text;
+        this.mPillId = pillId;
         setOnClickListener(this);
-        this.imagePath = imagePath;
-        this.text = text;
-        this.pillId = pillId;
-        outputProvider = new OutputProvider(context);
-        relativeLayout = (RelativeLayout) getChildAt(0);
-        imageView = (ImageView) relativeLayout.getChildAt(0);
-        textView = (TextView) relativeLayout.getChildAt(1);
-        checkBox = (CheckBox) relativeLayout.getChildAt(2);
+        mOutputProvider = new OutputProvider(context);
+
         setContent();
+        setView();
     }
 
-   /* @Override
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        super.onMeasure(heightMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        setMeasuredDimension(height, height);
-
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int size = width > height ? height : width;
-        setMeasuredDimension(size, size);
-
-    }*/
-
-
-    private void setContent() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setBackground(getResources().getDrawable(R.drawable.ripple_effect, context.getTheme()));
+    private void setView() {
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+            setBackground(getResources().getDrawable(R.drawable.ripple_effect, mContext.getTheme()));
         } else {
             setBackground(getResources().getDrawable(R.drawable.ripple_effect));
         }
-        Glide.with(imageView.getContext())
-                .load(Uri.parse(imagePath))
+        Glide.with(mImageView.getContext())
+                .load(Uri.parse(mImagePath))
                 .fitCenter()
-                .into(imageView);
-        textView.setText(text);
+                .into(mImageView);
+        mTextView.setText(mText);
         setClicked();
+    }
+
+    private void setContent() {
+        RelativeLayout relativeLayout = (RelativeLayout) getChildAt(0);
+        mImageView = (ImageView) relativeLayout.getChildAt(0);
+        mTextView = (TextView) relativeLayout.getChildAt(1);
+        mCheckBox = (CheckBox) relativeLayout.getChildAt(2);
     }
 
     private void setClicked() {
         if (!wasClicked) {
-            checkBox.setChecked(false);
-            textView.setTextColor(Color.BLACK);
+            mCheckBox.setChecked(false);
+            mTextView.setTextColor(Color.BLACK);
         } else {
-            checkBox.setChecked(true);
-            textView.setTextColor(Color.BLACK);
+            mCheckBox.setChecked(true);
+            mTextView.setTextColor(Color.BLACK);
         }
     }
 
@@ -115,41 +92,41 @@ public class HorizontalScrollViewItem extends RelativeLayout implements View.OnC
     public void onClick(View v) {
         wasClicked = (!wasClicked);
         setClicked();
-        outputProvider.displayLog(TAG, "Clicked");
+        mOutputProvider.displayLog(TAG, "Clicked");
     }
 
-    public void setClick(){
+    public void setClick() {
         wasClicked = (!wasClicked);
         setClicked();
-        outputProvider.displayLog(TAG, "Clicked");
+        mOutputProvider.displayLog(TAG, "Clicked");
     }
 
-    public boolean isChecked(){
-        return (checkBox.isChecked());
+    public boolean isChecked() {
+        return (mCheckBox.isChecked());
     }
 
-    public void setTextColorWhite(){
+    public void setTextColorWhite() {
         final int version = Build.VERSION.SDK_INT;
         if (version >= 23) {
-            textView.setTextColor(ContextCompat.getColor(context, R.color.alarm_list_item_text));
+            mTextView.setTextColor(ContextCompat.getColor(mContext, R.color.alarm_list_item_text));
         } else {
-            textView.setTextColor(context.getResources().getColor( R.color.alarm_list_item_text));
+            mTextView.setTextColor(mContext.getResources().getColor(R.color.alarm_list_item_text));
         }
     }
 
     public String getText() {
-        return text;
+        return mText;
     }
 
     public Long getPillId() {
-        return pillId;
+        return mPillId;
     }
 
-    public void setCheckboxGone(){
-        checkBox.setVisibility(GONE);
+    public void setCheckboxGone() {
+        mCheckBox.setVisibility(GONE);
     }
 
-    public void setImageGone(){
-        imageView.setVisibility(GONE);
+    public void setImageGone() {
+        mImageView.setVisibility(GONE);
     }
 }

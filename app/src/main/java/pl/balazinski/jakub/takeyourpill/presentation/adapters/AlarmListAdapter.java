@@ -32,22 +32,20 @@ import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
 import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
-/**
- * Created by Kuba on 2016-01-31.
- */
+
 public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder> {
 
     private int mBackground;
-    private Context context;
-    private AlarmListRefreshListener refreshListener;
-    private OutputProvider outputProvider;
+    private Context mContext;
+    private AlarmListRefreshListener mRefreshListener;
+    private OutputProvider mOutputProvider;
 
     public AlarmListAdapter(Context context) {
-        this.context = context;
+        this.mContext = context;
         TypedValue mTypedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+        mContext.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
-        outputProvider = new OutputProvider(context);
+        mOutputProvider = new OutputProvider(mContext);
     }
 
     /**
@@ -58,23 +56,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     }
 
     public void setListRefreshListener(AlarmListRefreshListener l) {
-        this.refreshListener = l;
+        this.mRefreshListener = l;
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.alarm_list_item, parent, false);
+                .inflate(R.layout.list_alarm_item, parent, false);
         view.setBackgroundResource(mBackground);
-        ViewHolder viewHolder = new ViewHolder(view, this);
-        return viewHolder;
+        return new ViewHolder(view, this);
     }
 
     public Alarm getItem(int position) {
-        return DatabaseRepository.getAllAlarms(context).get(position);
+        return DatabaseRepository.getAllAlarms(mContext).get(position);
     }
-
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
@@ -95,9 +91,9 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                     stringBuilder.append(" ");
                 }
             }
-                holder.alarmTimeTextView.setText(text + "\n ");
-                holder.alarmInfoTextView.setText("Days repeating : \n" + stringBuilder.toString());
-                holder.alarmTypeTextView.setText("Repeatable alarm");
+            holder.alarmTimeTextView.setText(text + "\n ");
+            holder.alarmInfoTextView.setText("Days repeating : \n" + stringBuilder.toString());
+            holder.alarmTypeTextView.setText("Repeatable alarm");
 
         } else if (holder.alarm.isInterval()) {
             holder.alarmTimeTextView.setText(text + "\n" + buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
@@ -112,18 +108,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         GridLayout gridLayout = (GridLayout) holder.pillList.getChildAt(0);
         gridLayout.removeAllViews();
 
-        List<Long> items = DatabaseRepository.getPillsByAlarm(context, holder.alarm.getId());
+        List<Long> items = DatabaseRepository.getPillsByAlarm(mContext, holder.alarm.getId());
         if (!items.isEmpty()) {
             for (Long pillId : items) {
-                Pill p = DatabaseRepository.getPillByID(context, pillId);
-                HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, p.getPhoto(), p.getName(), p.getId());
-                item.setCheckboxGone();
-                item.setTextColorWhite();
-                item.setClickable(false);
-                gridLayout.addView(item);
+                Pill p = DatabaseRepository.getPillByID(mContext, pillId);
+                HorizontalScrollViewItem item;
+                if (p != null) {
+                    item = new HorizontalScrollViewItem(mContext, p.getPhoto(), p.getName(), p.getId());
+                    item.setCheckboxGone();
+                    item.setTextColorWhite();
+                    item.setClickable(false);
+                    gridLayout.addView(item);
+                }
             }
         } else {
-            HorizontalScrollViewItem item = new HorizontalScrollViewItem(context, "", "No pills attached to alarm", null);
+            HorizontalScrollViewItem item = new HorizontalScrollViewItem(mContext, "", mContext.getString(R.string.no_pill_attached_to_alarm), null);
             item.setGravity(Gravity.CENTER);
             item.setCheckboxGone();
             item.setImageGone();
@@ -132,24 +131,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             gridLayout.addView(item);
         }
 
-
-        final int version = Build.VERSION.SDK_INT;
-
         if (holder.alarm.isActive()) {
-            if (version >= 23) {
-                holder.alarmItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_active_background));
-                holder.pillList.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners_active));
+            if (Constants.VERSION >= Build.VERSION_CODES.M) {
+                holder.alarmItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.alarm_list_item_active_background));
+                holder.pillList.setBackground(ContextCompat.getDrawable(mContext, R.drawable.rounded_corners_active));
             } else {
-                holder.alarmItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
-                holder.pillList.setBackground(context.getResources().getDrawable(R.drawable.rounded_corners_active));
+                holder.alarmItem.setBackground(mContext.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
+                holder.pillList.setBackground(mContext.getResources().getDrawable(R.drawable.rounded_corners_active));
             }
         } else {
-            if (version >= 23) {
-                holder.alarmItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_inactive_background));
-                holder.pillList.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners_inactive));
+            if (Constants.VERSION >= Build.VERSION_CODES.M) {
+                holder.alarmItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.alarm_list_item_inactive_background));
+                holder.pillList.setBackground(ContextCompat.getDrawable(mContext, R.drawable.rounded_corners_inactive));
             } else {
-                holder.alarmItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_inactive_background));
-                holder.pillList.setBackground(context.getResources().getDrawable(R.drawable.rounded_corners_inactive));
+                holder.alarmItem.setBackground(mContext.getResources().getDrawable(R.drawable.alarm_list_item_inactive_background));
+                holder.pillList.setBackground(mContext.getResources().getDrawable(R.drawable.rounded_corners_inactive));
 
             }
         }
@@ -164,7 +160,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
 
     @Override
     public int getItemCount() {
-        return DatabaseRepository.getAllAlarms(context).size();
+        return DatabaseRepository.getAllAlarms(mContext).size();
     }
 
     /**
@@ -211,13 +207,13 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     }
 
     private enum DayOfWeek {
-        MON(0, "Mon"),
-        TUE(1, "Tue"),
-        WED(2, "Wed"),
-        THU(3, "Thur"),
-        FRI(4, "Fri"),
-        SAT(5, "Sat"),
-        SUN(6, "Sun");
+        MON(0, Constants.MONDAY),
+        TUE(1, Constants.TUESDAY),
+        WED(2, Constants.WEDNESDAY),
+        THU(3, Constants.THURSDAY),
+        FRI(4, Constants.FRIDAY),
+        SAT(5, Constants.SATURDAY),
+        SUN(6, Constants.SUNDAY);
 
         private int id;
         private String day;
@@ -311,8 +307,8 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             alarmReceiver.cancelAlarm(mView.getContext(), alarm.getId());
             DatabaseRepository.deleteAlarm(context, alarm);
             mView.invalidate();
-            adapter.refreshListener.onListRefresh();
-            outputProvider.displayShortToast("Alarm deleted!");
+            adapter.mRefreshListener.onListRefresh();
+            outputProvider.displayShortToast(context.getString(R.string.alarm_deleted));
         }
 
         public void alarmActivator(final ViewHolder holder) {
@@ -326,7 +322,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                 holder.alarm.setIsActive(false);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                 alarmReceiver.cancelAlarm(context, holder.alarm.getId());
-                adapter.refreshListener.onListRefresh();
+                adapter.mRefreshListener.onListRefresh();
             } else {
 
                 holder.alarm.setIsActive(true);
@@ -338,7 +334,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                 else if (holder.alarm.isSingle())
                     alarmReceiver.setSingleAlarm(context, holder.alarm.getId());
 
-                adapter.refreshListener.onListRefresh();
+                adapter.mRefreshListener.onListRefresh();
             }
         }
 

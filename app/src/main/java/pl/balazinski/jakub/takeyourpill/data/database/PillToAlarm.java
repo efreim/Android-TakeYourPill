@@ -16,11 +16,11 @@ public class PillToAlarm {
     @DatabaseField(columnName = "alarmId")
     private Long alarmId;
 
-
-    public PillToAlarm(){
+    public PillToAlarm() {
 
     }
-    public PillToAlarm(Long alarmId, Long pillId){
+
+    public PillToAlarm(Long alarmId, Long pillId) {
         this.alarmId = alarmId;
         this.pillId = pillId;
     }

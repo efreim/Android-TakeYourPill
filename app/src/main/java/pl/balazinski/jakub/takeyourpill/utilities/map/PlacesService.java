@@ -18,18 +18,18 @@ public class PlacesService {
 
     private String API_KEY;
 
-    public PlacesService(String apikey) {
-        this.API_KEY = apikey;
+    public PlacesService(String apiKey) {
+        this.API_KEY = apiKey;
     }
 
-    public void setApiKey(String apikey) {
-        this.API_KEY = apikey;
+    public void setApiKey(String apiKey) {
+        this.API_KEY = apiKey;
     }
 
     public ArrayList<Place> findPlaces(double latitude, double longitude,
-                                       String placeSpacification) {
+                                       String placeSpecification) {
 
-        String urlString = makeUrl(latitude, longitude, placeSpacification);
+        String urlString = makeUrl(latitude, longitude, placeSpecification);
 
         try {
             String json = getJSON(urlString);
@@ -67,19 +67,8 @@ public class PlacesService {
         urlString.append(",");
         urlString.append(Double.toString(longitude));
         urlString.append("&radius=1000");
-        urlString.append("&types="+place);
-        urlString.append("&sensor=false&key=" + API_KEY);
-       /* if (place.equals("")) {
-
-        } else {
-            urlString.append("&location=");
-            urlString.append(Double.toString(latitude));
-            urlString.append(",");
-            urlString.append(Double.toString(longitude));
-            urlString.append("&radius=1000");
-            urlString.append("&types=" + place);
-            urlString.append("&sensor=false&key=" + API_KEY);
-        }*/
+        urlString.append("&types=").append(place);
+        urlString.append("&sensor=false&key=").append(API_KEY);
         return urlString.toString();
     }
 
@@ -97,12 +86,11 @@ public class PlacesService {
             connection.setRequestMethod("POST");
             connection.setDoInput(true);
             connection.connect();
-            //URLConnection urlConnection = url.openConnection();
             BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()), 8);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                content.append(line + "\n");
+                content.append(line).append("\n");
             }
             bufferedReader.close();
         }catch (Exception e) {

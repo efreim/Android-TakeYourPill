@@ -11,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -22,26 +20,22 @@ import com.bumptech.glide.Glide;
 
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
+import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.PillDetailActivity;
 
-/**
- * Adapter for lists in fragments
- * Nothing to explain :D
- */
+
 public class PillListAdapter
         extends RecyclerView.Adapter<PillListAdapter.ViewHolder> {
 
     private int mBackground;
-    private Context context;
-    private PillListRefreshListener refreshListener;
-    private ViewHolder viewHolder;
+    private Context mContext;
+    private PillListRefreshListener mRefreshListener;
 
     public PillListAdapter(Context context) {
-        this.context = context;
+        this.mContext = context;
         TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         mBackground = mTypedValue.resourceId;
@@ -55,21 +49,20 @@ public class PillListAdapter
     }
 
     public void setListRefreshListener(PillListRefreshListener l) {
-        this.refreshListener = l;
+        this.mRefreshListener = l;
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.pill_list_item, parent, false);
+                .inflate(R.layout.list_pill_item, parent, false);
         view.setBackgroundResource(mBackground);
-        viewHolder = new ViewHolder(view,this);
-        return viewHolder;
+        return new ViewHolder(view, this);
     }
 
     public Pill getItem(int position) {
-        Pill pill = DatabaseRepository.getAllPills(context).get(position);
+        Pill pill = DatabaseRepository.getAllPills(mContext).get(position);
         if (pill != null)
             return pill;
         else
@@ -78,59 +71,50 @@ public class PillListAdapter
     }
 
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.pill = getItem(position);
         holder.mTextView.setText(holder.pill.getName());
 
-        final int version = Build.VERSION.SDK_INT;
-
-        if (version >= 23) {
-            holder.pillItem.setBackground(ContextCompat.getDrawable(context, R.drawable.alarm_list_item_active_background));
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+            holder.pillItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.alarm_list_item_active_background));
         } else {
-            holder.pillItem.setBackground(context.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
+            holder.pillItem.setBackground(mContext.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
         }
 
         Glide.with(holder.mImageView.getContext())
                 .load(Uri.parse(getItem(position).getPhoto()))
                 .fitCenter()
                 .into(holder.mImageView);
-
-    //    animate(holder);
     }
 
-    public void animate(RecyclerView.ViewHolder viewHolder) {
-        final Animation animAnticipateOvershoot = AnimationUtils.loadAnimation(context, R.anim.bounce_interpolator);
-        viewHolder.itemView.setAnimation(animAnticipateOvershoot);
-    }
 
     @Override
     public int getItemCount() {
-        return DatabaseRepository.getAllPills(context).size();
+        return DatabaseRepository.getAllPills(mContext).size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnLongClickListener, View.OnClickListener{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnLongClickListener, View.OnClickListener {
         public Pill pill;
         public final View mView;
         public final ImageView mImageView;
         public final TextView mTextView;
         public final LinearLayout pillItem;
-        private PillListAdapter adapter;
-        private OutputProvider outputProvider;
-        private Context context;
+        private PillListAdapter mAdapter;
+        private OutputProvider mOutputProvider;
+        private Context mContext;
 
         public ViewHolder(View view, PillListAdapter adapter) {
             super(view);
-            context = view.getContext();
-            outputProvider = new OutputProvider(context);
+            mContext = view.getContext();
+            mOutputProvider = new OutputProvider(mContext);
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.avatar);
             mTextView = (TextView) view.findViewById(android.R.id.text1);
             pillItem = (LinearLayout) view.findViewById(R.id.pill_item);
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);
-            this.adapter = adapter;
+            this.mAdapter = adapter;
         }
 
         @Override
@@ -142,9 +126,9 @@ public class PillListAdapter
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.edit_pill:
-                    Intent intent = new Intent(context, PillActivity.class);
+                    Intent intent = new Intent(mContext, PillActivity.class);
                     intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
-                    context.startActivity(intent);
+                    mContext.startActivity(intent);
                     break;
                 case R.id.delete_pill:
                     pillDeleter();
@@ -157,22 +141,22 @@ public class PillListAdapter
 
         @Override
         public boolean onLongClick(View v) {
-            outputProvider.displayPopupMenu(this, v, R.menu.pill_context_menu);
+            mOutputProvider.displayPopupMenu(this, v, R.menu.pill_context_menu);
             return false;
         }
 
         public void pillDeleter() {
-            DatabaseRepository.deletePill(context, pill);
+            DatabaseRepository.deletePill(mContext, pill);
             mView.invalidate();
-            adapter.refreshListener.onListRefresh();
-            outputProvider.displayShortToast("Alarm deleted!");
+            mAdapter.mRefreshListener.onListRefresh();
+            mOutputProvider.displayShortToast(mContext.getString(R.string.alarm_deleted));
         }
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(context, PillDetailActivity.class);
+            Intent intent = new Intent(mContext, PillDetailActivity.class);
             intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
-            context.startActivity(intent);
+            mContext.startActivity(intent);
         }
     }
 

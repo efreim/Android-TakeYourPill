@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,8 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,8 +47,9 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private final String TAG = getClass().getSimpleName();
 
-    //States for setting up components for adding or edition
-
+    /**
+     * State activity is entered in
+     */
     private enum State {
         NEW, EDIT
     }
@@ -60,36 +58,36 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
 
+    @Bind(R.id.pill_name)
     public AutoCompleteTextView pillNameEditText;
-
     @Bind(R.id.pill_desc)
     public EditText pillDescEditText;
     @Bind(R.id.pill_dose)
     public EditText pillDosageEditText;
 
-    //Optional
+    //Optional components
     @Bind(R.id.optional_layout)
-    public LinearLayout optionalLayout;
+    LinearLayout optionalLayout;
     @Bind(R.id.pill_count)
-    public EditText pillCountEditText;
+    EditText pillCountEditText;
     @Bind(R.id.active_substance_et)
-    public EditText pillActiveSubEditText;
+    EditText pillActiveSubEditText;
     @Bind(R.id.pill_price)
-    public EditText pillPriceEditText;
+    EditText pillPriceEditText;
     @Bind(R.id.pill_barcode)
-    public EditText pillBarcodeEditText;
+    EditText pillBarcodeEditText;
     @Bind(R.id.add_photo)
-    public Button addPhoto;
+    Button addPhoto;
     @Bind(R.id.add_pill)
-    public Button addPill;
+    Button addPill;
 
-    private OuterPillDatabase outerPillDatabase;
-    private OutputProvider outputProvider;
+    private OuterPillDatabase mOuterPillDatabase;
+    private OutputProvider mOutputProvider;
     private String mName;
-    private State state;
-    private Pill mPill = null;
-    private Uri imageUri = null;
-    public static int id = 0;
+    private State mState;
+    private Pill mPill;
+    private Uri mImageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,72 +95,68 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_pill);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
-        outputProvider = new OutputProvider(this);
-        outerPillDatabase = new OuterPillDatabase(getApplicationContext());
+        mOutputProvider = new OutputProvider(this);
 
+        setupContent(extras);
+        setupView();
+        setupComponents(mState);
+    }
 
-        pillNameEditText = (AutoCompleteTextView) findViewById(R.id.pill_name);
-        pillNameEditText.setOnItemClickListener(this);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, getPillNameList());
-        pillNameEditText.setAdapter(adapter);
-        pillNameEditText.setThreshold(2);
-
-
+    private void setupContent(Bundle extras) {
         /*
-         * If extras are empty state is new otherwise
-         * state is edit and edited pill must be loaded
+         * If extras are empty mState is new otherwise
+         * mState is edit and edited pill must be loaded
          * from database.
          */
-
+        mOuterPillDatabase = new OuterPillDatabase(getApplicationContext());
         if (extras == null) {
-            state = State.NEW;
-            setView(state);
+            mState = State.NEW;
         } else {
-            state = State.EDIT;
+            mState = State.EDIT;
             Long mId = extras.getLong(Constants.EXTRA_LONG_ID);
-
 
             mPill = DatabaseRepository.getPillByID(this, mId);
             if (mPill == null)
-                outputProvider.displayShortToast("Error loading pills");
+                mOutputProvider.displayShortToast(getString(R.string.error_loading_pills));
             else {
-                setView(state);
-                imageUri = Uri.parse(mPill.getPhoto());
+                mImageUri = Uri.parse(mPill.getPhoto());
             }
         }
+    }
 
-        /*
-         * Setting up notification bar color:
-         * 1. Clear FLAG_TRANSLUCENT_STATUS flag
-         * 2. Add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-         * 3. Change the color
-         */
+    private void setupView() {
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
-
         //Setting up toolbar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+            addPill.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+            addPhoto.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+        } else {
+            addPill.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+            addPhoto.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
     }
+
 
     /**
      * Sets components to view.
      *
      * @param state lets method know to set up add or edit view
      */
-    private void setView(State state) {
-
-
+    private void setupComponents(State state) {
         if (state == State.NEW) {
-            addPill.setText("SAVE");
-            addPhoto.setText("ADD PHOTO");
+            addPill.setText(getString(R.string.save));
+            addPhoto.setText(getString(R.string.add_photo));
         } else if (state == State.EDIT) {
-            addPill.setText("UPDATE");
-            addPhoto.setText("EDIT PHOTO");
+            addPill.setText(getString(R.string.update));
+            addPhoto.setText(getString(R.string.edit_photo));
 
             pillNameEditText.setText(mPill.getName());
 
@@ -180,21 +174,13 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
                 pillBarcodeEditText.setText(String.valueOf(mPill.getBarcodeNumber()));
         }
 
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 23) {
-            addPill.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
-            addPhoto.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
-        } else {
-            addPill.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
-            addPhoto.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
-        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String pillDbName = (String) parent.getItemAtPosition(position);
-        Cursor cursor = outerPillDatabase.getReadableDatabase()
-                .rawQuery("SELECT * FROM " + Constants.TABLE_NAME + " where nazwa = " + "\"" + pillDbName + "\"" + ";", null);
+        Cursor cursor = mOuterPillDatabase.getReadableDatabase()
+                .rawQuery("SELECT * FROM " + Constants.OUTER_TABLE_NAME + " where nazwa = " + "\"" + pillDbName + "\"" + ";", null);
 
         if (cursor.getCount() != 0) {
             for (int i = 0; i < cursor.getCount(); i++) {
@@ -217,7 +203,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             String price = cursor.getString(5);
             int dosage = -1;
 
-            Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill_white_background);
+            Uri uri = Uri.parse(Constants.DRAWABLE_PATH + R.drawable.pill_white_background);
 
             mPill = new Pill();
             mPill.setName(name);
@@ -230,8 +216,8 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             mPill.setPhoto(uri);
             onChecked(true);
 
-            setView(State.EDIT);
-            setView(State.NEW);
+            setupComponents(State.EDIT);
+            setupComponents(State.NEW);
         }
 
     }
@@ -240,10 +226,10 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     public void addPill(View view) {
         int mCount = -1;
         int mDosage = -1;
+        long barcode = -1;
         String mDesc = "";
         String activeSubstance = "";
         String price = "";
-        long barcode = -1;
 
 
         if (pillNameEditText.getText() != null)
@@ -252,8 +238,6 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             mDesc = pillDescEditText.getText().toString();
         if (!pillDosageEditText.getText().toString().equals(""))
             mDosage = Integer.parseInt(pillDosageEditText.getText().toString());
-
-        //if(optionalLayout.getVisibility() == View.VISIBLE)
         if (!pillCountEditText.getText().toString().equals(""))
             mCount = Integer.parseInt(pillCountEditText.getText().toString());
         if (pillActiveSubEditText.getText() != null)
@@ -262,15 +246,23 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             price = pillPriceEditText.getText().toString();
         if (!pillBarcodeEditText.getText().toString().equals(""))
             barcode = Long.parseLong(pillBarcodeEditText.getText().toString());
-
-
         if (TextUtils.isEmpty(mName))
-            pillNameEditText.setError("Set name to your pill");
-        /*else if (TextUtils.isEmpty(mDesc)) {
-            pillDescEditText.setError("Set description to your pill");
-        } else if (mDosage == -1) {
-            pillDosageEditText.setError("Set dosage");*/
-        else if (state == State.EDIT) {
+            pillNameEditText.setError(getString(R.string.pill_error_set_name));
+
+        if (mState == State.NEW) {
+            String path;
+            if (getImageUri() != null)
+                path = getImageUri().toString();
+            else {
+                Uri uri = Uri.parse(Constants.DRAWABLE_PATH + R.drawable.pill_white_background);
+                path = uri.toString();
+            }
+            mPill = new Pill(mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
+            DatabaseRepository.addPill(this, mPill);
+            Intent i = new Intent(PillActivity.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+        } else if (mState == State.EDIT) {
             mPill.setName(mName);
             mPill.setDescription(mDesc);
             mPill.setDosage(mDosage);
@@ -283,23 +275,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent i = new Intent(PillActivity.this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
-        } else if (state == State.NEW) {
-            String path;
-            //If path equals "" pill image is empty.
-            if (getImageUri() != null)
-                path = getImageUri().toString();
-            else {
-                Uri uri = Uri.parse("android.resource://pl.balazinski.jakub.takeyourpill/" + R.drawable.pill_white_background);
-                path = uri.toString();
-            }
-
-            mPill = new Pill(mName, mDesc, mCount, mDosage, path, activeSubstance, price, barcode);
-            DatabaseRepository.addPill(this, mPill);
-            Intent i = new Intent(PillActivity.this, MainActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
         }
-
     }
 
     @OnClick(R.id.add_photo)
@@ -320,24 +296,24 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
      * photo or choosing from gallery.
      */
     private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
+        final CharSequence[] items = {getString(R.string.dialog_take_photo), getString(R.string.dialog_choose_from_library), getString(R.string.cancel)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(PillActivity.this);
-        builder.setTitle("Add Photo!");
+        builder.setTitle(getString(R.string.add_photo));
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
+                if (items[item].equals(getString(R.string.dialog_take_photo))) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(intent, Constants.REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
+                } else if (items[item].equals(getString(R.string.dialog_choose_from_library))) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
                     startActivityForResult(
-                            Intent.createChooser(intent, "Select File"), Constants.SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
+                            Intent.createChooser(intent, getString(R.string.dialog_select_file)), Constants.SELECT_FILE);
+                } else if (items[item].equals(getString(R.string.cancel))) {
                     dialog.dismiss();
                 }
             }
@@ -371,7 +347,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                imageUri = Uri.fromFile(destination);
+                mImageUri = Uri.fromFile(destination);
 
             } else if (requestCode == Constants.SELECT_FILE) {
                 Uri selectedImageUri = data.getData();
@@ -381,26 +357,12 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public Uri getImageUri() {
-        return imageUri;
+        return mImageUri;
     }
 
-    public void setImageUri(Uri imageUri) {
-        this.imageUri = imageUri;
+    public void setImageUri(Uri mImageUri) {
+        this.mImageUri = mImageUri;
     }
 
-    public List<String> getPillNameList() {
-        List<String> arrayList = new ArrayList<>();
-        Cursor cursor = outerPillDatabase.getReadableDatabase()
-                .rawQuery("SELECT nazwa FROM " + Constants.TABLE_NAME + ";", null);
-
-        if (cursor.getCount() != 0) {
-            while (cursor.moveToNext()) {
-                arrayList.add(cursor.getString(0));
-
-            }
-            cursor.close();
-        }
-        return arrayList;
-    }
 
 }

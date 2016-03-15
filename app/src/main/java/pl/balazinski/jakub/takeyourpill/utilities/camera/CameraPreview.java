@@ -2,29 +2,33 @@ package pl.balazinski.jakub.takeyourpill.utilities.camera;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
 
-/**
- * Created by Kuba on 16.01.2016.
- */
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
+
+
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+
+    private final String TAG = getClass().getSimpleName();
+
     private SurfaceHolder mHolder;
     private Camera mCamera;
-    private Camera.PreviewCallback previewCallback;
-    private Camera.AutoFocusCallback autoFocusCallback;
+    private Camera.PreviewCallback mPreviewCallback;
+    private Camera.AutoFocusCallback mAutoFocusCallback;
+    private OutputProvider mOutputProvider;
 
     public CameraPreview(Context context, Camera camera,
                          Camera.PreviewCallback previewCb,
                          Camera.AutoFocusCallback autoFocusCb) {
         super(context);
         mCamera = camera;
-        previewCallback = previewCb;
-        autoFocusCallback = autoFocusCb;
-
+        mPreviewCallback = previewCb;
+        mAutoFocusCallback = autoFocusCb;
+        mOutputProvider = new OutputProvider(context);
+        //TODO Change to camera 2.0
         /*
          * Set camera to continuous focus if supported, otherwise use
          * software auto-focus. Only works for API level >=9.
@@ -34,7 +38,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         for (String f : parameters.getSupportedFocusModes()) {
             if (f == Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
                 mCamera.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-                autoFocusCallback = null;
+                mAutoFocusCallback = null;
                 break;
             }
         }
@@ -54,7 +58,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            Log.d("DBG", "Error setting camera preview: " + e.getMessage());
+            mOutputProvider.displayDebugLog(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
@@ -67,7 +71,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
          * If your preview can change or rotate, take care of those events here.
          * Make sure to stop the preview before resizing or reformatting it.
          */
-        if (mHolder.getSurface() == null){
+        if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }
@@ -75,7 +79,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // stop preview before making changes
         try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
 
@@ -84,11 +88,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
 
             mCamera.setPreviewDisplay(mHolder);
-            mCamera.setPreviewCallback(previewCallback);
+            mCamera.setPreviewCallback(mPreviewCallback);
             mCamera.startPreview();
-            mCamera.autoFocus(autoFocusCallback);
-        } catch (Exception e){
-            Log.d("DBG", "Error starting camera preview: " + e.getMessage());
+            mCamera.autoFocus(mAutoFocusCallback);
+        } catch (Exception e) {
+            mOutputProvider.displayDebugLog(TAG, "Error starting camera preview: " + e.getMessage());
+
         }
     }
 }

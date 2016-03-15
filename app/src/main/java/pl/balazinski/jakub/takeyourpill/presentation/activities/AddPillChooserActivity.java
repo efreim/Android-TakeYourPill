@@ -15,30 +15,44 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
-
+/**
+ * Let user choose if he wants to add pill by scanning barcode or
+ * manually
+ */
 public class AddPillChooserActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
-    //Setting up components for activity
+    /**
+     * Setting up components for activity
+     */
+
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
+
     @Bind(R.id.scan_button)
     Button scanButton;
     @Bind(R.id.add_manually_button)
     Button addManuallyButton;
 
-    private OutputProvider outputProvider;
+    private OutputProvider mOutputProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pill_chooser);
         ButterKnife.bind(this);
-        outputProvider = new OutputProvider(this);
-        /*
+        mOutputProvider = new OutputProvider(this);
+
+        setupView();
+    }
+
+    private void setupView() {
+
+        /**
          * Setting up notification bar color:
          * 1. Clear FLAG_TRANSLUCENT_STATUS flag
          * 2. Add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
@@ -49,14 +63,14 @@ public class AddPillChooserActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.notification_bar));
 
-
-        //Setting up toolbar
+        /**
+         * Setting up toolbar
+         */
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 23) {
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
             scanButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
             addManuallyButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
 
@@ -64,12 +78,10 @@ public class AddPillChooserActivity extends AppCompatActivity {
             scanButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
             addManuallyButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
         }
-
     }
 
-
     @OnClick(R.id.scan_button)
-    public void scanBarcode(View v){
+    public void scanBarcode(View v) {
         startActivity(new Intent(getApplicationContext(), ScanBarcodeChooserActivity.class));
     }
 
@@ -77,7 +89,5 @@ public class AddPillChooserActivity extends AppCompatActivity {
     public void addManually(View v) {
         startActivity(new Intent(getApplicationContext(), PillActivity.class));
     }
-
-
 
 }

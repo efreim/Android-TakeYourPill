@@ -18,6 +18,7 @@ public abstract class WakeLocker {
     }
 
     public static void release() {
-        if (wakeLock != null) wakeLock.release(); wakeLock = null;
+        if (wakeLock != null) wakeLock.release();
+        wakeLock = null;
     }
 }

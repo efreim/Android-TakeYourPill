@@ -17,23 +17,19 @@ import pl.balazinski.jakub.takeyourpill.presentation.adapters.AlarmListAdapter.A
 public class AlarmListFragment extends Fragment implements AlarmListRefreshListener {
 
     private AlarmListAdapter alarmListAdapter;
-    private RecyclerView rv;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
-
+        RecyclerView rv = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
         setupRecyclerView(rv);
-
         return rv;
     }
 
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        //listAdapter = PillListAdapter.getInstance(getActivity());
         alarmListAdapter = new AlarmListAdapter(getActivity());
         alarmListAdapter.setListRefreshListener(this);
         recyclerView.setAdapter(alarmListAdapter);

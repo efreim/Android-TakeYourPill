@@ -20,9 +20,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 
 /**
- * Created by Kuba on 11.03.2016.
+ * Activity with information about app, terms&conditions and author
  */
 public class AboutActivity extends Activity {
 
@@ -37,16 +38,17 @@ public class AboutActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);
+        setupView();
+    }
 
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 23) {
+    private void setupView(){
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
             continueButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
 
         } else {
             continueButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
         }
 
-        //infoTextView.setText(Html.fromHtml(getString(R.string.about_text)));
         infoTextView.setText(getString(R.string.lorem_ipsum));
 
         DisplayMetrics dm = new DisplayMetrics();

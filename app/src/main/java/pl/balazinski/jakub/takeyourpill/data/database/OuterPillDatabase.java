@@ -4,14 +4,14 @@ import android.content.Context;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
+import pl.balazinski.jakub.takeyourpill.data.Constants;
+
 /**
- * Created by Kuba on 12.01.2016.
+ * Load medicines database from file.
  */
 public class OuterPillDatabase extends SQLiteAssetHelper {
-    private static final String DATABASE_NAME = "drugs.db";
-    private static final int DATABASE_VERSION = 1;
 
     public OuterPillDatabase(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, Constants.OUTER_DATABASE_NAME, null, Constants.OUTER_DATABASE_VERSION);
     }
 }

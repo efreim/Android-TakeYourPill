@@ -42,10 +42,93 @@
     <string name="count_left">Medicine left</string>
     <string name="price">Price</string>
     <string name="barcode_number">Barcode number</string>
+
+    <!--pills-->
+    <string name="pills">Pills</string>
+    <string name="add_pill">Add pill</string>
+    <string name="pill_error_set_name">Set name to your pill</string>
+    <string name="toast_pill_refilled">Your medicine is refilled</string>
+
+    <!--alarms-->
     <string name="alarms">Alarms</string>
+    <string name="add_alarm">Add alarm</string>
+    <string name="edit_alarm">Edit alarm</string>
+    <string name="repeatable">Repeatable</string>
+    <string name="interval">Interval</string>
+    <string name="single">Single</string>
+    <string name="no_pill_attached_to_alarm">No pills attached to alarm</string>
+    <string name="alarm_deleted">Alarm deleted!</string>
+    <string name="select_time">Select time</string>
+    <string name="select_starting_date">Select starting date</string>
+    <string name="error_set_interval">Set interval time</string>
+    <string name="error_choose_alarm_time">Choose alarm time</string>
+    <string name="error_choose_alarm_date">Choose alarm date</string>
+    <string name="toast_set_repeating_days">Set repeating days</string>
+    <string name="toast_dot_error">Number of alarms can\'t be .   :(</string>
+    <string name="toast_error_number_of_alarms">Error with number of alarms field</string>
+    <string name="toast_alarm_will_fire_in">Alarm will fire in: </string>
+    <string name="toast_add_new_date_to_interval">Add new date to interval alarm to activate.</string>
+
+    <!--days of week-->
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
+    <string name="days">days</string>
+    <string name="hours">hours</string>
+    <string name="minutes">minutes</string>
+
+
+    <!--errors-->
+    <string name="error_loading_pills">Error loading pills</string>
+
+    <!--alarm fired dialog-->
+    <string name="dialog_title">Take your pill</string>
+    <string name="dialog_message">Did you take your pills?\n</string>
+
+    <!--notification-->
+    <string name="find_nearby_pharmacy">Find nearby pharmacy!</string>
+    <string name="low_on">You are low on: </string>
+
+    <!--toolbar options items-->
+    <string name="dialog_delete_database_title">Delete database</string>
+    <string name="dialog_delete_database_message">Deleting database will remove all of your pills and alarms!\nAre you sure?</string>
+
+    <!--common-->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="settings">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="loading">Loading…</string>
+    <string name="scanning">Scanning…</string>
+    <string name="save">Save</string>
+    <string name="update">Update</string>
+
+    <!--maps-->
+    <string name="dialog_gps_error_title">Unable to connect</string>
+    <string name="dialog_gps_error_message">You need a gps connection to use this application. Please turn on GPS in Settings.</string>
+    <string name="dialog_internet_error_title">Unable to connect</string>
+    <string name="dialog_internet_error_message">You need a network connection to use this application. Please turn on mobile network or Wi-Fi in Settings.</string>
+
+    <!--camera-->
+    <string name="add_photo">Add photo</string>
+    <string name="edit_photo">Edit photo</string>
+    <string name="dialog_take_photo">Take photo</string>
+    <string name="dialog_choose_from_library">Choose from library</string>
+    <string name="dialog_select_file">Select file</string>
+    <string name="toast_no_rear_camera_available">No rear camera available!</string>
     <string name="none"/>
     <string name="pill_details">Pill details</string>
     <string name="pill_optional">Optional</string>
+    <string name="toast_no_rear_available_add_later">No rear camera available.\nAdd barcode number manually.</string>
+
+    <!--scan-->
+    <string name="scan_barcode_click">Click to scan barcode</string>
+    <string name="barcode_result">Barcode result: </string>
+    <string name="toast_pill_not_found">Pill not found, try again or add manually.</string>
 
     <string name="about_text"><![CDATA[<b>Simulation</b> is about creating worms, in a board of hexes, which can move in randomly chosen direction.
         Each time worm steps into the hex where bacteria is on worm life will be expanded. Otherwise worm will loose one unit of health.

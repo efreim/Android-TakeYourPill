@@ -2,37 +2,30 @@ package pl.balazinski.jakub.takeyourpill.presentation.views;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
-/**
- * Created by Kuba on 02.03.2016.
- */
 public class DayOfWeekView extends RelativeLayout implements View.OnClickListener {
     private final String TAG = getClass().getSimpleName();
 
-    private CheckBox checkBox;
+    private CheckBox mCheckBox;
+    private TextView mTextView;
 
-    private TextView textView;
-
-    private Context context;
+    private Context mContext;
     private boolean wasClicked = false;
-    private OutputProvider outputProvider;
-    private String text;
-    private int id;
+    private OutputProvider mOutputProvider;
+    private String mText;
+    private int mId;
 
     public DayOfWeekView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,39 +37,43 @@ public class DayOfWeekView extends RelativeLayout implements View.OnClickListene
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.day_of_week_view, this, true);
-        this.context = context;
-        ButterKnife.bind(this);
+        inflater.inflate(R.layout.view_day_of_week, this, true);
+        this.mContext = context;
+        this.mText = text;
+        this.mId = id;
+
         setOnClickListener(this);
-        this.text = text;
-        this.id = id;
-        outputProvider = new OutputProvider(context);
-        RelativeLayout relativeLayout = (RelativeLayout) getChildAt(0);
-        textView = (TextView) relativeLayout.getChildAt(0);
-        checkBox = (CheckBox) relativeLayout.getChildAt(1);
+        mOutputProvider = new OutputProvider(context);
+
         setContent();
+        setView();
     }
 
 
+    private void setView() {
 
-    private void setContent() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setBackground(getResources().getDrawable(R.drawable.ripple_effect, context.getTheme()));
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+            setBackground(getResources().getDrawable(R.drawable.ripple_effect, mContext.getTheme()));
         } else {
             setBackground(getResources().getDrawable(R.drawable.ripple_effect));
         }
-        textView.setText(text);
+        mTextView.setText(mText);
         setClicked();
+    }
+
+    private void setContent() {
+        RelativeLayout relativeLayout = (RelativeLayout) getChildAt(0);
+        mTextView = (TextView) relativeLayout.getChildAt(0);
+        mCheckBox = (CheckBox) relativeLayout.getChildAt(1);
     }
 
     private void setClicked() {
         if (!wasClicked) {
-            checkBox.setChecked(false);
-            textView.setTextColor(Color.BLACK);
+            mCheckBox.setChecked(false);
+            mTextView.setTextColor(Color.BLACK);
         } else {
-            checkBox.setChecked(true);
-            textView.setTextColor(Color.BLACK);
+            mCheckBox.setChecked(true);
+            mTextView.setTextColor(Color.BLACK);
         }
     }
 
@@ -84,28 +81,28 @@ public class DayOfWeekView extends RelativeLayout implements View.OnClickListene
     public void onClick(View v) {
         wasClicked = (!wasClicked);
         setClicked();
-        outputProvider.displayLog(TAG, "Clicked");
+        mOutputProvider.displayLog(TAG, "Clicked");
     }
 
-    public void setClick(){
+    public void setClick() {
         wasClicked = (!wasClicked);
         setClicked();
-        outputProvider.displayLog(TAG, "Clicked");
+        mOutputProvider.displayLog(TAG, "Clicked");
     }
 
-    public boolean isChecked(){
-        return (checkBox.isChecked());
+    public boolean isChecked() {
+        return (mCheckBox.isChecked());
     }
 
     public String getText() {
-        return text;
+        return mText;
     }
 
-    public int getId(){
-        return id;
+    public int getId() {
+        return mId;
     }
 
-    public void setCheckboxGone(){
-        checkBox.setVisibility(GONE);
+    public void setCheckboxGone() {
+        mCheckBox.setVisibility(GONE);
     }
 }

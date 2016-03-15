@@ -67,6 +67,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    /**
+     * Get Pill database access object
+     * @return Pill database access object
+     */
     public RuntimeExceptionDao<Pill, Integer> getPillDao() {
         if (pillDao == null) {
             pillDao = getRuntimeExceptionDao(Pill.class);
@@ -74,6 +78,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return pillDao;
     }
 
+    /**
+     * Get Alarm database access object
+     * @return Alarm database access object
+     */
     public RuntimeExceptionDao<Alarm, Integer> getAlarmDao() {
         if (alarmDao == null) {
             alarmDao = getRuntimeExceptionDao(Alarm.class);
@@ -81,6 +89,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return alarmDao;
     }
 
+    /**
+     * Get PillToAlarm database access object
+     * @return PillToAlarm database access object
+     */
     public RuntimeExceptionDao<PillToAlarm, Integer> getPillToAlarmDao() {
         if (pillToAlarmDao == null) {
             pillToAlarmDao = getRuntimeExceptionDao(PillToAlarm.class);

@@ -1,33 +1,21 @@
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
@@ -41,51 +29,46 @@ public class AlarmReceiverActivity extends Activity {
 
     private final String TAG = getClass().getSimpleName();
 
-    private OutputProvider outputProvider;
-    private Context context;
-    private AlarmReceiver alarmReceiver;
-    private Alarm alarm;
-    private List<Long> pillIds;
-    private Long alarmId = null;
-    private NotificationManager alarmNotificationManager;
-    private double pillLeftPercentage;
+    private OutputProvider mOutputProvider;
+    private Context mContext;
+    private AlarmReceiver mAlarmReceiver;
+    private Alarm mAlarm;
+    private List<Long> mPillIdList;
+    private Long mAlarmId;
+    private String mAlertMessage;
+    private double mPillRemainingPercentage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
-        WakeLocker.acquire(context);
-        outputProvider = new OutputProvider(context);
-        pillLeftPercentage = 0.1;
+        mContext = getApplicationContext();
+        Bundle extras = getIntent().getExtras();
+        mOutputProvider = new OutputProvider(mContext);
+        WakeLocker.acquire(mContext);
 
-        String s = " ";
-        Intent intent = getIntent();
-        if (intent != null) {
-            alarmId = intent.getLongExtra("alarmID", -1);
-            outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmId));
-            if (alarmId != -1) {
-                s = setupAlarmAndPill(alarmId);
+        //TODO this be get from shared preferences set in preferences activity
+        mPillRemainingPercentage = 0.1;
+
+        setupContent(extras);
+        setupView();
+    }
+
+    private void setupContent(Bundle extras) {
+        if (extras != null) {
+            mAlarmId = extras.getLong(Constants.EXTRA_LONG_ALARM_ID);
+            mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(mAlarmId));
+            if (mAlarmId != null) {
+                mAlertMessage = setupAlarmAndPill(mAlarmId);
             }
         }
+    }
 
+    private void setupView() {
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(AlarmReceiverActivity.this);
-        alertDialogBuilder.setTitle("Take your pill");
-        alertDialogBuilder.setMessage(s)
+        alertDialogBuilder.setTitle(getString(R.string.dialog_title));
+        alertDialogBuilder.setMessage(mAlertMessage)
                 .setCancelable(false)
-                .setNeutralButton("Cancel alarm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        cancelAlarm(alarmId);
-                    }
-                })
-                .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        cancelPillClick();
-                        dialog.cancel();
-                    }
-                })
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         takePillClick();
@@ -96,30 +79,24 @@ public class AlarmReceiverActivity extends Activity {
         android.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
-
     }
 
-    public void onAttachedToWindow() {
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-    }
 
+    /**
+     * @param alarmId id of mAlarm that fired.
+     * @return Built string for alert dialog window text
+     */
     private String setupAlarmAndPill(Long alarmId) {
-
-        alarmReceiver = new AlarmReceiver(getApplicationContext());
-        alarm = DatabaseRepository.getAlarmById(getApplicationContext(), alarmId);
-        pillIds = new ArrayList<>();
+        mAlarmReceiver = new AlarmReceiver(getApplicationContext());
+        mAlarm = DatabaseRepository.getAlarmById(getApplicationContext(), alarmId);
+        mPillIdList = new ArrayList<>();
         if (alarmId != null) {
-            pillIds = DatabaseRepository.getPillsByAlarm(this, alarmId);
+            mPillIdList = DatabaseRepository.getPillsByAlarm(this, alarmId);
         }
 
-
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Did you take your pills?\n");
-        for (Long pillId : pillIds) {
+        stringBuilder.append(getString(R.string.dialog_message));
+        for (Long pillId : mPillIdList) {
             Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
             if (pill != null) {
                 stringBuilder.append(pill.getName());
@@ -130,138 +107,140 @@ public class AlarmReceiverActivity extends Activity {
         return stringBuilder.toString();
     }
 
+    /**
+     * Used when user clicks button on notification when mAlarm is fired
+     */
     public void takePillClick() {
         AlarmReceiver.stopRingtone();
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean wasTaken = false;
-        if (!pillIds.isEmpty()) {
-            for (Long pillId : pillIds) {
-                Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
 
-                int pillRemaining = -1, pillDosage = -1, pillCount = -1;
+        //Checking pills for count and pill dosage to update pills remaining and send notification
+        if (!mPillIdList.isEmpty()) {
+            for (Long pillId : mPillIdList) {
+                //Getting pill for each pill attached to mAlarm
+                Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
+                int pillRemaining, pillDosage, pillCount;
+
+
                 if (pill != null) {
+                    //get pill info
                     pillRemaining = pill.getPillsRemaining();
                     pillDosage = pill.getDosage();
                     pillCount = pill.getPillsCount();
+                    //if pill dosage was set in pill
                     if (pillRemaining != -1 && pillDosage != -1) {
+                        //count how many pills are left
                         int remaining = pillRemaining - pillDosage;
-                        if(remaining<0) {
+
+                        //set remaining pills
+                        if (remaining < 0) {
+                            //number of pills remaining cannot be negative number
                             remaining = 0;
                             pill.setPillsRemaining(remaining);
                             DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(pill);
+                        } else {
+                            pill.setPillsRemaining(remaining);
+                            DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(pill);
                         }
-                        if(pillRemaining <= (pillCount*pillLeftPercentage))
-                            stringBuilder.append(pill.getName() + " ");
-                        outputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
-                        wasTaken = true;
+                        //count percentage of pills left to send notification
+                        if (remaining <= (pillCount * mPillRemainingPercentage)) {
+                            sendNotification(longToInt(pill.getId()), pill.getName());
+                        }
+                        mOutputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
                     }
                 }
 
-            }
-            if (alarm != null) {
-                int usageNumber = alarm.getUsageNumber();
-                if (usageNumber != -1) {
-                    usageNumber--;
-                    alarm.setUsageNumber(usageNumber);
-                    DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
-
-                    if (usageNumber > 0) {
-
-                        if (alarm.isRepeatable()) {
-                            alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                            alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmId);
-                        }
-                    } else if (usageNumber == 0) {
-                        outputProvider.displayShortToast("Alarm usage used");
-                        alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                        alarm.setIsActive(false);
-                        DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
-                    }
-
-                } else {
-                    if (alarm.isSingle()) {
-                        alarm.setIsActive(false);
-                        DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
-                    }
-                    if (alarm.isRepeatable()) {
-                        alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                        alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmId);
-                    }
-                }
             }
         }
-        if(wasTaken)
-            sendNotification(stringBuilder.toString());
-        startActivity(new Intent(context, MainActivity.class));
-        WakeLocker.release();
-    }
 
-    public void cancelPillClick() {
-        AlarmReceiver.stopRingtone();
-
-        if (alarm != null) {
-            int usageNumber = alarm.getUsageNumber();
+        //Checking number of usage set in mAlarm
+        if (mAlarm != null) {
+            int usageNumber = mAlarm.getUsageNumber();
             if (usageNumber != -1) {
+                //if usage number IS NOT -1 mAlarm is repeating until usage number is 0 (this is done repeating and interval alarms)
                 usageNumber--;
-                alarm.setUsageNumber(usageNumber);
-                DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
+
+                mAlarm.setUsageNumber(usageNumber);
+                DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(mAlarm);
 
                 if (usageNumber > 0) {
-
-                    if (alarm.isRepeatable()) {
-                        alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                        alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmId);
+                    //usage number is greater than 0 so next mAlarm can be set (interval alarms are set automatically)
+                    if (mAlarm.isRepeatable()) {
+                        mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
+                        mAlarmReceiver.setRepeatingAlarm(getApplicationContext(), mAlarmId);
                     }
+
                 } else if (usageNumber == 0) {
-                    outputProvider.displayShortToast("Alarm usage used");
-                    alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                    alarm.setIsActive(false);
-                    DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
+                    //usage number is 0 so repeating and interval alarms are canceled and set to false
+                    mOutputProvider.displayShortToast("Alarm usage used");
+                    mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
+                    mAlarm.setIsActive(false);
+                    DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(mAlarm);
                 }
 
             } else {
-                if (alarm.isSingle()) {
-                    alarm.setIsActive(false);
-                    DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(alarm);
+                //usage number == -1
+                if (mAlarm.isSingle()) {
+                    //cancelling and deleting single mAlarm after one and only usage
+                    mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
+                    DatabaseRepository.deleteAlarm(mContext, mAlarm);
                 }
-                if (alarm.isRepeatable()) {
-                    alarmReceiver.cancelAlarm(getApplicationContext(), alarmId);
-                    alarmReceiver.setRepeatingAlarm(getApplicationContext(), alarmId);
+                if (mAlarm.isRepeatable()) {
+                    //if usage number is -1 mAlarm is repeating infinitely (works the same for interval alarms)
+                    mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
+                    mAlarmReceiver.setRepeatingAlarm(mContext, mAlarmId);
                 }
             }
         }
-        // cancel the alert box and put a Toast to the user
-        outputProvider.displayShortToast("You didn't take your pill :(");
 
-    //    sendNotification("JUST A TEST");
-        startActivity(new Intent(context, MainActivity.class));
+        //Starting main activity and releasing locked screen
+        startActivity(new Intent(mContext, MainActivity.class));
         WakeLocker.release();
     }
 
-    private void cancelAlarm(Long alarmId){
-        AlarmReceiver.stopRingtone();
-        alarmReceiver.cancelAlarm(context, alarmId);
-        startActivity(new Intent(context, MainActivity.class));
-    }
 
-
-    //TODO Create notification class for creating,updating and deleting notification
-    private void sendNotification(String msg) {
-        alarmNotificationManager = (NotificationManager) this
+    /**
+     * Sends notification that opens in-app map with nearby pharmacies.
+     * Used only when remaining pill count is below given percentage of full pill count
+     *
+     * @param id  pill id
+     * @param msg pill name
+     */
+    private void sendNotification(int id, String msg) {
+        NotificationManager alarmNotificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MapsActivity.class), 0);
 
         NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                this).setContentTitle("Find nearby pharmacy!").setSmallIcon(R.drawable.pill)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("You are low on: " + msg))
-                .setContentText("You are low on: " + msg);
-
+                this).setContentTitle(getString(R.string.find_nearby_pharmacy)).setSmallIcon(R.drawable.pill)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.low_on) + msg))
+                .setContentText(getString(R.string.low_on) + msg);
 
         alarmNotificationBuilder.setContentIntent(contentIntent);
-        alarmNotificationManager.notify(1, alarmNotificationBuilder.build());
-        Log.d("AlarmReceiverActivity", "Notification sent.");
+        alarmNotificationManager.notify(id, alarmNotificationBuilder.build());
+        mOutputProvider.displayLog(TAG, "Notification snet.");
+    }
+
+    /**
+     * Converts Long value to int value.
+     *
+     * @param l Long value we want to transform.
+     * @return Transformed int value.
+     */
+    private int longToInt(Long l) {
+        return (int) (long) l;
+    }
+
+    /**
+     * Method used to get through locked screen
+     */
+    public void onAttachedToWindow() {
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
 }

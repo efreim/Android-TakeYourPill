@@ -27,18 +27,17 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
-import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.DayOfWeekView;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
+import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
-/**
- * Created by Kuba on 02.03.2016.
- */
+
 public class RepeatingAlarmFragment extends Fragment {
 
     private final String TAG = "REPEATING_ALARM_FRAGMENT";
+
     @Bind(R.id.inside_horizontal)
     GridLayout linearInsideHorizontal;
     @Bind(R.id.day_of_week_grid)
@@ -47,48 +46,50 @@ public class RepeatingAlarmFragment extends Fragment {
     EditText changeTimeButton;
     @Bind(R.id.number_of_usage)
     EditText numberOfUsageEditText;
-    private ScrollView scrollView;
+
     private List<HorizontalScrollViewItem> pillViewList;
     private List<DayOfWeekView> weekViewListList;
     private Alarm mAlarm;
-    private List<Pill> pills;
-    private AlarmActivity.State state;
     private OutputProvider outputProvider;
     private Context context;
-    private int mMinute = 0, mHour = 0, mNumberOfAlarms = 0;
-    private Long alarmId;
+    private int mMinute;
+    private int mHour;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        scrollView = (ScrollView) inflater.inflate(R.layout.fragment_repetable_alarm, container, false);
+        ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_repetable_alarm, container, false);
+        ButterKnife.bind(this, scrollView);
         context = getContext();
         outputProvider = new OutputProvider(context);
-        ButterKnife.bind(this, scrollView);
-
         Bundle bundle = getArguments();
+        setupContent(bundle);
+
+        return scrollView;
+    }
+
+    private void setupContent(Bundle bundle) {
+        AlarmActivity.State state;
         if (bundle == null) {
             state = AlarmActivity.State.NEW;
             setupView(state);
         } else {
             state = AlarmActivity.State.EDIT;
-            alarmId = bundle.getLong(Constants.EXTRA_LONG_ID);
+            Long alarmId = bundle.getLong(Constants.EXTRA_LONG_ID);
 
             mAlarm = DatabaseRepository.getAlarmById(context, alarmId);
             if (mAlarm == null)
-                outputProvider.displayShortToast("Error loading pills");
+                outputProvider.displayShortToast(getString(R.string.error_loading_pills));
             else {
                 setupView(state);
             }
         }
-
-        return scrollView;
     }
 
     private void setupView(AlarmActivity.State state) {
         pillViewList = new ArrayList<>();
         weekViewListList = new ArrayList<>();
-        pills = DatabaseRepository.getAllPills(context);
+        List<Pill> pills = DatabaseRepository.getAllPills(context);
 
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
@@ -104,7 +105,7 @@ public class RepeatingAlarmFragment extends Fragment {
                 pillViewList.add(item);
             }
         } else
-            outputProvider.displayShortToast("Error loading pills");
+            outputProvider.displayShortToast(getString(R.string.error_loading_pills));
 
 
         if (state == AlarmActivity.State.NEW) {
@@ -116,10 +117,11 @@ public class RepeatingAlarmFragment extends Fragment {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
             mHour = mAlarm.getHour();
+            int mNumberOfAlarms = mAlarm.getUsageNumber();
             changeTimeButton.setText(buildString(mMinute, mHour));
 
-            if (mAlarm.getUsageNumber() != -1) {
-                numberOfUsageEditText.setText(String.valueOf(mAlarm.getUsageNumber()));
+            if (mNumberOfAlarms != -1) {
+                numberOfUsageEditText.setText(String.valueOf(mNumberOfAlarms));
             }
             List<Long> pillIds = DatabaseRepository.getPillsByAlarm(context, mAlarm.getId());
             for (Long id : pillIds) {
@@ -160,7 +162,7 @@ public class RepeatingAlarmFragment extends Fragment {
                 mHour = selectedHour;
             }
         }, hour, minute, true);
-        mTimePicker.setTitle("Select Time");
+        mTimePicker.setTitle(getString(R.string.select_time));
         mTimePicker.show();
 
     }
@@ -173,10 +175,9 @@ public class RepeatingAlarmFragment extends Fragment {
         StringBuilder stringBuilder = new StringBuilder();
         for (DayOfWeekView dayOfWeekView : weekViewListList) {
             if (dayOfWeekView.isChecked()) {
-                isDayChecked= true;
+                isDayChecked = true;
                 stringBuilder.append("1");
-            }
-            else
+            } else
                 stringBuilder.append("0");
         }
 
@@ -184,13 +185,13 @@ public class RepeatingAlarmFragment extends Fragment {
         if (state == AlarmActivity.State.NEW) {
 
             if (changeTimeButton.getText().toString().equals("")) {
-                changeTimeButton.setError("Choose alarm time");
+                changeTimeButton.setError(getString(R.string.error_choose_alarm_time));
                 return false;
-            }else
+            } else
                 changeTimeButton.setError(null);
 
-            if(!isDayChecked){
-                outputProvider.displayShortToast("Set repeating days or use single alarm");
+            if (!isDayChecked) {
+                outputProvider.displayShortToast(getString(R.string.toast_set_repeating_days));
                 return false;
             }
 
@@ -205,12 +206,9 @@ public class RepeatingAlarmFragment extends Fragment {
                 DatabaseRepository.addAlarm(context, mAlarm);
                 alarmReceiver.setRepeatingAlarm(context, mAlarm.getId());
             } else {
-                outputProvider.displayShortToast("Number of alarms can't be .   :(");
+                outputProvider.displayShortToast(getString(R.string.toast_dot_error));
                 return false;
             }
-
-
-
 
         } else {
 
@@ -219,12 +217,12 @@ public class RepeatingAlarmFragment extends Fragment {
             } else if (!numberOfUsage.equals("") && !numberOfUsage.startsWith("."))
                 mAlarm.setUsageNumber(Integer.parseInt(numberOfUsage));
             else {
-                outputProvider.displayShortToast("Error with number of alarms field");
+                outputProvider.displayShortToast(getString(R.string.toast_error_number_of_alarms));
                 return false;
             }
 
-            if(!isDayChecked){
-                outputProvider.displayShortToast("Set repeating days or use single alarm");
+            if (!isDayChecked) {
+                outputProvider.displayShortToast(getString(R.string.toast_set_repeating_days));
                 return false;
             }
 
@@ -256,7 +254,6 @@ public class RepeatingAlarmFragment extends Fragment {
 
     /**
      * Builds string to be display in list item
-     *
      * @param minute alarm minute
      * @param hour   alarm hour
      * @return returns built string
@@ -275,13 +272,13 @@ public class RepeatingAlarmFragment extends Fragment {
     }
 
     private enum DayOfWeek {
-        MON(0, "Mon"),
-        TUE(1, "Tue"),
-        WED(2, "Wed"),
-        THU(3, "Thur"),
-        FRI(4, "Fri"),
-        SAT(5, "Sat"),
-        SUN(6, "Sun");
+        MON(0, Constants.MONDAY),
+        TUE(1, Constants.TUESDAY),
+        WED(2, Constants.WEDNESDAY),
+        THU(3, Constants.THURSDAY),
+        FRI(4, Constants.FRIDAY),
+        SAT(5, Constants.SATURDAY),
+        SUN(6, Constants.SUNDAY);
 
         private int id;
         private String day;
