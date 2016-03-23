@@ -6,11 +6,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +115,7 @@ public class AlarmReceiverActivity extends Activity {
      * Used when user clicks button on notification when mAlarm is fired
      */
     public void takePillClick() {
-        AlarmReceiver.stopRingtone();
+        mAlarmReceiver.stopRingtone();
 
         //Checking pills for count and pill dosage to update pills remaining and send notification
         if (!mPillIdList.isEmpty()) {
@@ -119,7 +123,6 @@ public class AlarmReceiverActivity extends Activity {
                 //Getting pill for each pill attached to mAlarm
                 Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
                 int pillRemaining, pillDosage, pillCount;
-
 
                 if (pill != null) {
                     //get pill info
@@ -156,7 +159,7 @@ public class AlarmReceiverActivity extends Activity {
         if (mAlarm != null) {
             int usageNumber = mAlarm.getUsageNumber();
             if (usageNumber != -1) {
-                //if usage number IS NOT -1 mAlarm is repeating until usage number is 0 (this is done repeating and interval alarms)
+                //if usage number IS NOT -1 mAlarm is repeating until usage number is 0 (this is done in repeating and interval alarms)
                 usageNumber--;
 
                 mAlarm.setUsageNumber(usageNumber);
@@ -206,20 +209,32 @@ public class AlarmReceiverActivity extends Activity {
      * @param msg pill name
      */
     private void sendNotification(int id, String msg) {
-        NotificationManager alarmNotificationManager = (NotificationManager) this
-                .getSystemService(Context.NOTIFICATION_SERVICE);
+        Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), (long) id);
+        if (pill != null) {
+            NotificationManager alarmNotificationManager = (NotificationManager) this
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MapsActivity.class), 0);
+            PendingIntent mapsIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(this, MapsActivity.class), 0);
 
-        NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                this).setContentTitle(getString(R.string.find_nearby_pharmacy)).setSmallIcon(R.drawable.pill)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.low_on) + msg))
-                .setContentText(getString(R.string.low_on) + msg);
+            Intent intent = new Intent(this, PillDetailActivity.class);
+            intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
+            PendingIntent refillIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        alarmNotificationBuilder.setContentIntent(contentIntent);
-        alarmNotificationManager.notify(id, alarmNotificationBuilder.build());
-        mOutputProvider.displayLog(TAG, "Notification snet.");
+            PendingIntent mainIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+            NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
+                    this).setContentTitle(getString(R.string.find_nearby_pharmacy)).setSmallIcon(R.drawable.pill)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.low_on) + msg))
+                    .setContentText(getString(R.string.low_on) + msg)
+                    .addAction(R.drawable.ic_room_black_36dp, "Find pharmacy", mapsIntent)
+                    .addAction(R.drawable.ic_autorenew_black_36dp, "Refill me", refillIntent);
+
+            alarmNotificationBuilder.setContentIntent(mainIntent);
+            alarmNotificationManager.notify(id, alarmNotificationBuilder.build());
+
+
+            mOutputProvider.displayLog(TAG, "Notification sent.");
+        }
     }
 
     /**

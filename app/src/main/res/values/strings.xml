@@ -34,7 +34,6 @@
     dolor quam.</string>
     <string name="checkin">Checkin</string>
     <string name="menu_settings">Settings</string>
-    <string name="place">pharmacy</string>
     <string name="info">Description</string>
     <string name="dosage">Dosage</string>
     <string name="active_substance">Active substance</string>
@@ -68,6 +67,7 @@
     <string name="toast_error_number_of_alarms">Error with number of alarms field</string>
     <string name="toast_alarm_will_fire_in">Alarm will fire in: </string>
     <string name="toast_add_new_date_to_interval">Add new date to interval alarm to activate.</string>
+    <string name="edit_text_info">Leave empty for infinite alarm.</string>
 
     <!--days of week-->
     <string name="monday">Mon</string>
@@ -91,7 +91,7 @@
 
     <!--notification-->
     <string name="find_nearby_pharmacy">Find nearby pharmacy!</string>
-    <string name="low_on">You are low on: </string>
+    <string name="low_on">You are low on:  </string>
 
     <!--toolbar options items-->
     <string name="dialog_delete_database_title">Delete database</string>

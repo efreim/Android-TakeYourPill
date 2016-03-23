@@ -23,11 +23,13 @@
     <style name="Base.Theme.DesignDemo" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">#673AB7</item>
         <item name="colorPrimaryDark">#512DA8</item>
-        <item name="colorAccent">#FF4081</item>
+        <item name="colorAccent">#673AB7</item>
         <item name="android:windowBackground">@color/window_background</item>
         <item name="colorControlNormal">@color/notification_bar</item>
         <item name="colorControlActivated">@color/main_theme</item>
         <item name="colorControlHighlight">@color/inactive_color</item>
+        <item name="android:datePickerDialogTheme">@style/MyDatePickerDialogTheme</item>
+        <item name="android:timePickerDialogTheme">@style/MyDatePickerDialogTheme</item>
     </style>
 
     <style name="Widget.CardContent" parent="android:Widget">
@@ -53,6 +55,13 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="MyDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">@color/main_theme</item>
+
+        <!-- No need to override 'datePickerStyle' -->
+        <!-- <item name="android:datePickerStyle">@style/MyDatePickerStyle</item> -->
     </style>
 
 </resources>

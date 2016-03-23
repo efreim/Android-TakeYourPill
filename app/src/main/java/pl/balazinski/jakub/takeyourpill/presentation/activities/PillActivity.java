@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -103,12 +106,12 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void setupContent(Bundle extras) {
+
         /*
          * If extras are empty mState is new otherwise
          * mState is edit and edited pill must be loaded
          * from database.
          */
-        mOuterPillDatabase = new OuterPillDatabase(getApplicationContext());
         if (extras == null) {
             mState = State.NEW;
         } else {
@@ -122,6 +125,15 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
                 mImageUri = Uri.parse(mPill.getPhoto());
             }
         }
+        /*
+        Setting autocomplete text view
+         */
+        mOuterPillDatabase = new OuterPillDatabase(getApplicationContext());
+        pillNameEditText = (AutoCompleteTextView) findViewById(R.id.pill_name);
+        pillNameEditText.setOnItemClickListener(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, getPillNameList());
+        pillNameEditText.setAdapter(adapter);
+        pillNameEditText.setThreshold(2);
     }
 
     private void setupView() {
@@ -364,5 +376,18 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
         this.mImageUri = mImageUri;
     }
 
+    public List<String> getPillNameList() {
+        List<String> arrayList = new ArrayList<>();
+        Cursor cursor = mOuterPillDatabase.getReadableDatabase()
+                .rawQuery("SELECT nazwa FROM " + Constants.OUTER_TABLE_NAME + ";", null);
 
+        if (cursor.getCount() != 0) {
+            while (cursor.moveToNext()) {
+                arrayList.add(cursor.getString(0));
+
+            }
+            cursor.close();
+        }
+        return arrayList;
+    }
 }

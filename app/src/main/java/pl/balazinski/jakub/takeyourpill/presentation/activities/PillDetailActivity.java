@@ -16,6 +16,7 @@
 
 package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -109,7 +110,6 @@ public class PillDetailActivity extends AppCompatActivity {
 
     private OutputProvider mOutputProvider;
     private Pill mPill;
-    private List<CardView> mCardViewList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -158,7 +158,6 @@ public class PillDetailActivity extends AppCompatActivity {
 
     private void setupComponents() {
 
-        mCardViewList = new ArrayList<>();
         final String pillName = mPill.getName();
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -167,49 +166,42 @@ public class PillDetailActivity extends AppCompatActivity {
             pillDescriptionCardView.setVisibility(View.GONE);
         else {
             descriptionTextView.setText(mPill.getDescription());
-            mCardViewList.add(pillDescriptionCardView);
         }
 
         if (mPill.getDosage() == -1)
             pillDosageCardView.setVisibility(View.GONE);
         else {
             dosageTextView.setText(String.valueOf(mPill.getDosage()));
-            mCardViewList.add(pillDosageCardView);
         }
 
         if (mPill.getActiveSubstance().equals(""))
             pillActiveSubCardView.setVisibility(View.GONE);
         else {
             activeSubstanceTextView.setText(mPill.getActiveSubstance());
-            mCardViewList.add(pillActiveSubCardView);
         }
 
         if (mPill.getPillsCount() == -1)
             pillCountCardView.setVisibility(View.GONE);
         else {
             pillCountTextView.setText(String.valueOf(mPill.getPillsCount()));
-            mCardViewList.add(pillCountCardView);
         }
 
         if (mPill.getPillsRemaining() == -1)
             pillCountLeftCardView.setVisibility(View.GONE);
         else {
             pillCountLeftTextView.setText(String.valueOf(mPill.getPillsRemaining()));
-            mCardViewList.add(pillCountLeftCardView);
         }
 
         if (mPill.getPrice().equals(""))
             pillPriceCardView.setVisibility(View.GONE);
         else {
             priceTextView.setText(mPill.getPrice());
-            mCardViewList.add(pillPriceCardView);
         }
 
         if (mPill.getBarcodeNumber() == -1)
             pillBarcodeCardView.setVisibility(View.GONE);
         else {
             barcodeNumberTextView.setText(String.valueOf(mPill.getBarcodeNumber()));
-            mCardViewList.add(pillBarcodeCardView);
         }
 
         List<Long> alarmIds = DatabaseRepository.getAlarmsByPill(this, mPill.getId());
@@ -229,7 +221,6 @@ public class PillDetailActivity extends AppCompatActivity {
                 }
             }
             alarmsAttachedTextView.setText(stringBuilder.toString());
-            mCardViewList.add(alarmsAttachedCardView);
         }
 
 
@@ -248,13 +239,6 @@ public class PillDetailActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        for (CardView cd : mCardViewList) {
-            if (Constants.VERSION >= Build.VERSION_CODES.M)
-                cd.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rounded_cardview));
-            else
-                cd.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.rounded_cardview));
-        }
-
         if (Constants.VERSION >= Build.VERSION_CODES.M) {
             refillButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
             searchWebButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
@@ -272,8 +256,8 @@ public class PillDetailActivity extends AppCompatActivity {
         mPill.setPillsRemaining(count);
         DatabaseHelper.getInstance(getApplicationContext()).getPillDao().update(mPill);
         pillCountLeftTextView.setText(String.valueOf(mPill.getPillsRemaining()));
-        if (isPillNotification(mPill.getId()))
-            clearNotification(mPill.getId());
+        //if (isPillNotification(mPill.getId()))
+        clearNotification(mPill.getId());
         mOutputProvider.displayShortToast(getString(R.string.toast_pill_refilled));
     }
 
@@ -320,9 +304,12 @@ public class PillDetailActivity extends AppCompatActivity {
     }
 
     private void clearNotification(Long id) {
-        Intent intent = new Intent(this, MapsActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, longToInt(id), intent, 0);
-        pendingIntent.cancel();
+       /* Intent intent = new Intent(this, MapsActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, , intent, 0);
+        pendingIntent.cancel();*/
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(ns);
+        nMgr.cancel(longToInt(id));
     }
 
 

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -99,7 +100,7 @@ public class PillListAdapter
         public final View mView;
         public final ImageView mImageView;
         public final TextView mTextView;
-        public final LinearLayout pillItem;
+        public final RelativeLayout pillItem;
         private PillListAdapter mAdapter;
         private OutputProvider mOutputProvider;
         private Context mContext;
@@ -111,7 +112,7 @@ public class PillListAdapter
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.avatar);
             mTextView = (TextView) view.findViewById(android.R.id.text1);
-            pillItem = (LinearLayout) view.findViewById(R.id.pill_item);
+            pillItem = (RelativeLayout) view.findViewById(R.id.pill_item);
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);
             this.mAdapter = adapter;

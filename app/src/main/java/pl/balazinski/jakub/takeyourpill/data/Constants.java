@@ -55,4 +55,7 @@ public class Constants {
     public static final String SATURDAY = "Sat";
     public static final String SUNDAY = "Sun";
 
+    //MAPS
+    public static final String MAP_PLACE = "pharmacy";
+
 }

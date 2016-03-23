@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,37 +14,33 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pill_item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
-    android:background="@drawable/alarm_list_item_active_background"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="15dp">
+    android:layout_height="@dimen/list_pill_height"
+    android:gravity="center_vertical">
 
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.3">
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/avatar"
         android:layout_width="@dimen/list_item_avatar_size"
         android:layout_height="@dimen/list_item_avatar_size"
-        android:layout_gravity="center"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"/>
-    </FrameLayout>
+        android:layout_gravity="start"
+        android:paddingEnd="@dimen/list_icon_left_padding"
+        android:paddingStart="@dimen/list_icon_left_padding"
+        android:layout_marginStart="@dimen/list_icon_left_padding"/>
+
     <TextView
         android:id="@android:id/text1"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.7"
-        android:gravity="left"
-        android:textColor="@color/alarm_list_item_text"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignTop="@+id/avatar"
+        android:layout_toEndOf="@+id/avatar"
+        android:gravity="start|center"
+        android:paddingEnd="0dp"
+        android:paddingStart="@dimen/list_text_right_padding"
+        android:text="asdasdasdasda"
+        android:textSize="@dimen/font_size_big" />
 
-</LinearLayout>
+</RelativeLayout>

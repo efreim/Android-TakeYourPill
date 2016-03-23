@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
     android:orientation="vertical">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:orientation="vertical">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,9 +21,11 @@
 
         <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
         <LinearLayout
+            android:id="@+id/repeatable_dummy"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:layout_width="0px"
+            android:orientation="horizontal"
             android:layout_height="0px"/>
 
         <TextView
@@ -65,7 +75,7 @@
             android:id="@+id/day_of_week_grid"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_gravity="start"
+            android:layout_gravity="center_horizontal"
             android:layout_weight="0.175"
             android:fitsSystemWindows="true"
             android:orientation="horizontal">
@@ -83,7 +93,8 @@
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.175">
+            android:layout_weight="0.175"
+            android:scrollbarAlwaysDrawHorizontalTrack="true">
 
             <GridLayout
                 android:id="@+id/inside_horizontal"
@@ -98,3 +109,4 @@
 
 
 </ScrollView>
+</LinearLayout>

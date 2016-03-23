@@ -6,12 +6,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 
@@ -48,6 +50,8 @@ public class IntervalAlarmFragment extends Fragment {
     EditText intervalTimeEditText;
     @Bind(R.id.number_of_usage)
     EditText numberOfUsageEditText;
+    @Bind(R.id.interval_dummy)
+    LinearLayout linearLayoutDummy;
 
     private List<HorizontalScrollViewItem> mPillViewList;
     private Alarm mAlarm;
@@ -92,9 +96,9 @@ public class IntervalAlarmFragment extends Fragment {
     }
 
     private void setupView(AlarmActivity.State state) {
+        linearLayoutDummy.requestFocus();
         mPillViewList = new ArrayList<>();
         List<Pill> pills = DatabaseRepository.getAllPills(mContext);
-
 
         if (pills != null) {
             for (Pill p : pills) {
@@ -180,7 +184,7 @@ public class IntervalAlarmFragment extends Fragment {
             mYear = mCurrentTime.get(Calendar.YEAR);
         }
         DatePickerDialog mDatePicker;
-        mDatePicker = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
+        mDatePicker = new DatePickerDialog(mContext,new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 

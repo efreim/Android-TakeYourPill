@@ -6,10 +6,14 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 import java.util.ArrayList;
@@ -28,9 +32,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     private final String TAG = getClass().getSimpleName();
 
-    private static Ringtone mRingtone = null;
     private OutputProvider outputProvider;
     private Context mContext;
+    private static MediaPlayer mPlayer;
+    private static Vibrator mVibrator;
 
     public AlarmReceiver() {
     }
@@ -43,16 +48,21 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
 
+        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
+        String alarms = getAlarms.getString("ringtone", "default ringtone");
+        boolean isVibrating = getAlarms.getBoolean("vibration", false);
         Bundle bundle = intent.getExtras();
         //this will sound the alarm tone
         //this will sound the alarm once, if you wish to
         //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
-        Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        /*Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (alarmUri == null) {
             alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }
-        mRingtone = RingtoneManager.getRingtone(context, alarmUri);
-        mRingtone.play();
+        }*/
+        /*mRingtone = RingtoneManager.getRingtone(context, Uri.parse(alarms));
+        mRingtone.play();*/
+        startRingtone(Uri.parse(alarms), isVibrating, context);
+
 
         Intent i = new Intent();
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -213,7 +223,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
      */
     public void setIntervalAlarm(Context context, Long alarmID) {
 
-        int interval, day, month, year;
+        int interval, day, month, year, hour, currentHour, minute;
         Calendar calendar = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
@@ -224,24 +234,45 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             day = alarm.getDay();
             month = alarm.getMonth();
             year = alarm.getYear();
+            hour = alarm.getHour();
+            minute = alarm.getMinute();
+            currentHour = now.get(Calendar.HOUR_OF_DAY);
 
-            calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
             calendar.set(Calendar.MINUTE, alarm.getMinute());
             calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.YEAR, year);
 
             if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
-                outputProvider.displayShortToast(context.getString(R.string.toast_add_new_date_to_interval));
-                alarm.setIsActive(false);
-                DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
+
+                outputProvider.displayDebugLog(TAG,"interval = " + interval);
+                int newHour = currentHour - hour;
+                outputProvider.displayDebugLog(TAG,"new hour = " + newHour);
+                int newStartingHour = interval - newHour;
+                outputProvider.displayDebugLog(TAG,"new starting hour = " + newStartingHour);
+                hour = currentHour + newStartingHour;
+                outputProvider.displayDebugLog(TAG,"hour = " + hour);
+                now.set(Calendar.HOUR_OF_DAY, hour);
+                now.set(Calendar.MINUTE, minute);
+
+
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmID);
+                long alarmTimeInMillis = now.getTimeInMillis();
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
+                outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
+                outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+
             } else {
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Intent intent = new Intent(context, AlarmReceiver.class);
                 intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmID);
                 long alarmTimeInMillis = calendar.getTimeInMillis();
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * interval, pendingIntent);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
                 outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
                 outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
             }
@@ -311,12 +342,24 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     }
 
+    private void startRingtone(Uri ringtone, boolean isVibration, Context context){
+        long[] pattern = { 0, 200, 2000 };
+
+        mPlayer = MediaPlayer.create(context,ringtone);
+        mPlayer.setLooping(true);
+        mPlayer.start();
+        if(isVibration){
+            mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            mVibrator.vibrate(pattern,0);
+        }
+    }
+
     /**
      * Stops annoying ringtone from ringing!!
      */
-    public static void stopRingtone() {
-        if (mRingtone != null)
-            mRingtone.stop();
+    public void stopRingtone() {
+        if(mPlayer!=null) mPlayer.stop();
+        if(mVibrator!=null) mVibrator.cancel();
     }
 
     /**

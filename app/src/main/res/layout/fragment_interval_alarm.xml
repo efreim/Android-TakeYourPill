@@ -13,8 +13,10 @@
 
         <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
         <LinearLayout
+            android:id="@+id/interval_dummy"
             android:layout_width="0px"
             android:layout_height="0px"
+            android:orientation="horizontal"
             android:focusable="true"
             android:focusableInTouchMode="true" />
 
@@ -96,7 +98,8 @@
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.15">
+            android:layout_weight="0.15"
+            android:scrollbarAlwaysDrawHorizontalTrack="true">
 
             <GridLayout
                 android:id="@+id/inside_horizontal"

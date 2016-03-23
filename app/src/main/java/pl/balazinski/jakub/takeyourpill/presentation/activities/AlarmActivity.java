@@ -192,12 +192,22 @@ public class AlarmActivity extends AppCompatActivity {
     @OnClick(R.id.add_alarm)
     public void addAlarmButton(View v) {
         boolean isOk = false;
-        if (viewPager.getCurrentItem() == 0) {
-            isOk = mRepeatableFragment.addAlarm(mState);
-        } else if (viewPager.getCurrentItem() == 1) {
-            isOk = mIntervalFragment.addAlarm(mState);
-        } else if (viewPager.getCurrentItem() == 2) {
-            isOk = mSingleFragment.addAlarm(mState);
+        if(mState == State.NEW) {
+            if (viewPager.getCurrentItem() == 0) {
+                isOk = mRepeatableFragment.addAlarm(mState);
+            } else if (viewPager.getCurrentItem() == 1) {
+                isOk = mIntervalFragment.addAlarm(mState);
+            } else if (viewPager.getCurrentItem() == 2) {
+                isOk = mSingleFragment.addAlarm(mState);
+            }
+        }else if(mState == State.EDIT){
+            if (mAlarm.isRepeatable()) {
+                isOk = mRepeatableFragment.addAlarm(mState);
+            } else if (mAlarm.isInterval()) {
+                isOk = mIntervalFragment.addAlarm(mState);
+            } else if (mAlarm.isSingle()) {
+                isOk = mSingleFragment.addAlarm(mState);
+            }
         }
 
         if (isOk)

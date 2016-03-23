@@ -140,6 +140,11 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
         }
     }
 
+    @OnClick(R.id.add_pill_manually_chooser)
+    public void onAddPillClick(View v) {
+        startActivity(new Intent(getApplicationContext(), PillActivity.class));
+    }
+
     /**
      * @param requestCode Requests camera or select file
      * @param resultCode  1 if result is valid

@@ -37,6 +37,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
+import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.utilities.map.Place;
 import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -68,7 +69,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         setupContent();
         setupView();
-        mPlaces = getResources().getString(R.string.place);
+        mPlaces = Constants.MAP_PLACE;
         checkEnabled();
 
     }
@@ -76,8 +77,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private void setupContent() {
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
                 .getMap();
-        mMap.setMyLocationEnabled(true);
-
+        if(mMap!=null)
+            mMap.setMyLocationEnabled(true);
+        else finish();
     }
 
     private void setupView(){

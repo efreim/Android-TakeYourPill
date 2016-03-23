@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="Your Name"
-        android:key="username"
-        android:summary="Please provide your username"/>
-    <CheckBoxPreference android:title="Application Updates"
+    <EditTextPreference android:title="Sneeze time"
+        android:key="sneeze"
+        android:inputType="numberDecimal"
+        android:summary="Set sneeze time of your alarms"/>
+    <RingtonePreference
+        android:title="Choose alarm"
+        android:key="ringtone"
+        android:summary="Ringtone for your alarms"/>
+    <CheckBoxPreference android:title="Vibration"
         android:defaultValue="false"
-        android:summary="This option if selected will allow the application to check for latest versions."
-        android:key="applicationUpdates" />
+        android:summary="Set vibrations for your alarms."
+        android:key="vibration" />
 </PreferenceScreen>

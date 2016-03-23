@@ -25,9 +25,17 @@
     <dimen name="pill_activity_item_margin">16dp</dimen>
 
     <dimen name="font_size">16sp</dimen>
+    <dimen name="font_size_big">26sp</dimen>
 
 
-    <dimen name="icon_left_padding">16dp</dimen>
+    <dimen name="list_icon_left_padding">16dp</dimen>
     <dimen name="list_item_left_padding">72dp</dimen>
-    <dimen name="list_item_right_padding">16dp</dimen>
+    <dimen name="list_item_edge_padding">16dp</dimen>
+    <dimen name="list_item_height">88dp</dimen>
+    <dimen name="list_text_view_height">44dp</dimen>
+    <dimen name="list_text_left_padding">72dp</dimen>
+    <dimen name="list_text_right_padding">16dp</dimen>
+    <dimen name="list_padding_above">8dp</dimen>
+
+    <dimen name="list_pill_height">56dp</dimen>
 </resources>
