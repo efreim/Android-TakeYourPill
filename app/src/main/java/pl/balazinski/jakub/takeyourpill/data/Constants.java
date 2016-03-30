@@ -30,6 +30,8 @@ public class Constants {
     public static final String MAIN_FROM_ALARM_KEY = "RETURNING_KEY";
     public static final String MAIN_FROM_ALARM = "RETURNING";
 
+    public static final String RECEIVER_NOTIFICATION_KEY = "receiver_notification_key";
+
     //DATABASE
     public static final String OUTER_TABLE_NAME = "drugtable";
     public static final String DATABASE_NAME = "takeyourpill4.db";
@@ -39,8 +41,6 @@ public class Constants {
 
     //SYSTEM
     public static final int VERSION = Build.VERSION.SDK_INT;
-
-    //SYSTEM
     public static final String DRAWABLE_PATH = "android.resource://pl.balazinski.jakub.takeyourpill/";
 
     //INTERNET

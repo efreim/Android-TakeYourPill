@@ -2,19 +2,13 @@ package pl.balazinski.jakub.takeyourpill.presentation.activities;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +20,7 @@ import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
+import pl.balazinski.jakub.takeyourpill.utilities.MyNotificationManager;
 import pl.balazinski.jakub.takeyourpill.utilities.WakeLocker;
 
 
@@ -34,6 +29,7 @@ public class AlarmReceiverActivity extends Activity {
     private final String TAG = getClass().getSimpleName();
 
     private OutputProvider mOutputProvider;
+    private MyNotificationManager myNotificationManager;
     private Context mContext;
     private AlarmReceiver mAlarmReceiver;
     private Alarm mAlarm;
@@ -48,21 +44,39 @@ public class AlarmReceiverActivity extends Activity {
         mContext = getApplicationContext();
         Bundle extras = getIntent().getExtras();
         mOutputProvider = new OutputProvider(mContext);
+        myNotificationManager = new MyNotificationManager(mContext);
+        mOutputProvider.displayLog(TAG, "IM  HERE FINALLY");
         WakeLocker.acquire(mContext);
-
         //TODO this be get from shared preferences set in preferences activity
         mPillRemainingPercentage = 0.1;
 
         setupContent(extras);
-        setupView();
+
     }
+
 
     private void setupContent(Bundle extras) {
         if (extras != null) {
+            mAlarmReceiver = new AlarmReceiver(getApplicationContext());
             mAlarmId = extras.getLong(Constants.EXTRA_LONG_ALARM_ID);
+            int sneeze = extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY);
             mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(mAlarmId));
             if (mAlarmId != null) {
-                mAlertMessage = setupAlarmAndPill(mAlarmId);
+                if (sneeze == 0) {
+                    mOutputProvider.displayLog(TAG, "sneeze == 0");
+                    sneezeClick();
+                    clearNotification(mAlarmId);
+                } else if (sneeze == 1) {
+                    mOutputProvider.displayLog(TAG, "sneeze == 1");
+                    setupAlarmAndPill(mAlarmId);
+                    takePillClick();
+                    clearNotification(mAlarmId);
+                } else if (sneeze == -1) {
+                    mOutputProvider.displayLog(TAG, "sneeze == -1");
+                    mAlertMessage = setupAlarmAndPill(mAlarmId);
+                    mAlarmReceiver.startRingtone(mContext);
+                    setupView();
+                }
             }
         }
     }
@@ -78,10 +92,18 @@ public class AlarmReceiverActivity extends Activity {
                         takePillClick();
                         dialog.cancel();
                     }
+                })
+                .setNeutralButton(getString(R.string.snooze), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sneezeClick();
+                        dialog.cancel();
+                    }
                 });
 
         android.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
         alertDialog.show();
     }
 
@@ -112,11 +134,26 @@ public class AlarmReceiverActivity extends Activity {
     }
 
     /**
+     * Stops ringtone and vibration and sets snooze alarm with
+     * provided alarm id for snooze time which is set in preferences
+     */
+    private void sneezeClick() {
+        if (mAlarmReceiver != null) {
+            clearNotification(mAlarmId);
+            mAlarmReceiver.stopRingtone();
+            mAlarmReceiver.setSnoozeAlarm(mContext, mAlarmId);
+            finish();
+        }
+    }
+
+    /**
      * Used when user clicks button on notification when mAlarm is fired
      */
-    public void takePillClick() {
-        mAlarmReceiver.stopRingtone();
+    private void takePillClick() {
+        if (mAlarmReceiver != null)
+            mAlarmReceiver.stopRingtone();
 
+        clearNotification(mAlarmId);
         //Checking pills for count and pill dosage to update pills remaining and send notification
         if (!mPillIdList.isEmpty()) {
             for (Long pillId : mPillIdList) {
@@ -146,7 +183,7 @@ public class AlarmReceiverActivity extends Activity {
                         }
                         //count percentage of pills left to send notification
                         if (remaining <= (pillCount * mPillRemainingPercentage)) {
-                            sendNotification(longToInt(pill.getId()), pill.getName());
+                            myNotificationManager.sendPillNotification(pill.getId(), pill.getName());
                         }
                         mOutputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
                     }
@@ -174,7 +211,7 @@ public class AlarmReceiverActivity extends Activity {
 
                 } else if (usageNumber == 0) {
                     //usage number is 0 so repeating and interval alarms are canceled and set to false
-                    mOutputProvider.displayShortToast("Alarm usage used");
+                    mOutputProvider.displayShortToast(getString(R.string.toast_alarm_usage_used));
                     mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
                     mAlarm.setIsActive(false);
                     DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(mAlarm);
@@ -202,42 +239,6 @@ public class AlarmReceiverActivity extends Activity {
 
 
     /**
-     * Sends notification that opens in-app map with nearby pharmacies.
-     * Used only when remaining pill count is below given percentage of full pill count
-     *
-     * @param id  pill id
-     * @param msg pill name
-     */
-    private void sendNotification(int id, String msg) {
-        Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), (long) id);
-        if (pill != null) {
-            NotificationManager alarmNotificationManager = (NotificationManager) this
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-
-            PendingIntent mapsIntent = PendingIntent.getActivity(this, 0,
-                    new Intent(this, MapsActivity.class), 0);
-
-            Intent intent = new Intent(this, PillDetailActivity.class);
-            intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
-            PendingIntent refillIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-            PendingIntent mainIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-            NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                    this).setContentTitle(getString(R.string.find_nearby_pharmacy)).setSmallIcon(R.drawable.pill)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.low_on) + msg))
-                    .setContentText(getString(R.string.low_on) + msg)
-                    .addAction(R.drawable.ic_room_black_36dp, "Find pharmacy", mapsIntent)
-                    .addAction(R.drawable.ic_autorenew_black_36dp, "Refill me", refillIntent);
-
-            alarmNotificationBuilder.setContentIntent(mainIntent);
-            alarmNotificationManager.notify(id, alarmNotificationBuilder.build());
-
-
-            mOutputProvider.displayLog(TAG, "Notification sent.");
-        }
-    }
-
-    /**
      * Converts Long value to int value.
      *
      * @param l Long value we want to transform.
@@ -256,6 +257,12 @@ public class AlarmReceiverActivity extends Activity {
                 | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    private void clearNotification(Long id) {
+        String notificationService = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(notificationService);
+        notificationManager.cancel(longToInt(id));
     }
 
 }

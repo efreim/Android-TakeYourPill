@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -47,22 +45,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-
-        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
-        String alarms = getAlarms.getString("ringtone", "default ringtone");
-        boolean isVibrating = getAlarms.getBoolean("vibration", false);
         Bundle bundle = intent.getExtras();
-        //this will sound the alarm tone
-        //this will sound the alarm once, if you wish to
-        //raise alarm in loop continuously then use MediaPlayer and setLooping(true)
-        /*Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if (alarmUri == null) {
-            alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }*/
-        /*mRingtone = RingtoneManager.getRingtone(context, Uri.parse(alarms));
-        mRingtone.play();*/
-        startRingtone(Uri.parse(alarms), isVibrating, context);
-
 
         Intent i = new Intent();
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -105,12 +88,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             outputProvider.displayLog(TAG, "alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
 
             Calendar now = Calendar.getInstance();
-            outputProvider.displayLog(TAG, "NOW day = " + now.get(Calendar.DAY_OF_WEEK) + "; timeinMillis = " + now.getTimeInMillis() + ";  date: " + now.getTime());
+            outputProvider.displayLog(TAG, "now day = " + now.get(Calendar.DAY_OF_WEEK) + ";  date: " + now.getTime());
 
             int weekOfMonth;
             int month = calendar.get(Calendar.MONTH);
             int year = calendar.get(Calendar.YEAR);
-            outputProvider.displayLog(TAG, "calendar HOUR = " + now.get(Calendar.HOUR_OF_DAY) + ";  calendar MINUTE = " + now.get(Calendar.MINUTE));
             int i;
             for (i = 0; i < daysOfWeekArray.length; i++) {
                 if (daysOfWeekArray[i] == '1') {
@@ -122,35 +104,13 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                             if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
                                 outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
                                 if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
-                                    weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                    weekOfMonth = weekOfMonth + 1;
-                                    calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
-                                    int day = i + 2;
-                                    calendar.set(Calendar.DAY_OF_WEEK, day);
+                                    calendar = nextWeekDay(calendar);
                                 }
                             } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
-                                weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                weekOfMonth = weekOfMonth + 1;
-                                calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
-                                int day = i + 2;
-                                calendar.set(Calendar.DAY_OF_WEEK, day);
+                                calendar = nextWeekDay(calendar);
                             }
                         } else if (i + 2 < now.get(Calendar.DAY_OF_WEEK)) {
-                            weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                            weekOfMonth = weekOfMonth + 1;
-                            calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
-                            int day = i + 2;
-                            calendar.set(Calendar.DAY_OF_WEEK, day);
-                        }
-
-
-                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH)) {
-                            month++;
-                            calendar.set(Calendar.MONTH, month);
-                        }
-                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {
-                            year++;
-                            calendar.set(Calendar.YEAR, year);
+                            calendar = nextWeekDay(calendar);
                         }
 
                         daysList.add(calendar.getTimeInMillis());
@@ -166,37 +126,15 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                             if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
                                 outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
                                 if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
-                                    weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                    weekOfMonth = weekOfMonth + 1;
-                                    calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
-                                    calendar.set(Calendar.DAY_OF_WEEK, sunday);
+                                    calendar = nextWeekDay(calendar);
                                 }
                             } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
-                                weekOfMonth = now.get(Calendar.WEEK_OF_MONTH);
-                                weekOfMonth = weekOfMonth + 1;
-                                calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
-                                calendar.set(Calendar.DAY_OF_WEEK, sunday);
+                                calendar = nextWeekDay(calendar);
                             }
                         }
-
-                        if (calendar.get(Calendar.MONTH) < now.get(Calendar.MONTH)) {
-                            month++;
-                            calendar.set(Calendar.MONTH, month);
-                        }
-                        if (calendar.get(Calendar.YEAR) < now.get(Calendar.YEAR)) {
-                            year++;
-                            calendar.set(Calendar.YEAR, year);
-                        }
-
                         daysList.add(calendar.getTimeInMillis());
                         outputProvider.displayLog(TAG, "i = " + i + ";  day = " + 1 + "; timeInMillis = " + calendar.getTimeInMillis() +
                                 ";  date: " + calendar.getTime().toString());
-
-                    }
-
-                    if (i + 2 <= now.get(Calendar.DAY_OF_WEEK)) {
-                        int week = now.get(Calendar.WEEK_OF_MONTH);
-                        calendar.set(Calendar.WEEK_OF_MONTH, week);
                     }
                 }
             }
@@ -223,7 +161,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
      */
     public void setIntervalAlarm(Context context, Long alarmID) {
 
-        int interval, day, month, year, hour, currentHour, minute;
+        int interval, day, month, year, hour, currentHour, currentMinute, minute;
         Calendar calendar = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
@@ -237,6 +175,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             hour = alarm.getHour();
             minute = alarm.getMinute();
             currentHour = now.get(Calendar.HOUR_OF_DAY);
+            currentMinute = now.get(Calendar.MINUTE);
 
             calendar.set(Calendar.HOUR_OF_DAY, hour);
             calendar.set(Calendar.MINUTE, alarm.getMinute());
@@ -246,16 +185,22 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
             if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
 
-                outputProvider.displayDebugLog(TAG,"interval = " + interval);
+                while ((hour + interval) < currentHour) {
+                    hour += interval;
+                }
+                outputProvider.displayDebugLog(TAG, "interval = " + interval);
                 int newHour = currentHour - hour;
-                outputProvider.displayDebugLog(TAG,"new hour = " + newHour);
+                outputProvider.displayDebugLog(TAG, "new hour = " + newHour);
                 int newStartingHour = interval - newHour;
-                outputProvider.displayDebugLog(TAG,"new starting hour = " + newStartingHour);
+                outputProvider.displayDebugLog(TAG, "new starting hour = " + newStartingHour);
                 hour = currentHour + newStartingHour;
-                outputProvider.displayDebugLog(TAG,"hour = " + hour);
+                outputProvider.displayDebugLog(TAG, "hour = " + hour);
+                if (hour == currentHour) {
+                    if (minute < currentMinute)
+                        hour += interval;
+                }
                 now.set(Calendar.HOUR_OF_DAY, hour);
                 now.set(Calendar.MINUTE, minute);
-
 
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Intent intent = new Intent(context, AlarmReceiver.class);
@@ -322,6 +267,23 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         }
     }
 
+    public void setSnoozeAlarm(Context context, Long id) {
+        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
+        int snoozeTime = Integer.parseInt(getAlarms.getString("snooze", "10"));
+
+
+        Calendar now = Calendar.getInstance();
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, id);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(id), intent, 0);
+        long alarmTimeInMillis = now.getTimeInMillis() + (snoozeTime * 60000);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+
+        outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
+        outputProvider.displayLog(TAG, "(snooze) alarmID == " + String.valueOf(id));
+    }
+
     /**
      * Cancel every type of alarm. You can reactive alarm by setting it again with same alarm id
      *
@@ -342,24 +304,43 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     }
 
-    private void startRingtone(Uri ringtone, boolean isVibration, Context context){
-        long[] pattern = { 0, 200, 2000 };
+    public void startRingtone(Context context) {
+        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
+        String ringtone = getAlarms.getString("ringtone", "default ringtone");
+        boolean isVibration = getAlarms.getBoolean("vibration", false);
 
-        mPlayer = MediaPlayer.create(context,ringtone);
+        long[] pattern = {0, 200, 2000};
+
+        mPlayer = MediaPlayer.create(context, Uri.parse(ringtone));
         mPlayer.setLooping(true);
         mPlayer.start();
-        if(isVibration){
+        if (isVibration) {
             mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            mVibrator.vibrate(pattern,0);
+            mVibrator.vibrate(pattern, 0);
         }
+    }
+
+    private Calendar nextWeekDay(Calendar calendar) {
+        Calendar date = Calendar.getInstance();
+        int dayDifference = calendar.get(Calendar.DAY_OF_WEEK) - date.get(Calendar.DAY_OF_WEEK);
+
+        if (!(dayDifference > 0))
+            dayDifference += 7;
+
+
+        calendar.add(Calendar.DAY_OF_WEEK, dayDifference);
+
+        //outputProvider.displayLog(TAG, "DATE (NEXT WEEK DAY) = " + date.toString());
+
+        return calendar;
     }
 
     /**
      * Stops annoying ringtone from ringing!!
      */
     public void stopRingtone() {
-        if(mPlayer!=null) mPlayer.stop();
-        if(mVibrator!=null) mVibrator.cancel();
+        if (mPlayer != null) mPlayer.stop();
+        if (mVibrator != null) mVibrator.cancel();
     }
 
     /**

@@ -38,9 +38,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.utilities.map.Place;
 import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
-import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**
  * Activity that creates map fragment
@@ -97,7 +97,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     @OnClick(R.id.toolbar_refresh_button)
     public void onRefreshClick(View v) {
         checkEnabled();
-        mOutputProvider.displayLog(TAG, "onclick ckiled!");
+        mOutputProvider.displayLog(TAG, "onclick clicked!");
     }
 
     private void checkEnabled() {

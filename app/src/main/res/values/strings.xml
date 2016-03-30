@@ -68,6 +68,9 @@
     <string name="toast_alarm_will_fire_in">Alarm will fire in: </string>
     <string name="toast_add_new_date_to_interval">Add new date to interval alarm to activate.</string>
     <string name="edit_text_info">Leave empty for infinite alarm.</string>
+    <string name="snooze">Snooze</string>
+    <string name="take_pill">Take pill</string>
+    <string name="toast_alarm_usage_used">Alarm usage used.</string>
 
     <!--days of week-->
     <string name="monday">Mon</string>
@@ -92,6 +95,8 @@
     <!--notification-->
     <string name="find_nearby_pharmacy">Find nearby pharmacy!</string>
     <string name="low_on">You are low on:  </string>
+    <string name="find_pharmacy">Find pharmacy</string>
+    <string name="refill_pill">Refill me</string>
 
     <!--toolbar options items-->
     <string name="dialog_delete_database_title">Delete database</string>

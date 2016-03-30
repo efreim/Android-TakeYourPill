@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="Sneeze time"
-        android:key="sneeze"
+    <EditTextPreference
+        android:title="Snooze time"
+        android:key="snooze"
         android:inputType="numberDecimal"
-        android:summary="Set sneeze time of your alarms"/>
+        android:summary="Set snooze time of your alarms (minutes)"
+        android:defaultValue="10" />
     <RingtonePreference
         android:title="Choose alarm"
         android:key="ringtone"
