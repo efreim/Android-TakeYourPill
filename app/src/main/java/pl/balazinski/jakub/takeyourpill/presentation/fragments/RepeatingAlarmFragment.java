@@ -64,7 +64,7 @@ public class RepeatingAlarmFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LinearLayout linearView = (LinearLayout) inflater.inflate(R.layout.fragment_repetable_alarm, container, false);
+        ScrollView linearView = (ScrollView) inflater.inflate(R.layout.fragment_repetable_alarm, container, false);
         ButterKnife.bind(this, linearView);
         mContext = getContext();
         mOutputProvider = new OutputProvider(mContext);

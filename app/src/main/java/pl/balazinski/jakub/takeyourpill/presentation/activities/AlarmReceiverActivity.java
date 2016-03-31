@@ -5,7 +5,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -48,7 +50,12 @@ public class AlarmReceiverActivity extends Activity {
         mOutputProvider.displayLog(TAG, "IM  HERE FINALLY");
         WakeLocker.acquire(mContext);
         //TODO this be get from shared preferences set in preferences activity
-        mPillRemainingPercentage = 0.1;
+        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mPillRemainingPercentage = Integer.parseInt(getAlarms.getString("percentage", "10"));
+
+        if(mPillRemainingPercentage>= 1 && mPillRemainingPercentage<=99)
+            mPillRemainingPercentage = mPillRemainingPercentage/100;
+        else mPillRemainingPercentage = 0.1;
 
         setupContent(extras);
 

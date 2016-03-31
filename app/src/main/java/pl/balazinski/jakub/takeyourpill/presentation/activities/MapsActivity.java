@@ -77,8 +77,19 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private void setupContent() {
         mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.maps))
                 .getMap();
-        if(mMap!=null)
+        if (mMap != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mMap.setMyLocationEnabled(true);
+        }
         else finish();
     }
 
@@ -106,12 +117,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         boolean isInternetOn = isNetworkConnected();
-
-        if(!isInternetOn) createNetErrorDialog();
-        else currentLocation();
-
-        boolean isGpsOn = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkOn = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean isGpsOn = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+
+
+        if(!isInternetOn || !isNetworkOn) createNetErrorDialog();
+        else currentLocation();
 
         if(!isGpsOn && (!isNetworkOn||!isInternetOn)) createGPSErrorDialog();
 
@@ -144,7 +156,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                                 MapsActivity.this.finish();
                             }
                         }
-                );
+                )
+                .setNeutralButton(getString(R.string.dismiss),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
         AlertDialog alert = builder.create();
         alert.show();
     }
@@ -169,7 +187,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                                 MapsActivity.this.finish();
                             }
                         }
-                );
+                )
+                .setNeutralButton(getString(R.string.dismiss),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
         AlertDialog alert = builder.create();
         alert.show();
     }

@@ -72,74 +72,85 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         List<Long> daysList = new ArrayList<>();
         String daysOfWeek;
         char[] daysOfWeekArray;
-        Calendar calendar = Calendar.getInstance();
 
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
         if (alarm != null) {
             alarm.setIsActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
 
+            int alarmMinute, alarmHour;
+            alarmMinute = alarm.getMinute();
+            alarmHour = alarm.getHour();
+
             daysOfWeek = alarm.getDaysRepeating();
             daysOfWeekArray = daysOfWeek.toCharArray();
-
-            calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
-            calendar.set(Calendar.MINUTE, alarm.getMinute());
 
             outputProvider.displayLog(TAG, "alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
 
             Calendar now = Calendar.getInstance();
             outputProvider.displayLog(TAG, "now day = " + now.get(Calendar.DAY_OF_WEEK) + ";  date: " + now.getTime());
 
-            int weekOfMonth;
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
             int i;
             for (i = 0; i < daysOfWeekArray.length; i++) {
+                outputProvider.displayLog(TAG, " ");
+                outputProvider.displayLog(TAG, "i == " + i);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
+                calendar.set(Calendar.MINUTE, alarm.getMinute());
                 if (daysOfWeekArray[i] == '1') {
                     if (i < 6) {
-                        calendar.set(Calendar.DAY_OF_WEEK, i + 2);
-
-                        if (i + 2 == now.get(Calendar.DAY_OF_WEEK)) {
-                            outputProvider.displayLog(TAG, "i + 2 == dayofweek");
-                            if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
-                                if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
-                                    calendar = nextWeekDay(calendar);
+                        int day = i + 2;
+                        calendar.set(Calendar.DAY_OF_WEEK, day);
+                        if (day == now.get(Calendar.DAY_OF_WEEK)) {
+                            outputProvider.displayLog(TAG, "i + 2 == day of week");
+                            if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
+                                if (alarmMinute <= now.get(Calendar.MINUTE)) {
+                                    outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
+                                    daysList.add(nextWeekDay(calendar));
+                                    continue;
                                 }
-                            } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
-                                calendar = nextWeekDay(calendar);
+                            } else if (alarmHour < now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
+                                daysList.add(nextWeekDay(calendar));
+                                continue;
                             }
-                        } else if (i + 2 < now.get(Calendar.DAY_OF_WEEK)) {
-                            calendar = nextWeekDay(calendar);
+                        } else if (day < now.get(Calendar.DAY_OF_WEEK)) {
+                            outputProvider.displayLog(TAG, "i + 2 < day of week");
+                            daysList.add(nextWeekDay(calendar));
+                            continue;
                         }
-
                         daysList.add(calendar.getTimeInMillis());
-
-                        outputProvider.displayLog(TAG, "i = " + i + ";  day = " + (i + 2) + "; timeInMillis = " + calendar.getTimeInMillis() +
-                                ";  date: " + calendar.getTime());
-
                     } else if (i == 6) {
-                        calendar.set(Calendar.DAY_OF_WEEK, 1);
                         int sunday = 1;
+                        calendar.set(Calendar.DAY_OF_WEEK, sunday);
                         if (sunday == now.get(Calendar.DAY_OF_WEEK)) {
-                            outputProvider.displayLog(TAG, "i  == dayofweek");
-                            if (alarm.getHour() == now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.gethour == now.gethourofday");
-                                if (alarm.getMinute() <= now.get(Calendar.MINUTE)) {
-                                    calendar = nextWeekDay(calendar);
+                            outputProvider.displayLog(TAG, "i  == dayOfWeek");
+                            if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
+                                if (alarmMinute <= now.get(Calendar.MINUTE)) {
+                                    outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
+                                    daysList.add(nextWeekDay(calendar));
+                                    continue;
                                 }
-                            } else if (alarm.getHour() < now.get(Calendar.HOUR_OF_DAY)) {
-                                calendar = nextWeekDay(calendar);
+                            } else if (alarmHour < now.get(Calendar.HOUR_OF_DAY)) {
+                                outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
+                                daysList.add(nextWeekDay(calendar));
+                                continue;
                             }
                         }
                         daysList.add(calendar.getTimeInMillis());
-                        outputProvider.displayLog(TAG, "i = " + i + ";  day = " + 1 + "; timeInMillis = " + calendar.getTimeInMillis() +
-                                ";  date: " + calendar.getTime().toString());
                     }
                 }
-            }
-            outputProvider.displayLog(TAG, "collections min = " + Collections.min(daysList));
 
+            }
+
+            outputProvider.displayLog(TAG, "collections min = " + Collections.min(daysList));
+            for (Long l : daysList) {
+                Calendar test = Calendar.getInstance();
+                test.setTimeInMillis(l);
+                outputProvider.displayLog(TAG, " " + test.getTime());
+            }
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, AlarmReceiver.class);
@@ -320,19 +331,19 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         }
     }
 
-    private Calendar nextWeekDay(Calendar calendar) {
-        Calendar date = Calendar.getInstance();
-        int dayDifference = calendar.get(Calendar.DAY_OF_WEEK) - date.get(Calendar.DAY_OF_WEEK);
-
-        if (!(dayDifference > 0))
-            dayDifference += 7;
-
-
-        calendar.add(Calendar.DAY_OF_WEEK, dayDifference);
-
-        //outputProvider.displayLog(TAG, "DATE (NEXT WEEK DAY) = " + date.toString());
-
-        return calendar;
+    private Long nextWeekDay(Calendar calendar) {
+        /*LocalTime localTime = new LocalTime(calendar);
+        LocalDate localDate = new LocalDate(calendar);
+        outputProvider.displayLog(TAG, "LocalDate(calendar) == " + localDate.toDate());
+        LocalDate nextWeek = localDate.plusDays(7);
+        outputProvider.displayLog(TAG, "LocalDate + 1 week  == " + nextWeek.toDate() + ";  dayOfWeek == " + dayOfWeek);
+        DateTime dateTime = nextWeek.toDateTime(localTime);
+        outputProvider.displayLog(TAG, "DateTime(localTime) == " + dateTime.toDate());
+        return dateTime.toInstant().getMillis();*/
+        outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
+        calendar.add(Calendar.DATE, 7);
+        outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
+        return calendar.getTimeInMillis();
     }
 
     /**
@@ -358,8 +369,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         alarmTimeInMillis = alarmTimeInMillis - now.getTimeInMillis();
         int minutes = (int) (alarmTimeInMillis / (1000 * 60)) % 60;
         int hours = (int) ((alarmTimeInMillis / (1000 * 60 * 60)) % 24);
+        int days = (int) ((alarmTimeInMillis / (1000 * 60 * 60)) / 24);
         StringBuilder sb = new StringBuilder();
-        int days = hours / 24;
         if (days > 0) {
             sb.append(days);
             sb.append(mContext.getString(R.string.days));

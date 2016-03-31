@@ -14,4 +14,11 @@
         android:defaultValue="false"
         android:summary="Set vibrations for your alarms."
         android:key="vibration" />
+    <EditTextPreference
+        android:title="Pill count notification"
+        android:key="percentage"
+        android:inputType="numberDecimal"
+        android:defaultValue="10"
+        android:summary="Set percentage for your pill left notifications (select between 1 and 99)."
+        />
 </PreferenceScreen>
