@@ -1,10 +1,7 @@
 package pl.balazinski.jakub.takeyourpill.presentation.fragments;
 
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
-import android.text.InputFilter;
-import android.text.Spanned;
 
 import pl.balazinski.jakub.takeyourpill.R;
 

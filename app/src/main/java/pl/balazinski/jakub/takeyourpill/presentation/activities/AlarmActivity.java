@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,14 +31,6 @@ import pl.balazinski.jakub.takeyourpill.presentation.fragments.SingleAlarmFragme
 public class AlarmActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-
-    /**
-     * State activity is entered in
-     */
-    public enum State {
-        NEW, EDIT
-    }
-
     /**
      * Setting up components for activity
      */
@@ -48,10 +40,11 @@ public class AlarmActivity extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.tabs)
     TabLayout tabLayout;
+    @Bind(R.id.toolbar_add_button)
+    ImageButton toolbarAddButton;
 
-    @Bind(R.id.add_alarm)
-    Button addAlarm;
-
+    /* @Bind(R.id.add_alarm)
+     Button addAlarm;*/
     private State mState;
     private Alarm mAlarm;
     private IntervalAlarmFragment mIntervalFragment;
@@ -87,9 +80,21 @@ public class AlarmActivity extends AppCompatActivity {
          */
         if (extras == null) {
             mState = AlarmActivity.State.NEW;
-            addAlarm.setText(getString(R.string.add_alarm));
+            //addAlarm.setText(getString(R.string.add_alarm));
+            if (Constants.VERSION >= Build.VERSION_CODES.M) {
+                toolbarAddButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add_white_36dp));
+
+            } else {
+                toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_add_white_36dp));
+            }
         } else {
-            addAlarm.setText(getString(R.string.edit_alarm));
+            //addAlarm.setText(getString(R.string.edit_alarm));
+            if (Constants.VERSION >= Build.VERSION_CODES.M) {
+                toolbarAddButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_done_white_36dp));
+
+            } else {
+                toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_done_white_36dp));
+            }
             mState = AlarmActivity.State.EDIT;
             Long id = extras.getLong(Constants.EXTRA_LONG_ID);
 
@@ -138,14 +143,13 @@ public class AlarmActivity extends AppCompatActivity {
         }
 
 
-        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+      /*  if (Constants.VERSION >= Build.VERSION_CODES.M) {
             addAlarm.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
 
         } else {
             addAlarm.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
-        }
+        }*/
     }
-
 
     /**
      * Sets up viewpager for fragments
@@ -188,11 +192,10 @@ public class AlarmActivity extends AppCompatActivity {
         });
     }
 
-
-    @OnClick(R.id.add_alarm)
+    @OnClick(R.id.toolbar_add_button)
     public void addAlarmButton(View v) {
         boolean isOk = false;
-        if(mState == State.NEW) {
+        if (mState == State.NEW) {
             if (viewPager.getCurrentItem() == 0) {
                 isOk = mRepeatableFragment.addAlarm(mState);
             } else if (viewPager.getCurrentItem() == 1) {
@@ -200,7 +203,7 @@ public class AlarmActivity extends AppCompatActivity {
             } else if (viewPager.getCurrentItem() == 2) {
                 isOk = mSingleFragment.addAlarm(mState);
             }
-        }else if(mState == State.EDIT){
+        } else if (mState == State.EDIT) {
             if (mAlarm.isRepeatable()) {
                 isOk = mRepeatableFragment.addAlarm(mState);
             } else if (mAlarm.isInterval()) {
@@ -212,6 +215,14 @@ public class AlarmActivity extends AppCompatActivity {
 
         if (isOk)
             finish();
+    }
+
+
+    /**
+     * State activity is entered in
+     */
+    public enum State {
+        NEW, EDIT
     }
 
 

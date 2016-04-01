@@ -2,15 +2,13 @@ package pl.balazinski.jakub.takeyourpill.presentation.fragments;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -23,6 +21,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
@@ -52,6 +51,8 @@ public class RepeatingAlarmFragment extends Fragment {
     EditText numberOfUsageEditText;
     @Bind(R.id.repeatable_dummy)
     LinearLayout linearLayoutDummy;
+    @Bind(R.id.number_of_usage_checkbox)
+    CheckBox numberOfUsageCheckbox;
 
     private List<HorizontalScrollViewItem> mPillViewList;
     private List<DayOfWeekView> mWeekViewListList;
@@ -119,17 +120,24 @@ public class RepeatingAlarmFragment extends Fragment {
             Calendar calendar = Calendar.getInstance();
             mMinute = calendar.get(Calendar.MINUTE);
             mHour = calendar.get(Calendar.HOUR_OF_DAY);
-            //changeTimeButton.setText(buildString(mMinute, mHour));
+            numberOfUsageCheckbox.setChecked(false);
+            numberOfUsageEditText.setVisibility(View.GONE);
+            changeTimeButton.setText(buildString(mMinute, mHour));
         } else {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
             mHour = mAlarm.getHour();
-            int mNumberOfAlarms = mAlarm.getUsageNumber();
+            int numberOfAlarms = mAlarm.getUsageNumber();
             changeTimeButton.setText(buildString(mMinute, mHour));
 
-            if (mNumberOfAlarms != -1) {
-                numberOfUsageEditText.setText(String.valueOf(mNumberOfAlarms));
+            if (numberOfAlarms != -1) {
+                numberOfUsageCheckbox.setChecked(true);
+                numberOfUsageEditText.setText(String.valueOf(numberOfAlarms));
+            } else {
+                numberOfUsageCheckbox.setChecked(false);
+                numberOfUsageEditText.setVisibility(View.GONE);
             }
+
             List<Long> pillIds = DatabaseRepository.getPillsByAlarm(mContext, mAlarm.getId());
             for (Long id : pillIds) {
                 getViewItem(id);
@@ -146,6 +154,14 @@ public class RepeatingAlarmFragment extends Fragment {
 
         }
 
+    }
+
+    @OnCheckedChanged(R.id.number_of_usage_checkbox)
+    public void onCheckedChanged(boolean isChecked) {
+        if (isChecked) {
+            numberOfUsageEditText.setVisibility(View.VISIBLE);
+        } else
+            numberOfUsageEditText.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.change_time_button)
@@ -202,6 +218,8 @@ public class RepeatingAlarmFragment extends Fragment {
                 return false;
             }
 
+            if (!numberOfUsageCheckbox.isChecked())
+                numberOfUsage = "";
             if (numberOfUsage.equals("")) {
                 int nou = -1;
                 mAlarm = new Alarm(mHour, mMinute, -1, nou, -1, -1, -1, true, true, false, false, stringBuilder.toString());
@@ -261,6 +279,7 @@ public class RepeatingAlarmFragment extends Fragment {
 
     /**
      * Builds string to be display in list item
+     *
      * @param minute alarm minute
      * @param hour   alarm hour
      * @return returns built string

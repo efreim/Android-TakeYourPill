@@ -6,10 +6,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -23,6 +23,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
@@ -52,6 +53,8 @@ public class IntervalAlarmFragment extends Fragment {
     EditText numberOfUsageEditText;
     @Bind(R.id.interval_dummy)
     LinearLayout linearLayoutDummy;
+    @Bind(R.id.number_of_usage_checkbox)
+    CheckBox numberOfUsageCheckbox;
 
     private List<HorizontalScrollViewItem> mPillViewList;
     private Alarm mAlarm;
@@ -117,6 +120,10 @@ public class IntervalAlarmFragment extends Fragment {
             mDay = calendar.get(Calendar.DAY_OF_MONTH);
             mMonth = calendar.get(Calendar.MONTH);
             mYear = calendar.get(Calendar.YEAR);
+            numberOfUsageEditText.setVisibility(View.GONE);
+            changeTimeButton.setText(buildString(mMinute, mHour));
+            changeTimeButton.setText(buildString(mMinute, mHour));
+            changeDayButton.setText(buildString(mDay, mMonth, mYear));
         } else {
             mMinute = mAlarm.getMinute();
             mHour = mAlarm.getHour();
@@ -127,11 +134,14 @@ public class IntervalAlarmFragment extends Fragment {
             int numberOfAlarms = mAlarm.getUsageNumber();
             changeTimeButton.setText(buildString(mMinute, mHour));
             changeDayButton.setText(buildString(mDay, mMonth, mYear));
-            numberOfUsageEditText.setText(String.valueOf(numberOfAlarms));
 
 
             if (numberOfAlarms != -1) {
+                numberOfUsageCheckbox.setChecked(true);
                 numberOfUsageEditText.setText(String.valueOf(numberOfAlarms));
+            } else {
+                numberOfUsageCheckbox.setChecked(false);
+                numberOfUsageEditText.setVisibility(View.GONE);
             }
 
             if (interval != -1) {
@@ -143,6 +153,14 @@ public class IntervalAlarmFragment extends Fragment {
                 getViewItem(id);
             }
         }
+    }
+
+    @OnCheckedChanged(R.id.number_of_usage_checkbox)
+    public void onCheckedChanged(boolean isChecked) {
+        if (isChecked) {
+            numberOfUsageEditText.setVisibility(View.VISIBLE);
+        } else
+            numberOfUsageEditText.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.change_time_button)

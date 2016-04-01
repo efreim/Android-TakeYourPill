@@ -2,8 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -16,77 +16,127 @@
             android:id="@+id/interval_dummy"
             android:layout_width="0px"
             android:layout_height="0px"
-            android:orientation="horizontal"
             android:focusable="true"
-            android:focusableInTouchMode="true" />
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.1"
+            android:text="Alarm starting time" />
 
         <EditText
             android:id="@+id/change_time_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_gravity="center|top"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.15"
-            android:focusableInTouchMode="false"
             android:clickable="true"
-            android:hint="Alarm time"
+            android:focusableInTouchMode="false"
+            android:hint="Alarm starting time"
             android:textAlignment="center" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.1"
+            android:text="Alarm starting date" />
         <EditText
             android:id="@+id/change_day_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_gravity="center|top"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.15"
-            android:focusableInTouchMode="false"
             android:clickable="true"
+            android:focusableInTouchMode="false"
             android:hint="Alarm date"
             android:textAlignment="center" />
 
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.1"
+            android:text="Alarm interval (in hours)" />
         <EditText
             android:id="@+id/interval_time"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="0.15"
             android:gravity="start"
             android:hint="Interval"
             android:inputType="numberDecimal"
             android:maxLength="3"
-            android:singleLine="true"
-            android:layout_marginStart="10dp"
+            android:singleLine="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.1">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/number_of_alarms" />
+
+            <CheckBox
+                android:id="@+id/number_of_usage_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/textView" />
+        </RelativeLayout>
 
         <EditText
             android:id="@+id/number_of_usage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="0.15"
             android:gravity="start"
             android:hint="Number of alarms"
             android:inputType="numberDecimal"
             android:maxLength="3"
-            android:singleLine="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"/>
+            android:singleLine="true" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/pill_activity_item_margin"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="0.1"
-            android:text="Select pill for your alarm" />
+            android:text="Select pill for your alarm (optional)" />
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"

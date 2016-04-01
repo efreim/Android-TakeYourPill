@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,17 +41,9 @@ public class PillListAdapter
         mBackground = mTypedValue.resourceId;
     }
 
-    /**
-     * Interface implemented in AlarmListFragment in order to refresh list after deleting item from.
-     */
-    public interface PillListRefreshListener {
-        void onListRefresh();
-    }
-
     public void setListRefreshListener(PillListRefreshListener l) {
         this.mRefreshListener = l;
     }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -71,16 +62,15 @@ public class PillListAdapter
 
     }
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.pill = getItem(position);
         holder.mTextView.setText(holder.pill.getName());
 
         if (Constants.VERSION >= Build.VERSION_CODES.M) {
-            holder.pillItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.alarm_list_item_active_background));
+            holder.pillItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.pill_list_item_background));
         } else {
-            holder.pillItem.setBackground(mContext.getResources().getDrawable(R.drawable.alarm_list_item_active_background));
+            holder.pillItem.setBackground(mContext.getResources().getDrawable(R.drawable.pill_list_item_background));
         }
 
         Glide.with(holder.mImageView.getContext())
@@ -89,18 +79,25 @@ public class PillListAdapter
                 .into(holder.mImageView);
     }
 
-
     @Override
     public int getItemCount() {
         return DatabaseRepository.getAllPills(mContext).size();
     }
 
+
+    /**
+     * Interface implemented in AlarmListFragment in order to refresh list after deleting item from.
+     */
+    public interface PillListRefreshListener {
+        void onListRefresh();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnLongClickListener, View.OnClickListener {
-        public Pill pill;
         public final View mView;
         public final ImageView mImageView;
         public final TextView mTextView;
         public final RelativeLayout pillItem;
+        public Pill pill;
         private PillListAdapter mAdapter;
         private OutputProvider mOutputProvider;
         private Context mContext;

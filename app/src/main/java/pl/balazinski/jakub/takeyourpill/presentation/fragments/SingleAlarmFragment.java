@@ -108,6 +108,8 @@ public class SingleAlarmFragment extends Fragment {
             mDay = calendar.get(Calendar.DAY_OF_MONTH);
             mMonth = calendar.get(Calendar.MONTH);
             mYear = calendar.get(Calendar.YEAR);
+            changeTimeButton.setText(buildString(mMinute, mHour));
+            changeDayButton.setText(buildString(mDay, mMonth, mYear));
         } else {
             //STATE EDIT
             mMinute = mAlarm.getMinute();
@@ -201,7 +203,7 @@ public class SingleAlarmFragment extends Fragment {
             DatabaseRepository.addAlarm(mContext, mAlarm);
             alarmReceiver.setSingleAlarm(mContext, mAlarm.getId());
 
-        } else {//TODO Protection from null interval and number of usage
+        } else {
 
             mAlarm.setDay(mDay);
             mAlarm.setMonth(mMonth);

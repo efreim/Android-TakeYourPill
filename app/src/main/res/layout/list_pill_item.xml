@@ -26,9 +26,9 @@
         android:layout_width="@dimen/list_item_avatar_size"
         android:layout_height="@dimen/list_item_avatar_size"
         android:layout_gravity="start"
+        android:layout_marginStart="@dimen/list_icon_left_padding"
         android:paddingEnd="@dimen/list_icon_left_padding"
-        android:paddingStart="@dimen/list_icon_left_padding"
-        android:layout_marginStart="@dimen/list_icon_left_padding"/>
+        android:paddingStart="@dimen/list_icon_left_padding" />
 
     <TextView
         android:id="@android:id/text1"
@@ -40,7 +40,7 @@
         android:gravity="start|center"
         android:paddingEnd="0dp"
         android:paddingStart="@dimen/list_text_right_padding"
-        android:text="asdasdasdasda"
         android:textSize="@dimen/font_size_big" />
+
 
 </RelativeLayout>

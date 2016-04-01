@@ -22,16 +22,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <ImageButton
+                    android:id="@+id/toolbar_add_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/ic_add_white_36dp" />
+            </android.support.v7.widget.Toolbar>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                app:tabIndicatorColor="@android:color/white"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                app:tabIndicatorColor="@color/white" />
 
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
@@ -40,9 +50,9 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_above="@+id/fab"
-        android:layout_below="@+id/main_content" />
+        android:layout_below="@+id/main_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
@@ -53,24 +63,24 @@
         android:focusableInTouchMode="true" />
 
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/main_content"
-        android:layout_above="@+id/add_alarm">
+    <!-- <FrameLayout
+          android:id="@+id/fragment_container"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_above="@+id/add_alarm"
+          android:layout_below="@+id/main_content">
 
-    </FrameLayout>
+      </FrameLayout>-->
 
 
-    <Button
-        android:id="@+id/add_alarm"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:layout_gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/pill_activity_item_margin"
-        android:textColor="@color/alarm_list_item_text"
-        android:text="Add alarm" />
+    <!--  <Button
+          android:id="@+id/add_alarm"
+          android:layout_width="match_parent"
+          android:layout_height="75dp"
+          android:layout_alignParentBottom="true"
+          android:layout_gravity="bottom"
+          android:layout_margin="@dimen/pill_activity_item_margin"
+          android:text="Add alarm"
+          android:textColor="@color/alarm_list_item_text" />-->
 
 </RelativeLayout>

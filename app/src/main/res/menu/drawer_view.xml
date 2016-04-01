@@ -19,19 +19,19 @@
     <group android:checkableBehavior="none">
         <item
             android:id="@+id/add_alarm_drawer"
-            android:icon="@android:drawable/ic_menu_add"
+            android:icon="@drawable/ic_add_black_36dp"
             android:title="Add alarm" />
         <item
             android:id="@+id/add_pill_drawer"
-            android:icon="@android:drawable/ic_menu_add"
+            android:icon="@drawable/ic_add_black_36dp"
             android:title="Add pill" />
         <item
             android:id="@+id/settings_drawer"
-            android:icon="@android:drawable/ic_menu_save"
+            android:icon="@drawable/ic_settings_black_36dp"
             android:title="Settings" />
         <item
             android:id="@+id/find_pharmacy_drawer"
-            android:icon="@android:drawable/ic_dialog_map"
+            android:icon="@drawable/ic_room_black_36dp"
             android:title="Find pharmacy" />
     </group>
 
@@ -39,7 +39,7 @@
         <menu>
             <item
                 android:id="@+id/about_drawer"
-                android:icon="@android:drawable/ic_dialog_info"
+                android:icon="@drawable/ic_help_outline_black_36dp"
                 android:title="About" />
         </menu>
     </item>
