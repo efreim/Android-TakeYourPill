@@ -28,12 +28,11 @@ import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 public class AlarmReceiver extends WakefulBroadcastReceiver {
 
-    private final String TAG = getClass().getSimpleName();
-
-    private OutputProvider outputProvider;
-    private Context mContext;
     private static MediaPlayer mPlayer;
     private static Vibrator mVibrator;
+    private final String TAG = getClass().getSimpleName();
+    private OutputProvider outputProvider;
+    private Context mContext;
 
     public AlarmReceiver() {
     }
@@ -120,6 +119,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                             daysList.add(nextWeekDay(calendar));
                             continue;
                         }
+
+                        if (now.get(Calendar.DAY_OF_WEEK) == 1) {
+                            outputProvider.displayLog(TAG, "i + 2 < day of week");
+                            daysList.add(nextWeekDay(calendar));
+                            continue;
+                        }
                         daysList.add(calendar.getTimeInMillis());
                     } else if (i == 6) {
                         int sunday = 1;
@@ -194,11 +199,21 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.YEAR, year);
 
+            //if alarm date is in the past
             if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
 
-                while ((hour + interval) < currentHour) {
-                    hour += interval;
+                //if alarm date is still in the past
+                while (calendar.getTimeInMillis() < now.getTimeInMillis()) {
+                    //add interval until it reaches future
+                    calendar.add(Calendar.HOUR_OF_DAY, interval);
+                    outputProvider.displayDebugLog(TAG, "while = " + calendar.get(Calendar.HOUR_OF_DAY));
                 }
+                hour = calendar.get(Calendar.HOUR_OF_DAY);
+                //if alarm hour + interval is in the future subtract interval from hour and begin algorithm
+                if (hour > now.get(Calendar.HOUR_OF_DAY))
+                    hour -= interval;
+
+                outputProvider.displayDebugLog(TAG, "hour = " + hour);
                 outputProvider.displayDebugLog(TAG, "interval = " + interval);
                 int newHour = currentHour - hour;
                 outputProvider.displayDebugLog(TAG, "new hour = " + newHour);

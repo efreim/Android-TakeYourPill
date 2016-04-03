@@ -7,6 +7,7 @@
         android:summary="Set snooze time of your alarms (minutes)"
         android:title="Snooze time" />
     <RingtonePreference
+        android:defaultValue="content://settings/system/alarm_alert"
         android:key="ringtone"
         android:summary="Ringtone for your alarms"
         android:title="Choose alarm" />

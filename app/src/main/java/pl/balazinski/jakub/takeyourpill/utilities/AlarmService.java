@@ -34,7 +34,7 @@ public class AlarmService extends IntentService {
                 Intent i = myNotificationManager.setupIntent(id, -1);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
-                myNotificationManager.sendAlarmNotification(id, "waky waky");
+                myNotificationManager.sendAlarmNotification(id, "Wake up !");
             } else {
                 //if screen is on display heads up notification
                 myNotificationManager.sendAlarmHeadsUpNotification(id, "Wake up !");

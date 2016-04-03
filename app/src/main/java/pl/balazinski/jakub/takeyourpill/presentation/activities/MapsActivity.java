@@ -47,9 +47,8 @@ import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
  */
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
-    private final String TAG = getClass().getSimpleName();
     private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
-
+    private final String TAG = getClass().getSimpleName();
     @Bind(R.id.mapToolbar)
     public Toolbar toolbar;
 
@@ -157,7 +156,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                             }
                         }
                 )
-                .setNeutralButton(getString(R.string.dismiss),
+                .setNeutralButton(getString(R.string.retry),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
@@ -188,7 +187,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                             }
                         }
                 )
-                .setNeutralButton(getString(R.string.dismiss),
+                .setNeutralButton(getString(R.string.retry),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();

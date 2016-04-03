@@ -23,6 +23,15 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("release.keystore")
+            storePassword "Asdfg123"
+            keyAlias "TakeYourPill"
+            keyPassword "Asdfg123"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false

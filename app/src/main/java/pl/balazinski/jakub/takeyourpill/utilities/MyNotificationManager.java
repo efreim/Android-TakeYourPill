@@ -51,7 +51,7 @@ public class MyNotificationManager {
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
             SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(mContext);
-            String ringtone = getAlarms.getString("ringtone", "default ringtone");
+            String ringtone = getAlarms.getString("ringtone", "content://settings/system/alarm_alert");
             boolean isVibration = getAlarms.getBoolean("vibration", false);
 
             PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, 0, setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
