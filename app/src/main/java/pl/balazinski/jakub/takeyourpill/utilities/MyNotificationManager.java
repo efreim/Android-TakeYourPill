@@ -38,13 +38,13 @@ public class MyNotificationManager {
     }
 
     /**
-     * Sends notification that opens in-app map with nearby pharmacies.
-     * Used only when remaining pill count is below given percentage of full pill count
+
      *
      * @param id  alarm id
      * @param msg alarm name
      */
     public void sendAlarmHeadsUpNotification(long id, String msg) {
+        mOutputProvider.displayLog(TAG, "Heads up notification opened");
         Alarm alarm = DatabaseRepository.getAlarmById(mContext, id);
         if (alarm != null) {
             android.app.NotificationManager alarmNotificationManager = (android.app.NotificationManager) mContext
@@ -54,14 +54,15 @@ public class MyNotificationManager {
             String ringtone = getAlarms.getString("ringtone", "content://settings/system/alarm_alert");
             boolean isVibration = getAlarms.getBoolean("vibration", false);
 
-            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, 0, setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, 0, setupIntent(alarm.getId(), 1), PendingIntent.FLAG_UPDATE_CURRENT);
 
-            PendingIntent mainIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), 0);
+            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 1), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
+
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
                     mContext).setContentTitle("Take you pill!!").setSmallIcon(R.drawable.pill)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText("Did you take your pills?"))
-                    .setContentText(mContext.getString(R.string.low_on) + " " + msg)
+                    //.setContentText(mContext.getString(R.string.low_on) + " " + msg)
                     .setPriority(Notification.PRIORITY_MAX)
                     .setSound(Uri.parse(ringtone))
                     .setAutoCancel(false)
@@ -85,7 +86,7 @@ public class MyNotificationManager {
             notification.flags |= Notification.FLAG_INSISTENT | Notification.FLAG_ONGOING_EVENT;
             alarmNotificationManager.notify(longToInt(id), notification);
 
-            mOutputProvider.displayLog(TAG, "Notification sent.");
+            mOutputProvider.displayLog(TAG, "Heads up notification sent.");
         }
     }
 
@@ -102,10 +103,10 @@ public class MyNotificationManager {
             android.app.NotificationManager alarmNotificationManager = (android.app.NotificationManager) mContext
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
-            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, 0, setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, 0, setupIntent(alarm.getId(), 1), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 1), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
 
-            PendingIntent mainIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), 0);
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
                     mContext).setContentTitle("Take you pill!!").setSmallIcon(R.drawable.pill)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText("Did you take your pills?"))
@@ -146,6 +147,7 @@ public class MyNotificationManager {
 
             Intent intent = new Intent(mContext, PillDetailActivity.class);
             intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
+
             PendingIntent refillIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 
             PendingIntent mainIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), 0);
@@ -160,7 +162,7 @@ public class MyNotificationManager {
             alarmNotificationManager.notify(longToInt(id), alarmNotificationBuilder.build());
 
 
-            mOutputProvider.displayLog(TAG, "Notification sent.");
+            mOutputProvider.displayLog(TAG, "Pill notification sent.");
         }
     }
 
@@ -182,6 +184,7 @@ public class MyNotificationManager {
      * @return intent with given extras
      */
     public Intent setupIntent(Long alarmId, int extraInt) {
+        mOutputProvider.displayLog(TAG, "setupIntent, extraInt = " + String.valueOf(extraInt));
         Intent intent = new Intent(mContext, AlarmReceiverActivity.class);
         intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmId);
         intent.putExtra(Constants.RECEIVER_NOTIFICATION_KEY, extraInt);

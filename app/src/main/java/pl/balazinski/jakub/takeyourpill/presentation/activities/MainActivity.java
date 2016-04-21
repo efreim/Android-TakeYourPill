@@ -37,11 +37,6 @@ import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-
-    private AlarmListFragment mAlarmFragment;
-    private PillListFragment mPillFragment;
-    private OutputProvider mOutputProvider;
-
     //Setting up components
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -53,9 +48,11 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.tabs)
     TabLayout tabLayout;
-
     @Bind(R.id.fab)
     Button button;
+    private AlarmListFragment mAlarmFragment;
+    private PillListFragment mPillFragment;
+    private OutputProvider mOutputProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
         setupContent(extras);
         setupView();
 
+
     }
+
 
     private void createFragments() {
         Bundle alarmBundle = new Bundle();

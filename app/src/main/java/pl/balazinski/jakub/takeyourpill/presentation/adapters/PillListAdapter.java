@@ -68,9 +68,9 @@ public class PillListAdapter
         holder.mTextView.setText(holder.pill.getName());
 
         if (Constants.VERSION >= Build.VERSION_CODES.M) {
-            holder.pillItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.pill_list_item_background));
+            holder.pillItem.setBackground(ContextCompat.getDrawable(mContext, R.drawable.alarm_list_item_inactive_background));
         } else {
-            holder.pillItem.setBackground(mContext.getResources().getDrawable(R.drawable.pill_list_item_background));
+            holder.pillItem.setBackground(mContext.getResources().getDrawable(R.drawable.alarm_list_item_inactive_background));
         }
 
         Glide.with(holder.mImageView.getContext())

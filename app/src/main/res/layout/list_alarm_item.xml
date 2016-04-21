@@ -18,9 +18,10 @@
     android:id="@+id/alarm_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:divider="@color/inactive_color"
     android:gravity="center_vertical"
     android:orientation="vertical"
-    android:divider="@color/inactive_color"
 
     >
 
@@ -34,33 +35,33 @@
             android:id="@+id/alarm_time_list_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center"
-            android:singleLine="true"
-            android:gravity="bottom"
-            android:textSize="@dimen/font_size_big"
-            android:paddingStart="@dimen/list_item_edge_padding"
-            android:paddingEnd="@dimen/list_item_edge_padding"
-            android:layout_toStartOf="@+id/alarm_list_item_switch"
+            android:layout_alignBottom="@+id/alarm_list_item_switch"
             android:layout_alignParentTop="true"
-            android:layout_alignBottom="@+id/alarm_list_item_switch" />
+            android:layout_gravity="start|center"
+            android:layout_toStartOf="@+id/alarm_list_item_switch"
+            android:gravity="bottom"
+            android:paddingEnd="@dimen/list_item_edge_padding"
+            android:paddingStart="@dimen/list_item_edge_padding"
+            android:singleLine="true"
+            android:textSize="@dimen/font_size_big" />
 
         <TextView
             android:id="@+id/alarm_date_list_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/list_item_edge_padding"
-            android:paddingEnd="@dimen/list_item_edge_padding"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/alarm_list_item_switch"
             android:layout_alignParentBottom="true"
-            android:layout_below="@+id/alarm_list_item_switch" />
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/alarm_list_item_switch"
+            android:layout_toStartOf="@+id/alarm_list_item_switch"
+            android:paddingEnd="@dimen/list_item_edge_padding"
+            android:paddingStart="@dimen/list_item_edge_padding" />
         <Switch
             android:id="@+id/alarm_list_item_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_gravity="end" />
 
     </RelativeLayout>
 
@@ -76,12 +77,12 @@
             android:id="@+id/expandable_item_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:gravity="start"
-            android:singleLine="false"
-            android:paddingStart="@dimen/list_item_edge_padding"
-            android:paddingEnd="@dimen/list_item_edge_padding"
             android:paddingBottom="@dimen/list_item_edge_padding"
-            android:layout_weight="0.5" />
+            android:paddingEnd="@dimen/list_item_edge_padding"
+            android:paddingStart="@dimen/list_item_edge_padding"
+            android:singleLine="false" />
 
     </LinearLayout>
 

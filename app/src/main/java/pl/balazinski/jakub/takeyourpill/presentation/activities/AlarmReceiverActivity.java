@@ -47,11 +47,10 @@ public class AlarmReceiverActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         mOutputProvider = new OutputProvider(mContext);
         myNotificationManager = new MyNotificationManager(mContext);
-        mOutputProvider.displayLog(TAG, "IM  HERE FINALLY");
+        mOutputProvider.displayLog(TAG, "ON CREATE");
         WakeLocker.acquire(mContext);
-        //TODO this be get from shared preferences set in preferences activity
-        SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mPillRemainingPercentage = Integer.parseInt(getAlarms.getString("percentage", "10"));
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mPillRemainingPercentage = Integer.parseInt(preferences.getString("percentage", "10"));
 
         if(mPillRemainingPercentage>= 1 && mPillRemainingPercentage<=99)
             mPillRemainingPercentage = mPillRemainingPercentage/100;
@@ -68,18 +67,15 @@ public class AlarmReceiverActivity extends Activity {
             mAlarmId = extras.getLong(Constants.EXTRA_LONG_ALARM_ID);
             int sneeze = extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY);
             mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(mAlarmId));
+            mOutputProvider.displayLog(TAG, "sneeze == " + String.valueOf(extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY)));
             if (mAlarmId != null) {
                 if (sneeze == 0) {
-                    mOutputProvider.displayLog(TAG, "sneeze == 0");
                     sneezeClick();
-                    clearNotification(mAlarmId);
                 } else if (sneeze == 1) {
-                    mOutputProvider.displayLog(TAG, "sneeze == 1");
                     setupAlarmAndPill(mAlarmId);
                     takePillClick();
-                    clearNotification(mAlarmId);
                 } else if (sneeze == -1) {
-                    mOutputProvider.displayLog(TAG, "sneeze == -1");
+                    clearNotification(mAlarmId);
                     mAlertMessage = setupAlarmAndPill(mAlarmId);
                     mAlarmReceiver.startRingtone(mContext);
                     setupView();
@@ -100,7 +96,7 @@ public class AlarmReceiverActivity extends Activity {
                         dialog.cancel();
                     }
                 })
-                .setNeutralButton(getString(R.string.snooze), new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.snooze), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         sneezeClick();
@@ -146,6 +142,7 @@ public class AlarmReceiverActivity extends Activity {
      */
     private void sneezeClick() {
         if (mAlarmReceiver != null) {
+            mOutputProvider.displayLog(TAG, "Sneeze clicked!");
             clearNotification(mAlarmId);
             mAlarmReceiver.stopRingtone();
             mAlarmReceiver.setSnoozeAlarm(mContext, mAlarmId);
@@ -157,6 +154,7 @@ public class AlarmReceiverActivity extends Activity {
      * Used when user clicks button on notification when mAlarm is fired
      */
     private void takePillClick() {
+        mOutputProvider.displayLog(TAG, "Take pill clicked!");
         if (mAlarmReceiver != null)
             mAlarmReceiver.stopRingtone();
 

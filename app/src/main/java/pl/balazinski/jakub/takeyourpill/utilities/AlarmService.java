@@ -37,6 +37,7 @@ public class AlarmService extends IntentService {
                 myNotificationManager.sendAlarmNotification(id, "Wake up !");
             } else {
                 //if screen is on display heads up notification
+                mOutputProvider.displayDebugLog(TAG, "NOT LOCKED");
                 myNotificationManager.sendAlarmHeadsUpNotification(id, "Wake up !");
             }
         }

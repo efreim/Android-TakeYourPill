@@ -39,7 +39,7 @@ import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 
 public class RepeatingAlarmFragment extends Fragment {
 
-    private final String TAG = "REPEATING_ALARM_FRAGMENT";
+    private final String TAG = getClass().getSimpleName();
 
     @Bind(R.id.inside_horizontal)
     GridLayout linearInsideHorizontal;
@@ -143,11 +143,11 @@ public class RepeatingAlarmFragment extends Fragment {
                 getViewItem(id);
             }
             String daysOfWeek = mAlarm.getDaysRepeating();
-            mOutputProvider.displayLog(TAG, "days of week:  " + daysOfWeek);
+            //mOutputProvider.displayLog(TAG, "days of week:  " + daysOfWeek);
             char[] daysArray = daysOfWeek.toCharArray();
 
             for (int i = 0; i < daysArray.length; i++) {
-                mOutputProvider.displayLog(TAG, "daysArray[" + i + "] = " + daysArray[i]);
+                // mOutputProvider.displayLog(TAG, "daysArray[" + i + "] = " + daysArray[i]);
                 if (daysArray[i] == '1')
                     mWeekViewListList.get(i).setClick();
             }

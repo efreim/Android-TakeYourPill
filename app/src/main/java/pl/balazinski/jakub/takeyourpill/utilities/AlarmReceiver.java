@@ -50,7 +50,6 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.putExtra(Constants.MAIN_FROM_ALARM_KEY, Constants.MAIN_FROM_ALARM);
         i.putExtra(Constants.EXTRA_LONG_ALARM_ID, bundle.getLong(Constants.EXTRA_LONG_ALARM_ID));
-
         ComponentName comp = new ComponentName(context.getPackageName(),
                 AlarmService.class.getName());
         startWakefulService(context, (i.setComponent(comp)));
@@ -84,15 +83,15 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             daysOfWeek = alarm.getDaysRepeating();
             daysOfWeekArray = daysOfWeek.toCharArray();
 
-            outputProvider.displayLog(TAG, "alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
+            //outputProvider.displayLog(TAG, "alarm.getHour = " + alarm.getHour() + ";  alarm.getMinute = " + alarm.getMinute());
 
             Calendar now = Calendar.getInstance();
-            outputProvider.displayLog(TAG, "now day = " + now.get(Calendar.DAY_OF_WEEK) + ";  date: " + now.getTime());
+            //outputProvider.displayLog(TAG, "now day = " + now.get(Calendar.DAY_OF_WEEK) + ";  date: " + now.getTime());
 
             int i;
             for (i = 0; i < daysOfWeekArray.length; i++) {
-                outputProvider.displayLog(TAG, " ");
-                outputProvider.displayLog(TAG, "i == " + i);
+                //outputProvider.displayLog(TAG, " ");
+                //outputProvider.displayLog(TAG, "i == " + i);
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
                 calendar.set(Calendar.MINUTE, alarm.getMinute());
@@ -101,27 +100,27 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                         int day = i + 2;
                         calendar.set(Calendar.DAY_OF_WEEK, day);
                         if (day == now.get(Calendar.DAY_OF_WEEK)) {
-                            outputProvider.displayLog(TAG, "i + 2 == day of week");
+                            //outputProvider.displayLog(TAG, "i + 2 == day of week");
                             if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
+                                //outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
                                 if (alarmMinute <= now.get(Calendar.MINUTE)) {
-                                    outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
+                                    //outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
                                     daysList.add(nextWeekDay(calendar));
                                     continue;
                                 }
                             } else if (alarmHour < now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
+                                //outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
                                 daysList.add(nextWeekDay(calendar));
                                 continue;
                             }
                         } else if (day < now.get(Calendar.DAY_OF_WEEK)) {
-                            outputProvider.displayLog(TAG, "i + 2 < day of week");
+                            //outputProvider.displayLog(TAG, "i + 2 < day of week");
                             daysList.add(nextWeekDay(calendar));
                             continue;
                         }
 
                         if (now.get(Calendar.DAY_OF_WEEK) == 1) {
-                            outputProvider.displayLog(TAG, "i + 2 < day of week");
+                            //outputProvider.displayLog(TAG, "i + 2 < day of week");
                             daysList.add(nextWeekDay(calendar));
                             continue;
                         }
@@ -130,16 +129,16 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                         int sunday = 1;
                         calendar.set(Calendar.DAY_OF_WEEK, sunday);
                         if (sunday == now.get(Calendar.DAY_OF_WEEK)) {
-                            outputProvider.displayLog(TAG, "i  == dayOfWeek");
+                            //outputProvider.displayLog(TAG, "i  == dayOfWeek");
                             if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
+                                //outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
                                 if (alarmMinute <= now.get(Calendar.MINUTE)) {
-                                    outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
+                                    //outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
                                     daysList.add(nextWeekDay(calendar));
                                     continue;
                                 }
                             } else if (alarmHour < now.get(Calendar.HOUR_OF_DAY)) {
-                                outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
+                                //outputProvider.displayLog(TAG, "alarm.getHour < now.getHourOfDay");
                                 daysList.add(nextWeekDay(calendar));
                                 continue;
                             }
@@ -150,11 +149,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
             }
 
-            outputProvider.displayLog(TAG, "collections min = " + Collections.min(daysList));
+            //outputProvider.displayLog(TAG, "collections min = " + Collections.min(daysList));
             for (Long l : daysList) {
                 Calendar test = Calendar.getInstance();
                 test.setTimeInMillis(l);
-                outputProvider.displayLog(TAG, " " + test.getTime());
+                //outputProvider.displayLog(TAG, " " + test.getTime());
             }
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -163,7 +162,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
             long alarmTimeInMillis = Collections.min(daysList);
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
-            outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+            //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
 
             outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
         }
@@ -206,21 +205,21 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 while (calendar.getTimeInMillis() < now.getTimeInMillis()) {
                     //add interval until it reaches future
                     calendar.add(Calendar.HOUR_OF_DAY, interval);
-                    outputProvider.displayDebugLog(TAG, "while = " + calendar.get(Calendar.HOUR_OF_DAY));
+                    //outputProvider.displayDebugLog(TAG, "while = " + calendar.get(Calendar.HOUR_OF_DAY));
                 }
                 hour = calendar.get(Calendar.HOUR_OF_DAY);
                 //if alarm hour + interval is in the future subtract interval from hour and begin algorithm
                 if (hour > now.get(Calendar.HOUR_OF_DAY))
                     hour -= interval;
 
-                outputProvider.displayDebugLog(TAG, "hour = " + hour);
-                outputProvider.displayDebugLog(TAG, "interval = " + interval);
+                // outputProvider.displayDebugLog(TAG, "hour = " + hour);
+                //outputProvider.displayDebugLog(TAG, "interval = " + interval);
                 int newHour = currentHour - hour;
-                outputProvider.displayDebugLog(TAG, "new hour = " + newHour);
+                //outputProvider.displayDebugLog(TAG, "new hour = " + newHour);
                 int newStartingHour = interval - newHour;
-                outputProvider.displayDebugLog(TAG, "new starting hour = " + newStartingHour);
+                //outputProvider.displayDebugLog(TAG, "new starting hour = " + newStartingHour);
                 hour = currentHour + newStartingHour;
-                outputProvider.displayDebugLog(TAG, "hour = " + hour);
+                //outputProvider.displayDebugLog(TAG, "hour = " + hour);
                 if (hour == currentHour) {
                     if (minute < currentMinute)
                         hour += interval;
@@ -235,7 +234,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
                 outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
-                outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+                //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
 
             } else {
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -245,7 +244,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
                 outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
-                outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+                //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
             }
         }
     }
@@ -288,7 +287,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 long alarmTimeInMillis = calendar.getTimeInMillis();
                 alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
                 outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
-                outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+                //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
             }
         }
     }
@@ -296,7 +295,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     public void setSnoozeAlarm(Context context, Long id) {
         SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = Integer.parseInt(getAlarms.getString("snooze", "10"));
-
+        //outputProvider.displayLog(TAG, "snooze time = " + String.valueOf(snoozeTime));
 
         Calendar now = Calendar.getInstance();
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -307,7 +306,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
 
         outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
-        outputProvider.displayLog(TAG, "(snooze) alarmID == " + String.valueOf(id));
+        // outputProvider.displayLog(TAG, "(snooze) alarmID == " + String.valueOf(id));
     }
 
     /**
@@ -326,7 +325,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         PendingIntent sender = PendingIntent.getBroadcast(context, longToInt(id), intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
-        outputProvider.displayLog(TAG, "cancel alarm  id == " + String.valueOf(id));
+        //outputProvider.displayLog(TAG, "cancel alarm  id == " + String.valueOf(id));
 
     }
 
@@ -347,17 +346,9 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     private Long nextWeekDay(Calendar calendar) {
-        /*LocalTime localTime = new LocalTime(calendar);
-        LocalDate localDate = new LocalDate(calendar);
-        outputProvider.displayLog(TAG, "LocalDate(calendar) == " + localDate.toDate());
-        LocalDate nextWeek = localDate.plusDays(7);
-        outputProvider.displayLog(TAG, "LocalDate + 1 week  == " + nextWeek.toDate() + ";  dayOfWeek == " + dayOfWeek);
-        DateTime dateTime = nextWeek.toDateTime(localTime);
-        outputProvider.displayLog(TAG, "DateTime(localTime) == " + dateTime.toDate());
-        return dateTime.toInstant().getMillis();*/
-        outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
+        //outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
         calendar.add(Calendar.DATE, 7);
-        outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
+        //outputProvider.displayLog(TAG, "calendar == " + calendar.getTime());
         return calendar.getTimeInMillis();
     }
 
