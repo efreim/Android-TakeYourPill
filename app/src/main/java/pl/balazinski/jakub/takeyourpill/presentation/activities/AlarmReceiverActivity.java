@@ -116,7 +116,6 @@ public class AlarmReceiverActivity extends Activity {
      * @return Built string for alert dialog window text
      */
     private String setupAlarmAndPill(Long alarmId) {
-        mAlarmReceiver = new AlarmReceiver(getApplicationContext());
         mAlarm = DatabaseRepository.getAlarmById(getApplicationContext(), alarmId);
         mPillIdList = new ArrayList<>();
         if (alarmId != null) {
@@ -162,7 +161,7 @@ public class AlarmReceiverActivity extends Activity {
         //Checking pills for count and pill dosage to update pills remaining and send notification
         if (!mPillIdList.isEmpty()) {
             for (Long pillId : mPillIdList) {
-                //Getting pill for each pill attached to mAlarm
+                //Getting pill for each pill attached to alarm
                 Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
                 int pillRemaining, pillDosage, pillCount;
 
@@ -191,6 +190,7 @@ public class AlarmReceiverActivity extends Activity {
                             myNotificationManager.sendPillNotification(pill.getId(), pill.getName());
                         }
                         mOutputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
+
                     }
                 }
 
@@ -213,6 +213,9 @@ public class AlarmReceiverActivity extends Activity {
                         mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
                         mAlarmReceiver.setRepeatingAlarm(getApplicationContext(), mAlarmId);
                     }
+                    if (mAlarm.isInterval()) {
+                        mOutputProvider.displayLongToast(mContext.getString(R.string.toast_alarm_will_fire_in) + " " + mAlarm.getInterval() + " hours");
+                    }
 
                 } else if (usageNumber == 0) {
                     //usage number is 0 so repeating and interval alarms are canceled and set to false
@@ -233,6 +236,9 @@ public class AlarmReceiverActivity extends Activity {
                     //if usage number is -1 mAlarm is repeating infinitely (works the same for interval alarms)
                     mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
                     mAlarmReceiver.setRepeatingAlarm(mContext, mAlarmId);
+                }
+                if (mAlarm.isInterval()) {
+                    mOutputProvider.displayLongToast(mContext.getString(R.string.toast_alarm_will_fire_in) + " " + mAlarm.getInterval() + " hours");
                 }
             }
         }

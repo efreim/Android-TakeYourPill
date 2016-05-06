@@ -51,7 +51,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:titleTextColor="@android:color/black" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -306,7 +307,7 @@
                     android:layout_gravity="bottom"
                     android:layout_marginEnd="@dimen/pill_activity_item_margin"
                     android:layout_weight="0.5"
-                    android:text="Click or shake to refill pill"
+                    android:text="Click to refill pill"
                     android:textColor="@color/alarm_list_item_text" />
 
                 <Button

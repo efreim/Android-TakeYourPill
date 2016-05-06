@@ -11,6 +11,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
@@ -38,12 +42,10 @@ public class MyNotificationManager {
     }
 
     /**
-
-     *
      * @param id  alarm id
      * @param msg alarm name
      */
-    public void sendAlarmHeadsUpNotification(long id, String msg) {
+    public void sendAlarmHeadsUpNotification(long id) {
         mOutputProvider.displayLog(TAG, "Heads up notification opened");
         Alarm alarm = DatabaseRepository.getAlarmById(mContext, id);
         if (alarm != null) {
@@ -60,9 +62,9 @@ public class MyNotificationManager {
             PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                    mContext).setContentTitle("Take you pill!!").setSmallIcon(R.drawable.pill)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Did you take your pills?"))
-                    //.setContentText(mContext.getString(R.string.low_on) + " " + msg)
+                    mContext).setContentTitle("Take you pill!").setSmallIcon(R.drawable.pill)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(""))
+                    .setContentText(setupAlarmAndPill(id))
                     .setPriority(Notification.PRIORITY_MAX)
                     .setSound(Uri.parse(ringtone))
                     .setAutoCancel(false)
@@ -94,10 +96,9 @@ public class MyNotificationManager {
      * Sends notification that opens in-app map with nearby pharmacies.
      * Used only when remaining pill count is below given percentage of full pill count
      *
-     * @param id  pill id
-     * @param msg pill name
+     * @param id pill id
      */
-    public void sendAlarmNotification(long id, String msg) {
+    public void sendAlarmNotification(long id) {
         Alarm alarm = DatabaseRepository.getAlarmById(mContext, id);
         if (alarm != null) {
             android.app.NotificationManager alarmNotificationManager = (android.app.NotificationManager) mContext
@@ -108,9 +109,9 @@ public class MyNotificationManager {
             PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                    mContext).setContentTitle("Take you pill!!").setSmallIcon(R.drawable.pill)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Did you take your pills?"))
-                    .setContentText(mContext.getString(R.string.low_on) + msg)
+                    mContext).setContentTitle("Take you pill!").setSmallIcon(R.drawable.pill)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(""))
+                    .setContentText(setupAlarmAndPill(id))
                     .setAutoCancel(false)
                     .addAction(R.drawable.ic_snooze_black_36dp, mContext.getString(R.string.snooze), sneezePendingIntent)
                     .addAction(R.drawable.ic_check_black_36dp, mContext.getString(R.string.take_pill), takePillPendingIntent);
@@ -142,15 +143,15 @@ public class MyNotificationManager {
             NotificationManager alarmNotificationManager = (NotificationManager) mContext
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
-            PendingIntent mapsIntent = PendingIntent.getActivity(mContext, 0,
+            PendingIntent mapsIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(),
                     new Intent(mContext, MapsActivity.class), 0);
 
             Intent intent = new Intent(mContext, PillDetailActivity.class);
             intent.putExtra(Constants.EXTRA_LONG_ID, pill.getId());
 
-            PendingIntent refillIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+            PendingIntent refillIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), intent, 0);
 
-            PendingIntent mainIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), 0);
+            PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), new Intent(mContext, MainActivity.class), 0);
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
                     mContext).setContentTitle(mContext.getString(R.string.find_nearby_pharmacy)).setSmallIcon(R.drawable.pill)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.low_on) + msg))
@@ -189,5 +190,32 @@ public class MyNotificationManager {
         intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmId);
         intent.putExtra(Constants.RECEIVER_NOTIFICATION_KEY, extraInt);
         return intent;
+    }
+
+
+    /**
+     * @param alarmId id of mAlarm that fired.
+     * @return Built string for alert dialog window text
+     */
+    private String setupAlarmAndPill(Long alarmId) {
+        List<Long> mPillIdList = new ArrayList<>();
+        if (alarmId != null) {
+            mPillIdList = DatabaseRepository.getPillsByAlarm(mContext, alarmId);
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!mPillIdList.isEmpty()) {
+            for (Long pillId : mPillIdList) {
+                Pill pill = DatabaseRepository.getPillByID(mContext, pillId);
+                if (pill != null) {
+                    stringBuilder.append(pill.getName());
+                    if (!Objects.equals(pillId, mPillIdList.get(mPillIdList.size() - 1)))
+                        stringBuilder.append(", ");
+                }
+            }
+        } else
+            stringBuilder.append(mContext.getString(R.string.no_pill_attached_to_alarm));
+
+        return stringBuilder.toString();
     }
 }

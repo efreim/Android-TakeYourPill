@@ -38,7 +38,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -126,6 +125,7 @@ public class PillDetailActivity extends AppCompatActivity {
     }
 
     private void setupContent(Bundle extras) {
+        //TODO CLICK REFILL WHEN OPEN FROM NOTIFICATION !!!!!!!!!!!!!!!
         if (extras != null) {
             Long id = extras.getLong(Constants.EXTRA_LONG_ID);
             mOutputProvider.displayLog(TAG, "Position = " + String.valueOf(id));
@@ -222,6 +222,7 @@ public class PillDetailActivity extends AppCompatActivity {
             }
             alarmsAttachedTextView.setText(stringBuilder.toString());
         }
+        alarmsAttachedCardView.setVisibility(View.GONE);
 
 
         loadBackdrop();

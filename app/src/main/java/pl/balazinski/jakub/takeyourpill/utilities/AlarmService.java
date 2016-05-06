@@ -34,11 +34,11 @@ public class AlarmService extends IntentService {
                 Intent i = myNotificationManager.setupIntent(id, -1);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
-                myNotificationManager.sendAlarmNotification(id, "Wake up !");
+                myNotificationManager.sendAlarmNotification(id);
             } else {
                 //if screen is on display heads up notification
                 mOutputProvider.displayDebugLog(TAG, "NOT LOCKED");
-                myNotificationManager.sendAlarmHeadsUpNotification(id, "Wake up !");
+                myNotificationManager.sendAlarmHeadsUpNotification(id);
             }
         }
     }
@@ -48,4 +48,6 @@ public class AlarmService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
+
+
 }

@@ -18,7 +18,7 @@
     android:id="@+id/pill_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_pill_height"
-    android:layout_margin="10dp"
+    android:layout_margin="5dp"
     android:gravity="center_vertical">
 
 

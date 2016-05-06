@@ -168,6 +168,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         }
     }
 
+    private void test() {
+
+    }
+
     /**
      * Method sets alarm with interval. Alarm will fire from chosen date every given time (minute/hour)
      *
@@ -220,9 +224,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 //outputProvider.displayDebugLog(TAG, "new starting hour = " + newStartingHour);
                 hour = currentHour + newStartingHour;
                 //outputProvider.displayDebugLog(TAG, "hour = " + hour);
-                if (hour == currentHour) {
-                    if (minute < currentMinute)
+                if (hour - interval == currentHour) {
+                    if (minute <= currentMinute)
                         hour += interval;
+                    else {
+                        hour -= interval;
+                    }
                 }
                 now.set(Calendar.HOUR_OF_DAY, hour);
                 now.set(Calendar.MINUTE, minute);
@@ -335,7 +342,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         boolean isVibration = getAlarms.getBoolean("vibration", false);
 
         long[] pattern = {0, 200, 2000};
-
+        //TODO mPlayer null error, swipe heads up then click on normal notification
         mPlayer = MediaPlayer.create(context, Uri.parse(ringtone));
         mPlayer.setLooping(true);
         mPlayer.start();
