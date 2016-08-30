@@ -63,17 +63,17 @@ public class Place {
         this.vicinity = vicinity;
     }
 
-    static Place jsonToPontoReferencia(JSONObject pontoReferencia) {
+    static Place jsonToPointReference(JSONObject pointReference) {
         try {
             Place result = new Place();
-            JSONObject geometry = (JSONObject) pontoReferencia.get("geometry");
+            JSONObject geometry = (JSONObject) pointReference.get("geometry");
             JSONObject location = (JSONObject) geometry.get("location");
             result.setLatitude((Double) location.get("lat"));
             result.setLongitude((Double) location.get("lng"));
-            result.setIcon(pontoReferencia.getString("icon"));
-            result.setName(pontoReferencia.getString("name"));
-            result.setVicinity(pontoReferencia.getString("vicinity"));
-            result.setId(pontoReferencia.getString("id"));
+            result.setIcon(pointReference.getString("icon"));
+            result.setName(pointReference.getString("name"));
+            result.setVicinity(pointReference.getString("vicinity"));
+            result.setId(pointReference.getString("id"));
             return result;
         } catch (JSONException ex) {
             Logger.getLogger(Place.class.getName()).log(Level.SEVERE, null, ex);

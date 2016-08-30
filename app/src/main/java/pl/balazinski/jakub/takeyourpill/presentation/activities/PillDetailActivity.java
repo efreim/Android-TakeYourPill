@@ -31,6 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -110,6 +111,7 @@ public class PillDetailActivity extends AppCompatActivity {
     private OutputProvider mOutputProvider;
     private Pill mPill;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +130,7 @@ public class PillDetailActivity extends AppCompatActivity {
         //TODO CLICK REFILL WHEN OPEN FROM NOTIFICATION !!!!!!!!!!!!!!!
         if (extras != null) {
             Long id = extras.getLong(Constants.EXTRA_LONG_ID);
-            mOutputProvider.displayLog(TAG, "Position = " + String.valueOf(id));
+            //mOutputProvider.displayLog(TAG, "Position = " + String.valueOf(id));
 
             //Getting chosen mPill from database
             List<Pill> list = DatabaseRepository.getAllPills(this);
@@ -161,6 +163,22 @@ public class PillDetailActivity extends AppCompatActivity {
         final String pillName = mPill.getName();
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+        collapsingToolbar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
+        Uri uri = Uri.parse(Constants.DRAWABLE_PATH + R.drawable.pill_white_background);
+        String path = uri.toString();
+        if (path.equals(mPill.getPhoto()))
+            titleColorMaker(collapsingToolbar, android.R.color.black);
+        else
+            titleColorMaker(collapsingToolbar, R.color.white);
+
+
         collapsingToolbar.setTitle(pillName);
         if (mPill.getDescription().equals(""))
             pillDescriptionCardView.setVisibility(View.GONE);
@@ -246,6 +264,15 @@ public class PillDetailActivity extends AppCompatActivity {
         } else {
             refillButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
             searchWebButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+        }
+    }
+
+    private void titleColorMaker(CollapsingToolbarLayout collapsingToolbarLayout, int color) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            collapsingToolbarLayout.setExpandedTitleColor(getColor(color));
+        } else {
+            collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(color));
         }
     }
 

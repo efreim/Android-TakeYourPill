@@ -43,10 +43,9 @@ public class MyNotificationManager {
 
     /**
      * @param id  alarm id
-     * @param msg alarm name
      */
     public void sendAlarmHeadsUpNotification(long id) {
-        mOutputProvider.displayLog(TAG, "Heads up notification opened");
+        //mOutputProvider.displayLog(TAG, "Heads up notification opened");
         Alarm alarm = DatabaseRepository.getAlarmById(mContext, id);
         if (alarm != null) {
             android.app.NotificationManager alarmNotificationManager = (android.app.NotificationManager) mContext
@@ -62,7 +61,7 @@ public class MyNotificationManager {
             PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                    mContext).setContentTitle("Take you pill!").setSmallIcon(R.drawable.pill)
+                    mContext).setContentTitle(mContext.getString(R.string.take_pill) + "!").setSmallIcon(R.drawable.pill)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(""))
                     .setContentText(setupAlarmAndPill(id))
                     .setPriority(Notification.PRIORITY_MAX)
@@ -88,15 +87,14 @@ public class MyNotificationManager {
             notification.flags |= Notification.FLAG_INSISTENT | Notification.FLAG_ONGOING_EVENT;
             alarmNotificationManager.notify(longToInt(id), notification);
 
-            mOutputProvider.displayLog(TAG, "Heads up notification sent.");
+            //mOutputProvider.displayLog(TAG, "Heads up notification sent.");
         }
     }
 
     /**
-     * Sends notification that opens in-app map with nearby pharmacies.
-     * Used only when remaining pill count is below given percentage of full pill count
+
      *
-     * @param id pill id
+     * @param id alarm id
      */
     public void sendAlarmNotification(long id) {
         Alarm alarm = DatabaseRepository.getAlarmById(mContext, id);
@@ -104,12 +102,12 @@ public class MyNotificationManager {
             android.app.NotificationManager alarmNotificationManager = (android.app.NotificationManager) mContext
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
-            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 0), PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 1), PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent sneezePendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 0), PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent takePillPendingIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), 1), PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent mainIntent = PendingIntent.getActivity(mContext, (int) System.currentTimeMillis(), setupIntent(alarm.getId(), -1), PendingIntent.FLAG_CANCEL_CURRENT);
 
             NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
-                    mContext).setContentTitle("Take you pill!").setSmallIcon(R.drawable.pill)
+                    mContext).setContentTitle(mContext.getString(R.string.take_pill) + "!").setSmallIcon(R.drawable.pill)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(""))
                     .setContentText(setupAlarmAndPill(id))
                     .setAutoCancel(false)
@@ -118,7 +116,7 @@ public class MyNotificationManager {
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmNotificationBuilder.setCategory(Notification.CATEGORY_REMINDER);
+                alarmNotificationBuilder.setCategory(Notification.CATEGORY_ALARM);
             }
 
             alarmNotificationBuilder.setContentIntent(mainIntent);
@@ -126,7 +124,7 @@ public class MyNotificationManager {
             notification.flags |= Notification.FLAG_INSISTENT | Notification.FLAG_ONGOING_EVENT;
             alarmNotificationManager.notify(longToInt(id), notification);
 
-            mOutputProvider.displayLog(TAG, "Notification sent.");
+            //mOutputProvider.displayLog(TAG, "Notification sent.");
         }
     }
 
@@ -163,7 +161,7 @@ public class MyNotificationManager {
             alarmNotificationManager.notify(longToInt(id), alarmNotificationBuilder.build());
 
 
-            mOutputProvider.displayLog(TAG, "Pill notification sent.");
+            //mOutputProvider.displayLog(TAG, "Pill notification sent.");
         }
     }
 
@@ -185,7 +183,7 @@ public class MyNotificationManager {
      * @return intent with given extras
      */
     public Intent setupIntent(Long alarmId, int extraInt) {
-        mOutputProvider.displayLog(TAG, "setupIntent, extraInt = " + String.valueOf(extraInt));
+        //mOutputProvider.displayLog(TAG, "setupIntent, extraInt = " + String.valueOf(extraInt));
         Intent intent = new Intent(mContext, AlarmReceiverActivity.class);
         intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmId);
         intent.putExtra(Constants.RECEIVER_NOTIFICATION_KEY, extraInt);

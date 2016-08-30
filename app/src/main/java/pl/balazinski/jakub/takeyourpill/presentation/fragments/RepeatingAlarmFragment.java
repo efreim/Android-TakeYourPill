@@ -101,7 +101,7 @@ public class RepeatingAlarmFragment extends Fragment {
 
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-            DayOfWeekView dayOfWeekView = new DayOfWeekView(mContext, dayOfWeek.getId(), dayOfWeek.getDay());
+            DayOfWeekView dayOfWeekView = new DayOfWeekView(mContext, dayOfWeek.getId(), dayOfWeek.getDay(mContext));
             dayOfWeekGrid.addView(dayOfWeekView);
             mWeekViewListList.add(dayOfWeekView);
         }
@@ -204,7 +204,7 @@ public class RepeatingAlarmFragment extends Fragment {
                 stringBuilder.append("0");
         }
 
-        mOutputProvider.displayLog(TAG, "addAlarm days list " + stringBuilder.toString());
+        //mOutputProvider.displayLog(TAG, "addAlarm days list " + stringBuilder.toString());
         if (state == AlarmActivity.State.NEW) {
 
             if (changeTimeButton.getText().toString().equals("")) {
@@ -298,18 +298,18 @@ public class RepeatingAlarmFragment extends Fragment {
     }
 
     private enum DayOfWeek {
-        MON(0, Constants.MONDAY),
-        TUE(1, Constants.TUESDAY),
-        WED(2, Constants.WEDNESDAY),
-        THU(3, Constants.THURSDAY),
-        FRI(4, Constants.FRIDAY),
-        SAT(5, Constants.SATURDAY),
-        SUN(6, Constants.SUNDAY);
+        MON(0, R.string.monday),
+        TUE(1, R.string.tuesday),
+        WED(2, R.string.wednesday),
+        THU(3, R.string.thursday),
+        FRI(4, R.string.friday),
+        SAT(5, R.string.saturday),
+        SUN(6, R.string.sunday);
 
         private int id;
-        private String day;
+        private int day;
 
-        DayOfWeek(int id, String day) {
+        DayOfWeek(int id, int day) {
             this.id = id;
             this.day = day;
         }
@@ -318,8 +318,9 @@ public class RepeatingAlarmFragment extends Fragment {
             return id;
         }
 
-        public String getDay() {
-            return day;
+        public String getDay(Context context) {
+
+            return context.getString(day);
         }
     }
 

@@ -17,7 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -48,8 +48,10 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.tabs)
     TabLayout tabLayout;
-    @Bind(R.id.fab)
-    Button button;
+    //@Bind(R.id.fab)
+    //Button button;
+    @Bind(R.id.toolbar_main_add_button)
+    ImageButton toolbarAddButton;
     private AlarmListFragment mAlarmFragment;
     private PillListFragment mPillFragment;
     private OutputProvider mOutputProvider;
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupContent(Bundle extras) {
         if (extras != null) {
             Long alarmID = extras.getLong(Constants.EXTRA_LONG_ALARM_ID);
-            mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+            //mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
         }
     }
 
@@ -106,16 +108,22 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
         }
 
-        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+        /*if (Constants.VERSION >= Build.VERSION_CODES.M) {
             button.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
         } else {
             button.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
         }
-        button.setText(getString(R.string.add_alarm));
+        button.setText(getString(R.string.add_alarm));*/
+        if (Constants.VERSION >= Build.VERSION_CODES.M) {
+            toolbarAddButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add_white_36dp));
+
+        } else {
+            toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_add_white_36dp));
+        }
     }
 
 
-    @OnClick(R.id.fab)
+    @OnClick(R.id.toolbar_main_add_button)
     public void onClick(View v) {
         if (viewPager != null) {
             if (viewPager.getCurrentItem() == 0) {
@@ -202,10 +210,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    button.setText(getString(R.string.add_alarm));
+                    //button.setText(getString(R.string.add_alarm));
                     mAlarmFragment.refreshList();
                 } else {
-                    button.setText(getString(R.string.add_pill));
+                    //button.setText(getString(R.string.add_pill));
                     mPillFragment.refreshList();
                 }
             }

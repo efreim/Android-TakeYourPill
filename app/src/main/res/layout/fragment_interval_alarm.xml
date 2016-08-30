@@ -27,7 +27,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_weight="0.1"
-            android:text="Alarm starting time" />
+            android:text="@string/alarm_starting_time" />
 
         <EditText
             android:id="@+id/change_time_button"
@@ -41,7 +41,7 @@
             android:layout_weight="0.15"
             android:clickable="true"
             android:focusableInTouchMode="false"
-            android:hint="Alarm starting time"
+            android:hint="@string/alarm_starting_time"
             android:textAlignment="center" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.1"
-            android:text="Alarm starting date" />
+            android:text="@string/alarm_starting_date" />
         <EditText
             android:id="@+id/change_day_button"
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             android:layout_weight="0.15"
             android:clickable="true"
             android:focusableInTouchMode="false"
-            android:hint="Alarm date"
+            android:hint="@string/alarm_starting_date"
             android:textAlignment="center" />
 
         <TextView
@@ -74,7 +74,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.1"
-            android:text="Alarm interval (in hours)" />
+            android:text="@string/alarm_interval" />
         <EditText
             android:id="@+id/interval_time"
             android:layout_width="match_parent"
@@ -85,7 +85,7 @@
             android:layout_marginTop="5dp"
             android:layout_weight="0.15"
             android:gravity="start"
-            android:hint="Interval"
+            android:hint="@string/alarm_interval"
             android:inputType="numberDecimal"
             android:maxLength="3"
             android:singleLine="true" />
@@ -124,7 +124,7 @@
             android:layout_marginTop="5dp"
             android:layout_weight="0.15"
             android:gravity="start"
-            android:hint="Number of alarms"
+            android:hint="@string/alarm_number_of"
             android:inputType="numberDecimal"
             android:maxLength="3"
             android:singleLine="true" />
@@ -136,7 +136,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.1"
-            android:text="Select pill for your alarm (optional)" />
+            android:text="@string/alarm_select_pills" />
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"

@@ -29,7 +29,7 @@ public class AlarmService extends IntentService {
             KeyguardManager keyguardManager = (KeyguardManager) getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
             //If screen is turned off (locked) send notification and display dialog.
             if (keyguardManager.inKeyguardRestrictedInputMode()) {
-                mOutputProvider.displayDebugLog(TAG, "IS LOCKED");
+                //mOutputProvider.displayDebugLog(TAG, "IS LOCKED");
                 intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, id);
                 Intent i = myNotificationManager.setupIntent(id, -1);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -37,17 +37,15 @@ public class AlarmService extends IntentService {
                 myNotificationManager.sendAlarmNotification(id);
             } else {
                 //if screen is on display heads up notification
-                mOutputProvider.displayDebugLog(TAG, "NOT LOCKED");
+                //mOutputProvider.displayDebugLog(TAG, "NOT LOCKED");
                 myNotificationManager.sendAlarmHeadsUpNotification(id);
             }
         }
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
-
 
 }

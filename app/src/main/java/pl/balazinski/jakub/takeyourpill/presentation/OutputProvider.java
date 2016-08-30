@@ -1,7 +1,6 @@
 package pl.balazinski.jakub.takeyourpill.presentation;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -41,12 +40,12 @@ public class OutputProvider {
         popupMenu.show();
     }
 
-    public void displayLog(String where, String whaaat) {
+    /*public void displayLog(String where, String whaaat) {
         Log.i(where, whaaat);
     }
 
     public void displayDebugLog(String where, String whaaat) {
         Log.i(where, whaaat);
-    }
+    }*/
 
 }

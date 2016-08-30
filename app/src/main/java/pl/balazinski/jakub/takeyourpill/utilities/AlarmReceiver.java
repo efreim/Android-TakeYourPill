@@ -36,6 +36,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     public AlarmReceiver() {
     }
+//        i.putExtra(Constants.MAIN_FROM_ALARM_KEY, Constants.MAIN_FROM_ALARM);
 
     public AlarmReceiver(Context context) {
         this.mContext = context;
@@ -45,15 +46,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
-
         Intent i = new Intent();
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.putExtra(Constants.MAIN_FROM_ALARM_KEY, Constants.MAIN_FROM_ALARM);
         i.putExtra(Constants.EXTRA_LONG_ALARM_ID, bundle.getLong(Constants.EXTRA_LONG_ALARM_ID));
         ComponentName comp = new ComponentName(context.getPackageName(),
                 AlarmService.class.getName());
         startWakefulService(context, (i.setComponent(comp)));
-
         setResultCode(Activity.RESULT_OK);
     }
 
@@ -162,15 +160,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
             long alarmTimeInMillis = Collections.min(daysList);
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
-            //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+
 
             outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
         }
     }
 
-    private void test() {
-
-    }
 
     /**
      * Method sets alarm with interval. Alarm will fire from chosen date every given time (minute/hour)
@@ -201,6 +196,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.SECOND, 0);
+            now.set(Calendar.SECOND, 0);
 
             //if alarm date is in the past
             if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
@@ -212,36 +209,19 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                     //outputProvider.displayDebugLog(TAG, "while = " + calendar.get(Calendar.HOUR_OF_DAY));
                 }
                 hour = calendar.get(Calendar.HOUR_OF_DAY);
-                //if alarm hour + interval is in the future subtract interval from hour and begin algorithm
-                if (hour > now.get(Calendar.HOUR_OF_DAY))
-                    hour -= interval;
-
-                // outputProvider.displayDebugLog(TAG, "hour = " + hour);
-                //outputProvider.displayDebugLog(TAG, "interval = " + interval);
-                int newHour = currentHour - hour;
-                //outputProvider.displayDebugLog(TAG, "new hour = " + newHour);
-                int newStartingHour = interval - newHour;
-                //outputProvider.displayDebugLog(TAG, "new starting hour = " + newStartingHour);
-                hour = currentHour + newStartingHour;
-                //outputProvider.displayDebugLog(TAG, "hour = " + hour);
-                if (hour - interval == currentHour) {
+                if (hour == currentHour)
                     if (minute <= currentMinute)
-                        hour += interval;
-                    else {
-                        hour -= interval;
-                    }
-                }
-                now.set(Calendar.HOUR_OF_DAY, hour);
-                now.set(Calendar.MINUTE, minute);
+                        calendar.add(Calendar.HOUR_OF_DAY, interval);
 
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Intent intent = new Intent(context, AlarmReceiver.class);
                 intent.putExtra(Constants.EXTRA_LONG_ALARM_ID, alarmID);
-                long alarmTimeInMillis = now.getTimeInMillis();
+                long alarmTimeInMillis = calendar.getTimeInMillis();
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
-                outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
+                //outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
                 //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+                //outputProvider.displayLog(TAG, context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
 
             } else {
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -250,8 +230,9 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 long alarmTimeInMillis = calendar.getTimeInMillis();
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, 1000 * 60 * 60 * interval, pendingIntent);
-                outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
+                //outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
                 //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
+                //outputProvider.displayLog(TAG, context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
             }
         }
     }
@@ -293,6 +274,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, longToInt(alarmID), intent, 0);
                 long alarmTimeInMillis = calendar.getTimeInMillis();
                 alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent);
+
+
                 outputProvider.displayLongToast(context.getString(R.string.toast_alarm_will_fire_in) + buildString(alarmTimeInMillis));
                 //outputProvider.displayLog(TAG, "alarmID == " + String.valueOf(alarmID));
             }
@@ -303,7 +286,31 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         SharedPreferences getAlarms = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = Integer.parseInt(getAlarms.getString("snooze", "10"));
         //outputProvider.displayLog(TAG, "snooze time = " + String.valueOf(snoozeTime));
+        Alarm alarm = DatabaseRepository.getAlarmById(context, id);
+        if (alarm != null) {
+            if (alarm.isInterval()) {
+                Calendar calendar = Calendar.getInstance();
+                int day, month, year, hour, minute;
+                day = alarm.getDay();
+                month = alarm.getMonth();
+                year = alarm.getYear();
+                hour = alarm.getHour();
+                minute = alarm.getMinute();
 
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.set(Calendar.MINUTE, minute);
+                calendar.set(Calendar.DAY_OF_MONTH, day);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.YEAR, year);
+                calendar.add(Calendar.MINUTE, snoozeTime);
+                alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+                alarm.setMinute(calendar.get(Calendar.MINUTE));
+                alarm.setDay(calendar.get(Calendar.DAY_OF_MONTH));
+                alarm.setMonth(calendar.get(Calendar.MONTH));
+                alarm.setYear(calendar.get(Calendar.YEAR));
+                DatabaseHelper.getInstance(mContext).getAlarmDao().update(alarm);
+            }
+        }
         Calendar now = Calendar.getInstance();
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -344,8 +351,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         long[] pattern = {0, 200, 2000};
         //TODO mPlayer null error, swipe heads up then click on normal notification
         mPlayer = MediaPlayer.create(context, Uri.parse(ringtone));
-        mPlayer.setLooping(true);
-        mPlayer.start();
+        if (mPlayer != null) {
+            mPlayer.setLooping(true);
+            mPlayer.start();
+        }
         if (isVibration) {
             mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             mVibrator.vibrate(pattern, 0);

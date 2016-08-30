@@ -36,7 +36,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <ImageButton
+                    android:id="@+id/toolbar_main_add_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/ic_add_white_36dp" />
+            </android.support.v7.widget.Toolbar>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
@@ -53,7 +63,6 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/fab"
         android:layout_below="@+id/main_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
@@ -68,7 +77,7 @@
          android:layout_height="wrap_content"
          android:layout_gravity="end|bottom"
          android:layout_margin="@dimen/fab_margin"
-         android:src="@android:drawable/ic_input_add" />-->
+         android:src="@android:drawable/ic_input_add" />
 
 
     <Button
@@ -78,8 +87,8 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/pill_activity_item_margin"
-        android:text="Add pill"
-        android:textColor="@color/alarm_list_item_text" />
+        android:text="@string/add_pill"
+        android:textColor="@color/alarm_list_item_text" />-->
 
 </RelativeLayout>
 

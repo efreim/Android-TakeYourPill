@@ -47,13 +47,35 @@ public class Constants {
     public static final String SEARCH_PILL_WEBSITE = "http://www.bazalekow.mp.pl/leki/szukaj.html?item_name=";
 
     //DAYS
-    public static final String MONDAY = "Mon";
+ /*   public static final String MONDAY = "Mon";
     public static final String TUESDAY = "Tue";
     public static final String WEDNESDAY = "Wed";
     public static final String THURSDAY = "Thu";
     public static final String FRIDAY = "Fri";
     public static final String SATURDAY = "Sat";
     public static final String SUNDAY = "Sun";
+
+    public static String getDay(Context context, int day){
+        switch (day){
+            case 0:
+                return context.getString(R.string.monday);
+            case 1:
+                return context.getString(R.string.tuesday);
+            case 2:
+                return context.getString(R.string.wednesday);
+            case 3:
+                return context.getString(R.string.thursday);
+            case 4:
+                return context.getString(R.string.friday);
+            case 5:
+                return context.getString(R.string.saturday);
+            case 6:
+                return context.getString(R.string.sunday);
+            default:
+                return "error happened";
+        }
+
+    }*/
 
     //MAPS
     public static final String MAP_PLACE = "pharmacy";

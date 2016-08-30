@@ -63,7 +63,7 @@ public class AlarmListFragment extends Fragment implements AlarmListRefreshListe
             refreshList();
 
         }catch (Exception e){
-            mOutputProvider.displayDebugLog(TAG, e.toString());
+            //mOutputProvider.displayDebugLog(TAG, e.toString());
         }
       /*      }
         };

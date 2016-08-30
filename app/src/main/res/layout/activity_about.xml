@@ -29,7 +29,7 @@
         android:layout_gravity="bottom"
         android:textColor="@color/alarm_list_item_text"
         android:gravity="center"
-        android:text="I understand"
+        android:text="@string/understand"
         android:layout_marginLeft="@dimen/pill_activity_item_margin"
         android:layout_marginRight="@dimen/pill_activity_item_margin"
         android:layout_marginBottom="@dimen/pill_activity_item_margin"

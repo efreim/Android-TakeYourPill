@@ -28,7 +28,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_weight="0.1"
-            android:text="Alarm time" />
+            android:text="@string/alarm_time" />
 
         <EditText
             android:id="@+id/change_time_button"
@@ -42,7 +42,7 @@
             android:layout_weight="0.175"
             android:clickable="true"
             android:focusableInTouchMode="false"
-            android:hint="Alarm time"
+            android:hint="@string/alarm_time"
             android:textAlignment="center" />
 
 
@@ -54,7 +54,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_weight="0.1"
-            android:text="Select repeatable days of week" />
+            android:text="@string/alarm_repeatable_days" />
 
         <GridLayout
             android:id="@+id/day_of_week_grid"
@@ -101,7 +101,7 @@
             android:layout_marginTop="5dp"
             android:layout_weight="0.175"
             android:gravity="start"
-            android:hint="Number of alarms"
+            android:hint="@string/alarm_number_of"
             android:inputType="numberDecimal"
             android:maxLength="3"
             android:singleLine="true" />
@@ -114,7 +114,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_weight="0.1"
-            android:text="Select pill for your alarm (Optional)" />
+            android:text="@string/alarm_select_pills" />
 
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"

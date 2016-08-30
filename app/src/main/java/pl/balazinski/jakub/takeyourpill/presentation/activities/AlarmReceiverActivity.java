@@ -47,13 +47,13 @@ public class AlarmReceiverActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         mOutputProvider = new OutputProvider(mContext);
         myNotificationManager = new MyNotificationManager(mContext);
-        mOutputProvider.displayLog(TAG, "ON CREATE");
+        //mOutputProvider.displayLog(TAG, "ON CREATE");
         WakeLocker.acquire(mContext);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPillRemainingPercentage = Integer.parseInt(preferences.getString("percentage", "10"));
 
-        if(mPillRemainingPercentage>= 1 && mPillRemainingPercentage<=99)
-            mPillRemainingPercentage = mPillRemainingPercentage/100;
+        if (mPillRemainingPercentage >= 1 && mPillRemainingPercentage <= 99)
+            mPillRemainingPercentage = mPillRemainingPercentage / 100;
         else mPillRemainingPercentage = 0.1;
 
         setupContent(extras);
@@ -63,18 +63,18 @@ public class AlarmReceiverActivity extends Activity {
 
     private void setupContent(Bundle extras) {
         if (extras != null) {
-            mAlarmReceiver = new AlarmReceiver(getApplicationContext());
+            mAlarmReceiver = new AlarmReceiver(mContext);
             mAlarmId = extras.getLong(Constants.EXTRA_LONG_ALARM_ID);
-            int sneeze = extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY);
-            mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(mAlarmId));
-            mOutputProvider.displayLog(TAG, "sneeze == " + String.valueOf(extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY)));
+            int snooze = extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY);
+            //mOutputProvider.displayLog(TAG, "alarmID == " + String.valueOf(mAlarmId));
+            //mOutputProvider.displayLog(TAG, "sneeze == " + String.valueOf(extras.getInt(Constants.RECEIVER_NOTIFICATION_KEY)));
             if (mAlarmId != null) {
-                if (sneeze == 0) {
-                    sneezeClick();
-                } else if (sneeze == 1) {
+                if (snooze == 0) {
+                    snoozeClick();
+                } else if (snooze == 1) {
                     setupAlarmAndPill(mAlarmId);
                     takePillClick();
-                } else if (sneeze == -1) {
+                } else if (snooze == -1) {
                     clearNotification(mAlarmId);
                     mAlertMessage = setupAlarmAndPill(mAlarmId);
                     mAlarmReceiver.startRingtone(mContext);
@@ -99,7 +99,7 @@ public class AlarmReceiverActivity extends Activity {
                 .setNegativeButton(getString(R.string.snooze), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        sneezeClick();
+                        snoozeClick();
                         dialog.cancel();
                     }
                 });
@@ -139,9 +139,9 @@ public class AlarmReceiverActivity extends Activity {
      * Stops ringtone and vibration and sets snooze alarm with
      * provided alarm id for snooze time which is set in preferences
      */
-    private void sneezeClick() {
+    private void snoozeClick() {
         if (mAlarmReceiver != null) {
-            mOutputProvider.displayLog(TAG, "Sneeze clicked!");
+            //mOutputProvider.displayLog(TAG, "Sneeze clicked!");
             clearNotification(mAlarmId);
             mAlarmReceiver.stopRingtone();
             mAlarmReceiver.setSnoozeAlarm(mContext, mAlarmId);
@@ -153,13 +153,13 @@ public class AlarmReceiverActivity extends Activity {
      * Used when user clicks button on notification when mAlarm is fired
      */
     private void takePillClick() {
-        mOutputProvider.displayLog(TAG, "Take pill clicked!");
+        //mOutputProvider.displayLog(TAG, "Take pill clicked!");
         if (mAlarmReceiver != null)
             mAlarmReceiver.stopRingtone();
 
         clearNotification(mAlarmId);
         //Checking pills for count and pill dosage to update pills remaining and send notification
-        if (!mPillIdList.isEmpty()) {
+        if (mPillIdList != null) {
             for (Long pillId : mPillIdList) {
                 //Getting pill for each pill attached to alarm
                 Pill pill = DatabaseRepository.getPillByID(getApplicationContext(), pillId);
@@ -189,7 +189,7 @@ public class AlarmReceiverActivity extends Activity {
                         if (remaining <= (pillCount * mPillRemainingPercentage)) {
                             myNotificationManager.sendPillNotification(pill.getId(), pill.getName());
                         }
-                        mOutputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
+                        //mOutputProvider.displayLog(TAG, "pill taken. id = " + pill.getId() + "  name: " + pill.getName() + "  pills left: " + pill.getPillsRemaining());
 
                     }
                 }
@@ -210,19 +210,20 @@ public class AlarmReceiverActivity extends Activity {
                 if (usageNumber > 0) {
                     //usage number is greater than 0 so next mAlarm can be set (interval alarms are set automatically)
                     if (mAlarm.isRepeatable()) {
-                        mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
-                        mAlarmReceiver.setRepeatingAlarm(getApplicationContext(), mAlarmId);
+                        mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
+                        mAlarmReceiver.setRepeatingAlarm(mContext, mAlarmId);
                     }
                     if (mAlarm.isInterval()) {
-                        mOutputProvider.displayLongToast(mContext.getString(R.string.toast_alarm_will_fire_in) + " " + mAlarm.getInterval() + " hours");
+                        mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
+                        mAlarmReceiver.setIntervalAlarm(mContext, mAlarmId);
                     }
 
                 } else if (usageNumber == 0) {
                     //usage number is 0 so repeating and interval alarms are canceled and set to false
                     mOutputProvider.displayShortToast(getString(R.string.toast_alarm_usage_used));
-                    mAlarmReceiver.cancelAlarm(getApplicationContext(), mAlarmId);
+                    mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
                     mAlarm.setIsActive(false);
-                    DatabaseHelper.getInstance(getApplicationContext()).getAlarmDao().update(mAlarm);
+                    DatabaseHelper.getInstance(mContext).getAlarmDao().update(mAlarm);
                 }
 
             } else {
@@ -238,7 +239,8 @@ public class AlarmReceiverActivity extends Activity {
                     mAlarmReceiver.setRepeatingAlarm(mContext, mAlarmId);
                 }
                 if (mAlarm.isInterval()) {
-                    mOutputProvider.displayLongToast(mContext.getString(R.string.toast_alarm_will_fire_in) + " " + mAlarm.getInterval() + " hours");
+                    mAlarmReceiver.setIntervalAlarm(mContext, mAlarmId);
+                    //mOutputProvider.displayLongToast(mContext.getString(R.string.toast_alarm_will_fire_in) + " " + mAlarm.getInterval() + " hours");
                 }
             }
         }

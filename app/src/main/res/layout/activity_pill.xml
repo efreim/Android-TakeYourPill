@@ -12,7 +12,18 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <ImageButton
+            android:id="@+id/toolbar_pill_add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/ic_add_white_36dp" />
+    </android.support.v7.widget.Toolbar>
+
 
     <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
     <LinearLayout
@@ -25,7 +36,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/add_pill"
         android:layout_below="@+id/toolbarPill">
 
         <LinearLayout
@@ -47,10 +57,9 @@
                 android:layout_margin="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.5"
                 android:ems="10"
-                android:hint="Pill name"
+                android:hint="@string/pill_name"
                 android:maxLength="50"
                 android:singleLine="true" />
-
 
 
             <RelativeLayout
@@ -80,13 +89,14 @@
                 android:layout_weight="0.4"
                 android:orientation="vertical"
                 android:visibility="gone">
+
                 <EditText
                     android:id="@+id/pill_desc"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_margin="@dimen/pill_activity_item_margin"
                     android:layout_weight="0.1"
-                    android:hint="Pill description"
+                    android:hint="@string/pill_desc"
                     android:maxLength="100"
                     android:singleLine="false" />
 
@@ -97,7 +107,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="@dimen/pill_activity_item_margin"
                     android:layout_weight="0.1"
-                    android:hint="Dosage"
+                    android:hint="@string/pill_dosage"
                     android:inputType="numberDecimal"
                     android:maxLength="2"
                     android:singleLine="true" />
@@ -109,7 +119,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="@dimen/pill_activity_item_margin"
                     android:layout_weight="0.1"
-                    android:hint="Number of pills"
+                    android:hint="@string/pills_count"
                     android:inputType="numberDecimal"
                     android:maxLength="3"
                     android:singleLine="true" />
@@ -155,13 +165,13 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/add_pill"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="bottom"
-        android:layout_margin="@dimen/pill_activity_item_margin"
-        android:textColor="@color/alarm_list_item_text" />
+    <!--   <Button
+           android:id="@+id/add_pill"
+           android:layout_width="match_parent"
+           android:layout_height="75dp"
+           android:layout_alignParentBottom="true"
+           android:layout_alignParentStart="true"
+           android:layout_gravity="bottom"
+           android:layout_margin="@dimen/pill_activity_item_margin"
+           android:textColor="@color/alarm_list_item_text" />-->
 </RelativeLayout>

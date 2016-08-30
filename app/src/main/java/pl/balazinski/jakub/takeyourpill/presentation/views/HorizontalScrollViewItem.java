@@ -92,13 +92,13 @@ public class HorizontalScrollViewItem extends RelativeLayout implements View.OnC
     public void onClick(View v) {
         wasClicked = (!wasClicked);
         setClicked();
-        mOutputProvider.displayLog(TAG, "Clicked");
+        //mOutputProvider.displayLog(TAG, "Clicked");
     }
 
     public void setClick() {
         wasClicked = (!wasClicked);
         setClicked();
-        mOutputProvider.displayLog(TAG, "Clicked");
+        //mOutputProvider.displayLog(TAG, "Clicked");
     }
 
     public boolean isChecked() {

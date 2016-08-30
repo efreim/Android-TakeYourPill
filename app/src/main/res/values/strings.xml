@@ -17,7 +17,7 @@
 <resources>
     <string name="app_name">Take your pill</string>
 
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet enim. Etiam ullamcorper. Suspendisse
+    <string name="lorem_ipsum" translatable="false">Lorem ipsum dolor sit amet enim. Etiam ullamcorper. Suspendisse
     a pellentesque dui, non felis. Maecenas malesuada elit lectus felis, malesuada ultricies.
     Curabitur et ligula. Ut molestie a, ultricies porta urna. Vestibulum commodo volutpat a,
     convallis ac, laoreet enim. Phasellus fermentum in, dolor. Pellentesque facilisis. Nulla
@@ -47,6 +47,17 @@
     <string name="add_pill">Add pill</string>
     <string name="pill_error_set_name">Set name to your pill</string>
     <string name="toast_pill_refilled">Your medicine is refilled</string>
+    <string name="add_pill_manually">Add pill manually</string>
+    <string name="add_pill_manually_nl">Add pill \nmanually</string>
+    <string name="pill_not_taken">Pill not taken</string>
+    <string name="pill_taken">Pill taken</string>
+    <string name="alarms_attached">Alarms attached</string>
+    <string name="click_to_refill">Click to refill pill</string>
+    <string name="find_on_web">Find pill on internet</string>
+    <string name="pill_name">Pill name</string>
+    <string name="pill_desc">Pill description</string>
+    <string name="pill_dosage">Dosage</string>
+    <string name="pills_count">Number of pills</string>
 
     <!--alarms-->
     <string name="alarms">Alarms</string>
@@ -63,7 +74,7 @@
     <string name="error_choose_alarm_time">Choose alarm time</string>
     <string name="error_choose_alarm_date">Choose alarm date</string>
     <string name="toast_set_repeating_days">Set repeating days</string>
-    <string name="toast_dot_error">Number of alarms can\'t be .   :(</string>
+    <string name="toast_dot_error">Number of alarms can\'t be a dot</string>
     <string name="toast_error_number_of_alarms">Error with number of alarms field</string>
     <string name="toast_alarm_will_fire_in">Alarm will fire in: </string>
     <string name="toast_add_new_date_to_interval">Add new date to interval alarm to activate.</string>
@@ -72,7 +83,19 @@
     <string name="take_pill">Take pill</string>
     <string name="toast_alarm_usage_used">Alarm usage used.</string>
     <string name="number_of_alarms">Set number of alarms (Optional)</string>
-
+    <string name="infinite_usage">Infinite usage</string>
+    <string name="alarm_usage_left">Alarm usage left</string>
+    <string name="pills_attached">Pills attached</string>
+    <string name="usage_used_edit">Alarm usage is used. Edit your alarm usage number to activate.</string>
+    <!--fragments-->
+    <string name="alarm_starting_time">Alarm starting time</string>
+    <string name="alarm_starting_date">Alarm starting date</string>
+    <string name="alarm_interval">Alarm interval (in hours)</string>
+    <string name="alarm_number_of">Number of alarms</string>
+    <string name="alarm_select_pills">Select pill for your alarm (optional)</string>
+    <string name="alarm_time">Alarm time</string>
+    <string name="alarm_date">Alarm date</string>
+    <string name="alarm_repeatable_days">Select repeatable days of week</string>
     <!--days of week-->
     <string name="monday">Mon</string>
     <string name="tuesday">Tue</string>
@@ -85,6 +108,24 @@
     <string name="hours">hours</string>
     <string name="minutes">minutes</string>
 
+    <!--menus-->
+    <string name="set_active">Set active/inactive</string>
+    <string name="delete_alarm">Delete alarm</string>
+    <string name="other">Other</string>
+    <string name="about">About</string>
+    <string name="edit_pill">Edit pill</string>
+    <string name="delete_pill">Delete pill</string>
+    <string name="delete_all">Delete all</string>
+
+    <!--preferences-->
+    <string name="edit_text_summary">Set snooze time of your alarms (minutes).</string>
+    <string name="edit_text_title">Snooze time</string>
+    <string name="ringtone_summary">Ringtone for your alarms.</string>
+    <string name="ringtone_title">Choose ringtone</string>
+    <string name="checkbox_summary">Set vibrations for your alarms.</string>
+    <string name="checkbox_title">Vibrations</string>
+    <string name="percentage_summary">Set percentage for your pill left notifications.</string>
+    <string name="percentage_title">Pill count notification</string>
 
     <!--errors-->
     <string name="error_loading_pills">Error loading pills</string>
@@ -125,24 +166,24 @@
     <string name="add_photo">Add photo</string>
     <string name="edit_photo">Edit photo</string>
     <string name="dialog_take_photo">Take photo</string>
-    <string name="dialog_choose_from_library">Choose from library</string>
+    <string name="dialog_choose_from_library">Choose from gallery</string>
     <string name="dialog_select_file">Select file</string>
     <string name="toast_no_rear_camera_available">No rear camera available!</string>
-    <string name="none"/>
+    <string name="none" translatable="false" />
     <string name="pill_details">Pill details</string>
     <string name="pill_optional">Optional</string>
     <string name="toast_no_rear_available_add_later">No rear camera available.\nAdd barcode number manually.</string>
 
     <!--scan-->
+    <string name="scan_barcode">Scan barcode</string>
     <string name="scan_barcode_click">Click to scan barcode</string>
     <string name="barcode_result">Barcode result: </string>
     <string name="toast_pill_not_found">Pill not found, try again or add manually.</string>
+    <string name="add_barcode_manually">Add barcode \nmanually</string>
+    <string name="click_to_insert_barcode">Click here to insert your barcode manually</string>
+    <string name="find_pill_by_barcode">Find pill \nby barcode</string>
 
-    <string name="about_text"><![CDATA[<b>Simulation</b> is about creating worms, in a board of hexes, which can move in randomly chosen direction.
-        Each time worm steps into the hex where bacteria is on worm life will be expanded. Otherwise worm will loose one unit of health.
-        After gaining maximum of health units the worm will expand into two. When health pool is equal to 0 worm dies. Simulation lasts until all worms are dead.
-        <br><b>The board</b> makes a whole. Worm can go from top to bottom and from right to left.<br><br>
-        <b>Board size:</b> choose a board size of simulation, you can set width and height from 3 to 18 hexes long.<br><br>
-        <b>Worm count:</b> set number of worms that will appear randomly on the board. The number of worms can be equal from 1 to half area of the board.<br><br>
-        <b>Bacteria factor:</b> set the possibility of bacteria appearance in each and every hex of the board.]]></string>
+    <!--layouts-->
+    <string name="understand">I understand</string>
+    <string name="about_text"><![CDATA[Application was made as a part of Computer Science Bachelor\'s degree on Jagiellonian University.<br><br><b>Database version:</b> 25.02.2016<br>http://www.mz.gov.pl/leki/refundacja/lista-lekow-refundowanych-obwieszczenia-ministra-zdrowia<br><br><b>Application logo:</b> http://www.iconarchive.com/show/medical-icons-by-klukeart/pills-5-icon.html<br><br><<b>Libraries used:<br>Butter Knife</b> - http://jakewharton.github.io/butterknife/<br><b>Glide</b> - https://github.com/bumptech/glide<br><b>CircleImageView</b> - https://github.com/hdodenhof/CircleImageView<br><b>FloatingActionButton</b> - https://github.com/makovkastar/FloatingActionButton<br><b>ORMLite</b> - http://ormlite.com/<br><b>GSON</b> - https://github.com/google/gson<br><b>ZBar</b> - https://github.com/ZBar/ZBar/tree/master/android<br><b>SQLiteAssetHelper</b> - https://github.com/jgilfelt/android-sqlite-asset-helper<br><b>FloatingActionButton</b> - https://github.com/futuresimple/android-floating-action-button/blob/master/README.md]]></string>
 </resources>

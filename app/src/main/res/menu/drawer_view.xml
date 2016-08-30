@@ -20,27 +20,27 @@
         <item
             android:id="@+id/add_alarm_drawer"
             android:icon="@drawable/ic_add_black_36dp"
-            android:title="Add alarm" />
+            android:title="@string/add_alarm" />
         <item
             android:id="@+id/add_pill_drawer"
             android:icon="@drawable/ic_add_black_36dp"
-            android:title="Add pill" />
+            android:title="@string/add_pill" />
         <item
             android:id="@+id/settings_drawer"
             android:icon="@drawable/ic_settings_black_36dp"
-            android:title="Settings" />
+            android:title="@string/settings" />
         <item
             android:id="@+id/find_pharmacy_drawer"
             android:icon="@drawable/ic_room_black_36dp"
-            android:title="Find pharmacy" />
+            android:title="@string/find_pharmacy" />
     </group>
 
-    <item android:title="Other">
+    <item android:title="@string/other">
         <menu>
             <item
                 android:id="@+id/about_drawer"
                 android:icon="@drawable/ic_help_outline_black_36dp"
-                android:title="About" />
+                android:title="@string/about" />
         </menu>
     </item>
 

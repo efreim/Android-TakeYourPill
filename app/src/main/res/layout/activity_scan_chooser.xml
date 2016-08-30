@@ -30,7 +30,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="76dp"
             android:gravity="center"
-            android:hint="Click here to insert your barcode manually"
+            android:hint="@string/click_to_insert_barcode"
             android:inputType="numberDecimal"
             android:textAlignment="center"
             android:textSize="@dimen/font_size" />
@@ -53,17 +53,16 @@
                 android:layout_gravity="bottom"
                 android:layout_marginEnd="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.5"
-                android:text="Find pill \nby barcode"
+                android:text="@string/find_pill_by_barcode"
                 android:textColor="@color/alarm_list_item_text" />
 
             <Button
                 android:id="@+id/add_pill_manually_chooser"
                 android:layout_width="0dp"
                 android:layout_height="75dp"
-                android:layout_gravity="bottom"
                 android:layout_marginEnd="@dimen/pill_activity_item_margin"
                 android:layout_weight="0.5"
-                android:text="Add pill \nmanually"
+                android:text="@string/add_pill_manually_nl"
                 android:textColor="@color/alarm_list_item_text"
                 />
         </LinearLayout>

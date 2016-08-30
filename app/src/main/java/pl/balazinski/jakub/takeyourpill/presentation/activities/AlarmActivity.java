@@ -142,13 +142,6 @@ public class AlarmActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
         }
 
-
-      /*  if (Constants.VERSION >= Build.VERSION_CODES.M) {
-            addAlarm.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
-
-        } else {
-            addAlarm.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
-        }*/
     }
 
     /**

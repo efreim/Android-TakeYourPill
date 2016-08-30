@@ -25,7 +25,7 @@
         android:layout_gravity="center"
         android:layout_weight="0.1"
         android:gravity="center"
-        android:text="Scanning..."
+        android:text="@string/scanning"
         android:textAlignment="center">
     </TextView>
     <LinearLayout
@@ -42,9 +42,10 @@
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:layout_gravity="bottom"
+        android:gravity="center"
         android:layout_marginEnd="@dimen/pill_activity_item_margin"
         android:layout_weight="0.5"
-        android:text="Add barcode manually"
+        android:text="@string/add_barcode_manually"
         android:textColor="@color/alarm_list_item_text"
         />
 
@@ -53,9 +54,10 @@
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:layout_gravity="bottom"
+        android:gravity="center"
         android:layout_marginEnd="@dimen/pill_activity_item_margin"
         android:layout_weight="0.5"
-        android:text="Add pill \nmanually"
+        android:text="@string/add_pill_manually"
         android:textColor="@color/alarm_list_item_text"
         />
     </LinearLayout>

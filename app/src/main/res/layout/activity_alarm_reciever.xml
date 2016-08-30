@@ -24,7 +24,7 @@
             android:layout_height="75dp"
             android:layout_gravity="bottom"
             android:layout_weight="0.5"
-            android:text="Pill not taken"
+            android:text="@string/pill_not_taken"
             android:layout_margin="8dp"
             android:textColor="@color/alarm_list_item_text" />
 
@@ -34,7 +34,7 @@
             android:layout_height="75dp"
             android:layout_weight="0.5"
             android:layout_gravity="bottom"
-            android:text="Pill taken"
+            android:text="@string/pill_taken"
             android:layout_margin="8dp"
             android:textColor="@color/alarm_list_item_text" />
 

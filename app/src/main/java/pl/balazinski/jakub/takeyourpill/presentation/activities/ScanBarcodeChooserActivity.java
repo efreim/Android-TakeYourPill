@@ -86,6 +86,7 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             isScanManually = extras.getBoolean(Constants.ADD_BARCODE_MANUALLY);
 
         int i = getCameraInformation();
+        //mOutputProvider.displayLog(TAG, "isScanManually = " + isScanManually + "  i = " + i);
         if (i != 0 || isScanManually) {
             mOutputProvider.displayShortToast(getString(R.string.toast_no_rear_available_add_later));
         } else {
@@ -98,7 +99,7 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
         OuterPillDatabase outerPillDatabase = new OuterPillDatabase(getApplicationContext());
         Cursor cursor = outerPillDatabase.getReadableDatabase()
                 .rawQuery("SELECT * FROM " + Constants.OUTER_TABLE_NAME + " where kod = " + code + ";", null);
-        mOutputProvider.displayLog(TAG, "read = " + code);
+        //mOutputProvider.displayLog(TAG, "read = " + code);
         if (cursor.getCount() != 0) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
@@ -158,7 +159,6 @@ public class ScanBarcodeChooserActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra(Constants.SCAN_BARCODE_RESULT);
                 read(result);
-                finish();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //TODO co tu zrobic?

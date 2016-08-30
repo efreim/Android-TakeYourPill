@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.data.MapApiKey;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.utilities.map.Place;
 import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
@@ -47,7 +48,6 @@ import pl.balazinski.jakub.takeyourpill.utilities.map.PlacesService;
  */
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
-    private static final String API_KEY = "AIzaSyD7P7G-ebIiLwuxlFoY2xR5BitJnljRjjk";
     private final String TAG = getClass().getSimpleName();
     @Bind(R.id.mapToolbar)
     public Toolbar toolbar;
@@ -107,7 +107,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     @OnClick(R.id.toolbar_refresh_button)
     public void onRefreshClick(View v) {
         checkEnabled();
-        mOutputProvider.displayLog(TAG, "onclick clicked!");
+        //mOutputProvider.displayLog(TAG, "onclick clicked!");
     }
 
     private void checkEnabled() {
@@ -197,6 +197,45 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         alert.show();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    finish();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case 2: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    finish();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
 
     private void currentLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -207,9 +246,29 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+// Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS}, 1);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
         }
-        mOutputProvider.displayLog(TAG, "Current mLocation inside");
+
+
+        //mOutputProvider.displayLog(TAG, "Current mLocation inside");
 
         // Creating a criteria object to retrieve provider
         Criteria criteria = new Criteria();
@@ -219,7 +278,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         //Location mLocation = mLocationManager.getLastKnownLocation(provider);
         Location location = getMyLocation();
 
-        mOutputProvider.displayLog(TAG, "map getmylocation" + mMap.getMyLocation());
+        //mOutputProvider.displayLog(TAG, "map getmylocation" + mMap.getMyLocation());
 
         if (mMap.getMyLocation() != null) {
             location = mMap.getMyLocation();
@@ -227,7 +286,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             new GetPlaces(MapsActivity.this, mPlaces).execute();
         }
         if (location == null) {
-            mOutputProvider.displayLog(TAG, "mLocation ==null");
+            //mOutputProvider.displayLog(TAG, "mLocation ==null");
             onLocationChanged(location);
             mLocationManager.requestLocationUpdates(provider, 20000, 0, this);
         } else {
@@ -264,7 +323,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        mOutputProvider.displayLog(TAG, "mLocation update : " + location);
+        //mOutputProvider.displayLog(TAG, "mLocation update : " + location);
 
         this.mLocation = location;
 
@@ -272,13 +331,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             return;
 
         if (this.mLocation.getLatitude() == location.getLatitude() && this.mLocation.getLatitude() == location.getLongitude()) {
-            mOutputProvider.displayLog(TAG, "mLocation not changed.");
+            //mOutputProvider.displayLog(TAG, "mLocation not changed.");
             return;
         }
 
         this.mLocation.setLatitude(location.getLatitude());
         this.mLocation.setLongitude(location.getLongitude());
-        mOutputProvider.displayLog(TAG, "Location changed to (" + this.mLocation.getLatitude() + ", " + this.mLocation.getLatitude() + ")");
+        //mOutputProvider.displayLog(TAG, "Location changed to (" + this.mLocation.getLatitude() + ", " + this.mLocation.getLatitude() + ")");
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -337,12 +396,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         @Override
         protected ArrayList<Place> doInBackground(Void... arg0) {
-            PlacesService service = new PlacesService(API_KEY);
+            PlacesService service = new PlacesService(MapApiKey.API_KEY);
             ArrayList<Place> findPlaces = service.findPlaces(mLocation.getLatitude(),
                     mLocation.getLongitude(), places);
             for (int i = 0; i < findPlaces.size(); i++) {
                 Place placeDetail = findPlaces.get(i);
-                mOutputProvider.displayLog(TAG, "mPlaces : " + placeDetail.getName());
+                //mOutputProvider.displayLog(TAG, "mPlaces : " + placeDetail.getName());
             }
             return findPlaces;
         }

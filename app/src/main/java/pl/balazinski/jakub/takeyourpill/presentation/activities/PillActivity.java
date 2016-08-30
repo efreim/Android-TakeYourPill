@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -81,8 +82,10 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     EditText pillBarcodeEditText;
     @Bind(R.id.add_photo)
     Button addPhoto;
-    @Bind(R.id.add_pill)
-    Button addPill;
+    //@Bind(R.id.add_pill)
+    //Button addPill;
+    @Bind(R.id.toolbar_pill_add_button)
+    ImageButton toolbarAddButton;
 
     private OuterPillDatabase mOuterPillDatabase;
     private OutputProvider mOutputProvider;
@@ -148,10 +151,10 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (Constants.VERSION >= Build.VERSION_CODES.M) {
-            addPill.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
+            //addPill.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
             addPhoto.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_background));
         } else {
-            addPill.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
+            //addPill.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
             addPhoto.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.button_background));
         }
     }
@@ -164,10 +167,18 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     private void setupComponents(State state) {
         if (state == State.NEW) {
-            addPill.setText(getString(R.string.save));
+            if (Constants.VERSION >= Build.VERSION_CODES.M)
+                toolbarAddButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add_white_36dp));
+            else
+                toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_add_white_36dp));
+            //addPill.setText(getString(R.string.save));
             addPhoto.setText(getString(R.string.add_photo));
         } else if (state == State.EDIT) {
-            addPill.setText(getString(R.string.update));
+            //addPill.setText(getString(R.string.update));
+            if (Constants.VERSION >= Build.VERSION_CODES.M)
+                toolbarAddButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_done_white_36dp));
+            else
+                toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_done_white_36dp));
             addPhoto.setText(getString(R.string.edit_photo));
 
             pillNameEditText.setText(mPill.getName());
@@ -234,7 +245,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    @OnClick(R.id.add_pill)
+    @OnClick(R.id.toolbar_pill_add_button)
     public void addPill(View view) {
         int mCount = -1;
         int mDosage = -1;

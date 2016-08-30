@@ -90,17 +90,17 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             holder.alarmDateTextView.setText("");
             holder.alarmTimeTextView.setText(buildString(minute, hour));
             if (numberOfUsage == -1)
-                holder.alarmInfoTextView.setText("Infinite usage." + "\n");
+                holder.alarmInfoTextView.setText(mContext.getString(R.string.infinite_usage) + "." + "\n");
             else
-                holder.alarmInfoTextView.setText(Html.fromHtml("Alarm usages left: <font color=#673AB7>" + numberOfUsage + "</font><br>"));
+                holder.alarmInfoTextView.setText(Html.fromHtml(mContext.getString(R.string.alarm_usage_left) + ": <font color=#673AB7>" + numberOfUsage + "</font><br>"));
 
             int i = 0;
             for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
                 if (daysOfWeekArray[i] == '1') {
-                    holder.alarmDateTextView.append(Html.fromHtml("<font color=#673AB7>" + dayOfWeek.getDay() + "</font>"));
+                    holder.alarmDateTextView.append(Html.fromHtml("<font color=#673AB7>" + dayOfWeek.getDay(mContext) + "</font>"));
                     holder.alarmDateTextView.append(" ");
                 } else if (daysOfWeekArray[i] == '0') {
-                    holder.alarmDateTextView.append(dayOfWeek.getDay());
+                    holder.alarmDateTextView.append(dayOfWeek.getDay(mContext));
                     holder.alarmDateTextView.append(" ");
                 }
                 i++;
@@ -108,18 +108,18 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         } else if (holder.alarm.isInterval()) {
             holder.alarmTimeTextView.setText(buildString(minute, hour));
             holder.alarmDateTextView.setText(buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear())+ " ");
-            holder.alarmDateTextView.append(Html.fromHtml("Interval: <font color=#673AB7>" + holder.alarm.getInterval() + "</font> hours."));
+            holder.alarmDateTextView.append(Html.fromHtml(mContext.getString(R.string.interval) + ": <font color=#673AB7>" + holder.alarm.getInterval() + "</font> " + mContext.getString(R.string.hours) + "."));
             if (numberOfUsage == -1)
-                holder.alarmInfoTextView.setText("Infinite usage." + "\n");
+                holder.alarmInfoTextView.setText(mContext.getString(R.string.infinite_usage) + "." + "\n");
             else
-                holder.alarmInfoTextView.setText(Html.fromHtml("Alarm usages left: <font color=#673AB7>" + numberOfUsage + "</font><br>"));
+                holder.alarmInfoTextView.setText(Html.fromHtml(mContext.getString(R.string.alarm_usage_left) + ": <font color=#673AB7>" + numberOfUsage + "</font><br>"));
         } else if (holder.alarm.isSingle()) {
             holder.alarmTimeTextView.setText(buildString(minute, hour));
             holder.alarmDateTextView.setText(buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear()));
             holder.alarmInfoTextView.setText("");
         }
 
-        holder.alarmInfoTextView.append("Pills attached: " + "\n");
+        holder.alarmInfoTextView.append(mContext.getString(R.string.pills_attached) + ": " + "\n");
         List<Long> items = DatabaseRepository.getPillsByAlarm(mContext, holder.alarm.getId());
         if (!items.isEmpty()) {
             for (Long pillId : items) {
@@ -208,18 +208,18 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
     }
 
     private enum DayOfWeek {
-        MON(0, Constants.MONDAY),
-        TUE(1, Constants.TUESDAY),
-        WED(2, Constants.WEDNESDAY),
-        THU(3, Constants.THURSDAY),
-        FRI(4, Constants.FRIDAY),
-        SAT(5, Constants.SATURDAY),
-        SUN(6, Constants.SUNDAY);
+        MON(0, R.string.monday),
+        TUE(1, R.string.tuesday),
+        WED(2, R.string.wednesday),
+        THU(3, R.string.thursday),
+        FRI(4, R.string.friday),
+        SAT(5, R.string.saturday),
+        SUN(6, R.string.sunday);
 
         private int id;
-        private String day;
+        private int day;
 
-        DayOfWeek(int id, String day) {
+        DayOfWeek(int id, int day) {
             this.id = id;
             this.day = day;
         }
@@ -228,8 +228,9 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             return id;
         }
 
-        public String getDay() {
-            return day;
+        public String getDay(Context context) {
+
+            return context.getString(day);
         }
     }
 
@@ -323,7 +324,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
             } else {
                 if (holder.alarm.isRepeatable()) {
                     if (holder.alarm.getUsageNumber() == 0) {
-                        outputProvider.displayShortToast("Alarm usage is used. Edit your alarm usage number to activate.");
+                        outputProvider.displayShortToast(mContext.getString(R.string.usage_used_edit));
                         holder.alarm.setIsActive(false);
                         holder.aSwitch.setChecked(false);
                     }
@@ -333,7 +334,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
                     }
                 } else if (holder.alarm.isInterval()) {
                     if (holder.alarm.getUsageNumber() == 0) {
-                        outputProvider.displayShortToast("Alarm usage is used. Edit your alarm usage number to activate.");
+                        outputProvider.displayShortToast(mContext.getString(R.string.usage_used_edit));
                         holder.alarm.setIsActive(false);
                         holder.aSwitch.setChecked(false);
                     }

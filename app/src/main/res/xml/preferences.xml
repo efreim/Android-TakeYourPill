@@ -4,21 +4,21 @@
         android:defaultValue="10"
         android:inputType="numberDecimal"
         android:key="snooze"
-        android:summary="Set snooze time of your alarms (minutes)"
-        android:title="Snooze time" />
+        android:summary="@string/edit_text_summary"
+        android:title="@string/edit_text_title" />
     <RingtonePreference
         android:defaultValue="content://settings/system/alarm_alert"
         android:key="ringtone"
-        android:summary="Ringtone for your alarms"
-        android:title="Choose alarm" />
+        android:summary="@string/ringtone_summary"
+        android:title="@string/ringtone_title" />
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="vibration"
-        android:summary="Set vibrations for your alarms."
-        android:title="Vibration" />
+        android:summary="@string/checkbox_summary"
+        android:title="@string/checkbox_title" />
     <pl.balazinski.jakub.takeyourpill.presentation.views.PercentagePickerPreference
         android:inputType="numberDecimal"
         android:key="percentage"
-        android:summary="Set percentage for your pill left notifications."
-        android:title="Pill count notification" />
+        android:summary="@string/percentage_summary"
+        android:title="@string/percentage_title" />
 </PreferenceScreen>

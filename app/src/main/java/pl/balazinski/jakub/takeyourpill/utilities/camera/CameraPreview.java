@@ -58,7 +58,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            mOutputProvider.displayDebugLog(TAG, "Error setting camera preview: " + e.getMessage());
+            //mOutputProvider.displayDebugLog(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
             mCamera.autoFocus(mAutoFocusCallback);
         } catch (Exception e) {
-            mOutputProvider.displayDebugLog(TAG, "Error starting camera preview: " + e.getMessage());
+            //mOutputProvider.displayDebugLog(TAG, "Error starting camera preview: " + e.getMessage());
 
         }
     }

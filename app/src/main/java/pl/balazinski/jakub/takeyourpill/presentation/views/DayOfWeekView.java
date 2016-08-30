@@ -10,7 +10,6 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import butterknife.ButterKnife;
 import pl.balazinski.jakub.takeyourpill.R;
 import pl.balazinski.jakub.takeyourpill.data.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -81,13 +80,13 @@ public class DayOfWeekView extends RelativeLayout implements View.OnClickListene
     public void onClick(View v) {
         wasClicked = (!wasClicked);
         setClicked();
-        mOutputProvider.displayLog(TAG, "Clicked");
+        //mOutputProvider.displayLog(TAG, "Clicked");
     }
 
     public void setClick() {
         wasClicked = (!wasClicked);
         setClicked();
-        mOutputProvider.displayLog(TAG, "Clicked");
+        //mOutputProvider.displayLog(TAG, "Clicked");
     }
 
     public boolean isChecked() {

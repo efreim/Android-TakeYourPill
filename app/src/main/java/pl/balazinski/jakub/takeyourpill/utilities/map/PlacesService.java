@@ -1,5 +1,11 @@
 package pl.balazinski.jakub.takeyourpill.utilities.map;
 
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -7,12 +13,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.util.Log;
 
 public class PlacesService {
 
@@ -42,7 +42,7 @@ public class PlacesService {
             for (int i = 0; i < array.length(); i++) {
                 try {
                     Place place = Place
-                            .jsonToPontoReferencia((JSONObject) array.get(i));
+                            .jsonToPointReference((JSONObject) array.get(i));
                     Log.v("Places Services ", "" + place);
                     arrayList.add(place);
                 } catch (Exception e) {
