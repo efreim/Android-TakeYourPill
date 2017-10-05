@@ -37,11 +37,11 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**
@@ -61,14 +61,12 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
     //Setting up components for activity
     @Bind(R.id.toolbarPill)
     Toolbar toolbar;
-
     @Bind(R.id.pill_name)
     public AutoCompleteTextView pillNameEditText;
     @Bind(R.id.pill_desc)
     public EditText pillDescEditText;
     @Bind(R.id.pill_dose)
     public EditText pillDosageEditText;
-
     //Optional components
     @Bind(R.id.optional_layout)
     LinearLayout optionalLayout;
@@ -106,6 +104,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
         setupContent(extras);
         setupView();
         setupComponents(mState);
+
     }
 
     private void setupContent(Bundle extras) {
@@ -236,7 +235,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             mPill.setActiveSubstance(activeSubstance);
             mPill.setPrice(price);
             mPill.setBarcodeNumber(barcode);
-            mPill.setPhoto(uri);
+            mPill.setPhoto(uri.toString());
             onChecked(true);
 
             setupComponents(State.EDIT);
@@ -293,7 +292,7 @@ public class PillActivity extends AppCompatActivity implements AdapterView.OnIte
             mPill.setActiveSubstance(activeSubstance);
             mPill.setPrice(price);
             mPill.setBarcodeNumber(barcode);
-            mPill.setPhoto(getImageUri());
+            mPill.setPhoto(getImageUri().toString());
             DatabaseHelper.getInstance(this).getPillDao().update(mPill);
             Intent i = new Intent(PillActivity.this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 public class DayOfWeekView extends RelativeLayout implements View.OnClickListener {

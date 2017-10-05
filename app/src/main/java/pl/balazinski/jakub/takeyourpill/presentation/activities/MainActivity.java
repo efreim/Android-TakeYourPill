@@ -22,19 +22,27 @@ import android.widget.ImageButton;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.crashlytics.android.Crashlytics;
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
+import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
+
+import io.fabric.sdk.android.Fabric;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.presentation.views.Fab;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.adapters.FragmentViewPagerAdapter;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.AlarmListFragment;
 import pl.balazinski.jakub.takeyourpill.presentation.fragments.PillListFragment;
 
+import static android.R.attr.statusBarColor;
+
 
 /**
  * Main class of the project
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private final String TAG = getClass().getSimpleName();
     //Setting up components
@@ -55,10 +63,13 @@ public class MainActivity extends AppCompatActivity {
     private AlarmListFragment mAlarmFragment;
     private PillListFragment mPillFragment;
     private OutputProvider mOutputProvider;
+    private MaterialSheetFab materialSheetFab;
+    private int statusBarColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
@@ -66,11 +77,64 @@ public class MainActivity extends AppCompatActivity {
 
         createFragments();
         setupContent(extras);
+
         setupView();
 
 
     }
 
+
+    /**
+     * Sets up the Floating action button.
+     */
+    private void setupFab() {
+
+        Fab fab = (Fab) findViewById(R.id.fab);
+        View sheetView = findViewById(R.id.fab_sheet);
+        View overlay = findViewById(R.id.overlay);
+        int sheetColor = getResources().getColor(R.color.background_card);
+        int fabColor = getResources().getColor(R.color.theme_accent);
+
+        // Create material sheet FAB
+        materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay, sheetColor, fabColor);
+
+        // Set material sheet event listener
+        materialSheetFab.setEventListener(new MaterialSheetFabEventListener() {
+            @Override
+            public void onShowSheet() {
+                // Save current status bar color
+                statusBarColor = getStatusBarColor();
+                // Set darker status bar color to match the dim overlay
+                setStatusBarColor(getResources().getColor(R.color.theme_primary_dark2));
+            }
+
+            @Override
+            public void onHideSheet() {
+                // Restore status bar color
+                setStatusBarColor(statusBarColor);
+            }
+        });
+
+        // Set material sheet item click listeners
+        findViewById(R.id.fab_sheet_item_recording).setOnClickListener(this);
+        findViewById(R.id.fab_sheet_item_reminder).setOnClickListener(this);
+        findViewById(R.id.fab_sheet_item_photo).setOnClickListener(this);
+        findViewById(R.id.fab_sheet_item_note).setOnClickListener(this);
+    }
+
+
+    private int getStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return getWindow().getStatusBarColor();
+        }
+        return 0;
+    }
+
+    private void setStatusBarColor(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(color);
+        }
+    }
 
     private void createFragments() {
         Bundle alarmBundle = new Bundle();
@@ -120,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             toolbarAddButton.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.ic_add_white_36dp));
         }
+
+        setupFab();
     }
 
 

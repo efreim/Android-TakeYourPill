@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Objects;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
@@ -108,7 +108,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         } else if (holder.alarm.isInterval()) {
             holder.alarmTimeTextView.setText(buildString(minute, hour));
             holder.alarmDateTextView.setText(buildString(holder.alarm.getDay(), holder.alarm.getMonth(), holder.alarm.getYear())+ " ");
-            holder.alarmDateTextView.append(Html.fromHtml(mContext.getString(R.string.interval) + ": <font color=#673AB7>" + holder.alarm.getInterval() + "</font> " + mContext.getString(R.string.hours) + "."));
+            holder.alarmDateTextView.append(Html.fromHtml(mContext.getString(R.string.interval) + ": <font color=#673AB7>" + holder.alarm.getIntervalTime() + "</font> " + mContext.getString(R.string.hours) + "."));
             if (numberOfUsage == -1)
                 holder.alarmInfoTextView.setText(mContext.getString(R.string.infinite_usage) + "." + "\n");
             else
@@ -318,28 +318,28 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.View
         public void alarmActivator(final ViewHolder holder) {
             if (holder.alarm.isActive()) {
                 holder.aSwitch.setChecked(false);
-                holder.alarm.setIsActive(false);
+                holder.alarm.setActive(false);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(holder.alarm);
                 alarmReceiver.cancelAlarm(context, holder.alarm.getId());
             } else {
                 if (holder.alarm.isRepeatable()) {
                     if (holder.alarm.getUsageNumber() == 0) {
                         outputProvider.displayShortToast(mContext.getString(R.string.usage_used_edit));
-                        holder.alarm.setIsActive(false);
+                        holder.alarm.setActive(false);
                         holder.aSwitch.setChecked(false);
                     }
                     else {
-                        holder.alarm.setIsActive(true);
+                        holder.alarm.setActive(true);
                         alarmReceiver.setRepeatingAlarm(context, holder.alarm.getId());
                     }
                 } else if (holder.alarm.isInterval()) {
                     if (holder.alarm.getUsageNumber() == 0) {
                         outputProvider.displayShortToast(mContext.getString(R.string.usage_used_edit));
-                        holder.alarm.setIsActive(false);
+                        holder.alarm.setActive(false);
                         holder.aSwitch.setChecked(false);
                     }
                     else {
-                        holder.alarm.setIsActive(true);
+                        holder.alarm.setActive(true);
                         alarmReceiver.setIntervalAlarm(context, holder.alarm.getId());
                     }
                 } else if (holder.alarm.isSingle())

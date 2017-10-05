@@ -16,10 +16,9 @@ import java.util.List;
 import java.util.Objects;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmReceiverActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.MainActivity;

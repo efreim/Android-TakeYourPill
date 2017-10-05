@@ -20,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
@@ -71,7 +70,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
         if (alarm != null) {
-            alarm.setIsActive(true);
+            alarm.setActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
 
             int alarmMinute, alarmHour;
@@ -95,11 +94,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 calendar.set(Calendar.MINUTE, alarm.getMinute());
                 if (daysOfWeekArray[i] == '1') {
                     if (i < 6) {
-                        int day = i + 2;
+                        int day = Calendar.MONDAY;
                         calendar.set(Calendar.DAY_OF_WEEK, day);
                         if (day == now.get(Calendar.DAY_OF_WEEK)) {
                             //outputProvider.displayLog(TAG, "i + 2 == day of week");
-                            if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
+                            if (Calendar.THURSDAY == now.get(Calendar.HOUR_OF_DAY)) {
                                 //outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
                                 if (alarmMinute <= now.get(Calendar.MINUTE)) {
                                     //outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
@@ -117,18 +116,18 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                             continue;
                         }
 
-                        if (now.get(Calendar.DAY_OF_WEEK) == 1) {
+                        if (now.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                             //outputProvider.displayLog(TAG, "i + 2 < day of week");
                             daysList.add(nextWeekDay(calendar));
                             continue;
                         }
                         daysList.add(calendar.getTimeInMillis());
                     } else if (i == 6) {
-                        int sunday = 1;
+                        int sunday = Calendar.SUNDAY;
                         calendar.set(Calendar.DAY_OF_WEEK, sunday);
                         if (sunday == now.get(Calendar.DAY_OF_WEEK)) {
                             //outputProvider.displayLog(TAG, "i  == dayOfWeek");
-                            if (alarmHour == now.get(Calendar.HOUR_OF_DAY)) {
+                            if (Calendar.FRIDAY == now.get(Calendar.HOUR_OF_DAY)) {
                                 //outputProvider.displayLog(TAG, "alarm.getHour == now.getHourOfDay");
                                 if (alarmMinute <= now.get(Calendar.MINUTE)) {
                                     //outputProvider.displayLog(TAG, "alarm.getMinute <= now.getMinute");
@@ -180,9 +179,9 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         Calendar now = Calendar.getInstance();
         Alarm alarm = DatabaseRepository.getAlarmById(context, alarmID);
         if (alarm != null) {
-            alarm.setIsActive(true);
+            alarm.setActive(true);
             DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
-            interval = alarm.getInterval();
+            interval = alarm.getIntervalTime();
             day = alarm.getDay();
             month = alarm.getMonth();
             year = alarm.getYear();
@@ -263,10 +262,10 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             calendar.set(Calendar.YEAR, year);
             if ((calendar.getTimeInMillis() - now.getTimeInMillis()) <= 0) {
                 outputProvider.displayShortToast(context.getString(R.string.toast_add_new_date_to_interval));
-                alarm.setIsActive(false);
+                alarm.setActive(false);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
             } else {
-                alarm.setIsActive(true);
+                alarm.setActive(true);
                 DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 Intent intent = new Intent(context, AlarmReceiver.class);
@@ -332,7 +331,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     public void cancelAlarm(Context context, Long id) {
         Alarm alarm = DatabaseRepository.getAlarmById(context, id);
         if (alarm != null) {
-            alarm.setIsActive(false);
+            alarm.setActive(false);
             DatabaseHelper.getInstance(context).getAlarmDao().update(alarm);
         }
         Intent intent = new Intent(context, AlarmReceiver.class);

@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.utilities.AlarmReceiver;
 import pl.balazinski.jakub.takeyourpill.utilities.MyNotificationManager;
@@ -222,7 +222,7 @@ public class AlarmReceiverActivity extends Activity {
                     //usage number is 0 so repeating and interval alarms are canceled and set to false
                     mOutputProvider.displayShortToast(getString(R.string.toast_alarm_usage_used));
                     mAlarmReceiver.cancelAlarm(mContext, mAlarmId);
-                    mAlarm.setIsActive(false);
+                    mAlarm.setActive(false);
                     DatabaseHelper.getInstance(mContext).getAlarmDao().update(mAlarm);
                 }
 

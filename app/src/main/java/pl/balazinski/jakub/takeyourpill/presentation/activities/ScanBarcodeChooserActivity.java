@@ -21,10 +21,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
 import pl.balazinski.jakub.takeyourpill.data.database.OuterPillDatabase;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 
 /**

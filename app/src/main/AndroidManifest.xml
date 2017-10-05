@@ -2,11 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pl.balazinski.jakub.takeyourpill">
 
-
     <permission
         android:name="pl.balazinski.jakub.takeyourpill.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
-
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
@@ -149,6 +147,9 @@
         <receiver android:name=".utilities.AlarmReceiver" />
 
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="6f5308f37d4fc5e6343f69e5bbcc3d3978b12762" />
     </application>
 
 </manifest>

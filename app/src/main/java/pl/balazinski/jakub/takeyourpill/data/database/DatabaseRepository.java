@@ -11,6 +11,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.PillToAlarm;
+
 
 public class DatabaseRepository {
 

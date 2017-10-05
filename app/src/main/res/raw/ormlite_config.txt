@@ -1,102 +1,102 @@
 # --table-start--
-dataClass=pl.balazinski.jakub.takeyourpill.data.database.Alarm
+dataClass=pl.balazinski.jakub.takeyourpill.data.model.Alarm
 tableName=alarm
 # --table-fields-start--
 # --field-start--
-fieldName=mId
+fieldName=id
 columnName=id
 generatedId=true
 # --field-end--
 # --field-start--
-fieldName=mHour
+fieldName=hour
 columnName=hour
 # --field-end--
 # --field-start--
-fieldName=mMinute
+fieldName=minute
 columnName=minute
 # --field-end--
 # --field-start--
-fieldName=mInterval
+fieldName=intervalTime
 # --field-end--
 # --field-start--
-fieldName=mUsageNumber
+fieldName=usageNumber
 # --field-end--
 # --field-start--
-fieldName=mDay
+fieldName=day
 columnName=day
 # --field-end--
 # --field-start--
-fieldName=mMonth
+fieldName=month
 columnName=month
 # --field-end--
 # --field-start--
-fieldName=mYear
+fieldName=year
 columnName=year
 # --field-end--
 # --field-start--
-fieldName=mIsActive
+fieldName=active
 columnName=active
 # --field-end--
 # --field-start--
-fieldName=mIsRepeatable
+fieldName=repeatable
 columnName=repeatable
 # --field-end--
 # --field-start--
-fieldName=mIsInterval
+fieldName=interval
 columnName=interval
 # --field-end--
 # --field-start--
-fieldName=mIsSingle
+fieldName=single
 columnName=single
 # --field-end--
 # --field-start--
-fieldName=mDaysRepeating
+fieldName=daysRepeating
 # --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=pl.balazinski.jakub.takeyourpill.data.database.Pill
+dataClass=pl.balazinski.jakub.takeyourpill.data.model.Pill
 tableName=pill
 # --table-fields-start--
 # --field-start--
-fieldName=mId
+fieldName=id
 columnName=id
 generatedId=true
 # --field-end--
 # --field-start--
-fieldName=mName
+fieldName=name
 columnName=name
 # --field-end--
 # --field-start--
-fieldName=mDescription
+fieldName=description
 # --field-end--
 # --field-start--
-fieldName=mPillsCount
+fieldName=pillsCount
 # --field-end--
 # --field-start--
-fieldName=mDosage
+fieldName=dosage
 # --field-end--
 # --field-start--
-fieldName=mPhoto
+fieldName=photo
 # --field-end--
 # --field-start--
-fieldName=mActiveSubstance
+fieldName=activeSubstance
 # --field-end--
 # --field-start--
-fieldName=mBarcodeNumber
+fieldName=barcodeNumber
 # --field-end--
 # --field-start--
-fieldName=mPrice
+fieldName=price
 # --field-end--
 # --field-start--
-fieldName=mPillsRemaining
+fieldName=pillsRemaining
 # --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
 # --table-start--
-dataClass=pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm
+dataClass=pl.balazinski.jakub.takeyourpill.data.model.PillToAlarm
 tableName=pilltoalarm
 # --table-fields-start--
 # --field-start--

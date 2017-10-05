@@ -26,12 +26,12 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import pl.balazinski.jakub.takeyourpill.R;
-import pl.balazinski.jakub.takeyourpill.data.Constants;
-import pl.balazinski.jakub.takeyourpill.data.database.Alarm;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseHelper;
 import pl.balazinski.jakub.takeyourpill.data.database.DatabaseRepository;
-import pl.balazinski.jakub.takeyourpill.data.database.Pill;
-import pl.balazinski.jakub.takeyourpill.data.database.PillToAlarm;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.PillToAlarm;
 import pl.balazinski.jakub.takeyourpill.presentation.OutputProvider;
 import pl.balazinski.jakub.takeyourpill.presentation.activities.AlarmActivity;
 import pl.balazinski.jakub.takeyourpill.presentation.views.HorizontalScrollViewItem;
@@ -130,7 +130,7 @@ public class IntervalAlarmFragment extends Fragment {
             mDay = mAlarm.getDay();
             mMonth = mAlarm.getMonth();
             mYear = mAlarm.getYear();
-            int interval = mAlarm.getInterval();
+            int interval = mAlarm.getIntervalTime();
             int numberOfAlarms = mAlarm.getUsageNumber();
             changeTimeButton.setText(buildString(mMinute, mHour));
             changeDayButton.setText(buildString(mDay, mMonth, mYear));
@@ -254,14 +254,14 @@ public class IntervalAlarmFragment extends Fragment {
             alarmReceiver.setIntervalAlarm(mContext, mAlarm.getId());
 
         } else {
-            mAlarm.setInterval(interval);
+            mAlarm.setIntervalTime(interval);
             mAlarm.setUsageNumber(numberOfUsage);
             mAlarm.setDay(mDay);
             mAlarm.setMonth(mMonth);
             mAlarm.setYear(mYear);
             mAlarm.setMinute(mMinute);
             mAlarm.setHour(mHour);
-            mAlarm.setIsActive(true);
+            mAlarm.setActive(true);
             DatabaseHelper.getInstance(mContext).getAlarmDao().update(mAlarm);
             DatabaseRepository.deleteAlarmToPill(mContext, mAlarm.getId());
             alarmReceiver.setIntervalAlarm(mContext, mAlarm.getId());

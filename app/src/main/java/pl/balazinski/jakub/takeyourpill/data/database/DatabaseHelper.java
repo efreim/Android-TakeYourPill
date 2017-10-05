@@ -12,7 +12,10 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-import pl.balazinski.jakub.takeyourpill.data.Constants;
+import pl.balazinski.jakub.takeyourpill.utilities.Constants;
+import pl.balazinski.jakub.takeyourpill.data.model.Alarm;
+import pl.balazinski.jakub.takeyourpill.data.model.Pill;
+import pl.balazinski.jakub.takeyourpill.data.model.PillToAlarm;
 
 /**
  * Class that stores pill objects in database
