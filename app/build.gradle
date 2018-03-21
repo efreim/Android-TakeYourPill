@@ -38,7 +38,7 @@ android {
         applicationId "pl.balazinski.jakub.takeyourpill"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 1
+        versionCode 10
         versionName "1.0"
         multiDexEnabled true
     }
@@ -83,7 +83,7 @@ dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
     compile 'com.gordonwong:material-sheet-fab:1.2.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
-        transitive = true;
+        transitive = true
     }
     compile 'org.projectlombok:lombok:1.16.16'
 }
